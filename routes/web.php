@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LevelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +13,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/level', [LevelController::class, 'index']);
+Route::get('/level/create', [LevelController::class, 'create']);
+Route::post('/level', [LevelController::class, 'store'])->name('level.store');
+Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
+Route::put('/level/update/{id}', [LevelController::class, 'update']);
+Route::delete('/level/delete/{id}', [LevelController::class, 'destroy']);
 
 Route::get('/', function () {
 	return view('welcome');
