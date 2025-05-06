@@ -67,7 +67,7 @@
                     </ul>
                 </div>
             </li>
-            <li class="{{ $elementActive == 'map' ? 'active' : '' }}">
+            <li class="{{ $elementActive == 'laporan' ? 'active' : '' }}">
                 <a data-toggle="collapse" aria-expanded="true" href="#laporan">
                     <i class="nc-icon nc-single-copy-04"></i>
                     <p>
