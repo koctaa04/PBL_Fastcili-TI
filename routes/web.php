@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\RuanganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,13 @@ Route::post('/level', [LevelController::class, 'store'])->name('level.store');
 Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
 Route::put('/level/update/{id}', [LevelController::class, 'update']);
 Route::delete('/level/delete/{id}', [LevelController::class, 'destroy']);
+
+Route::get('/ruangan', [RuanganController::class, 'index']);
+Route::get('/ruangan/create', [RuanganController::class, 'create']);
+Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
+Route::get('/ruangan/edit/{id}', [RuanganController::class, 'edit']);
+Route::put('/ruangan/update/{id}', [RuanganController::class, 'update']);
+Route::delete('/ruangan/delete/{id}', [RuanganController::class, 'destroy']);
 
 Route::get('/', function () {
 	return view('welcome');
