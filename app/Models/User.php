@@ -17,11 +17,29 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+    
+    protected $table = 'users';
+    protected $primaryKey = 'id_user';
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'id_level', 'nama_user', 'username', 'password', 'no_hp', 'alamat'
     ];
+
+    public function level()
+    {
+        return $this->belongsTo(Level::class, 'id_level');
+    }
+
+    public function laporan()
+    {
+        return $this->hasMany(LaporanKerusakan::class, 'id_user');
+    }
+
+    public function penugasan()
+    {
+        return $this->hasMany(PenugasanTeknisi::class, 'id_user');
+    }
 
     /**
      * The attributes that should be hidden for serialization.

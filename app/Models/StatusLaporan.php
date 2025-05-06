@@ -9,4 +9,12 @@ class StatusLaporan extends Model
 {
     use HasFactory;
     protected $table = 'status_laporan';
+    protected $primaryKey = 'id_status';
+
+    protected $fillable = ['nama_status'];
+
+    public function laporan()
+    {
+        return $this->hasMany(LaporanKerusakan::class, 'id_status');
+    }
 }

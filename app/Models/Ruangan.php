@@ -8,5 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Ruangan extends Model
 {
     use HasFactory;
+
     protected $table = 'ruangan';
+    protected $primaryKey = 'id_ruangan';
+
+    protected $fillable = ['id_gedung', 'nama_ruangan'];
+
+    public function gedung()
+    {
+        return $this->belongsTo(Gedung::class, 'id_gedung');
+    }
+
+    public function fasilitas()
+    {
+        return $this->hasMany(Fasilitas::class, 'id_ruangan');
+    }
 }
