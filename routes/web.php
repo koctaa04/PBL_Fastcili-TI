@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\RuanganController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,13 @@ Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.stor
 Route::get('/ruangan/edit/{id}', [RuanganController::class, 'edit']);
 Route::put('/ruangan/update/{id}', [RuanganController::class, 'update']);
 Route::delete('/ruangan/delete/{id}', [RuanganController::class, 'destroy']);
+
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/create', [UserController::class, 'create']);
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::get('/users/edit/{id}', [UserController::class, 'edit']);
+Route::put('/users/update/{id}', [UserController::class, 'update']);
+Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
 
 Route::get('/', function () {
 	return view('welcome');
