@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\RuanganController;
+use App\Http\Controllers\MabacController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,8 @@ use App\Http\Controllers\RuanganController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/mabac', [MabacController::class, 'index']);
 
 Route::get('/level', [LevelController::class, 'index']);
 Route::get('/level/create', [LevelController::class, 'create']);
