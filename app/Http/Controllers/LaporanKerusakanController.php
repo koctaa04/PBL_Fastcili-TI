@@ -28,7 +28,7 @@ class LaporanKerusakanController extends Controller
         $rules = [
             'id_fasilitas' => 'required|exists:fasilitas,id_fasilitas',
             'deskripsi' => 'required|string',
-            'foto_kerusakan' => 'nullable|image|max:2048'
+            'foto_kerusakan' => 'required|image|max:2048'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -46,15 +46,15 @@ class LaporanKerusakanController extends Controller
         if ($request->hasFile('foto_kerusakan')) {
             $file = $request->file('foto_kerusakan');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename);
+            $file->move(public_path('storage/uploads/laporan_kerusakan'), $filename);
         }
 
         // Simpan data ke database
         LaporanKerusakan::create([
-            'id_user' => $request->id_user,
+            'id_user' => $request->id_user ?? 1,
             'id_fasilitas' => $request->id_fasilitas,
             'deskripsi' => $request->deskripsi,
-            'foto_kerusakan' => $filename ?? 'default.jpg',
+            'foto_kerusakan' => $filename,
             'tanggal_lapor' => now(),
             'id_status' => 1 // Status default: "Menunggu"
         ]);

@@ -31,7 +31,7 @@
                                 <tr>
                                     <th scope="row">{{ $lapor + 1 }}</th>
                                     <td>
-                                        <img src="{{ asset('storage/foto_kerusakan/' . $l->foto_kerusakan) }}"
+                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $l->foto_kerusakan) }}"
                                              alt="Foto Kerusakan"
                                              width="200"
                                              onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">

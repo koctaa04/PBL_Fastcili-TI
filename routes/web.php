@@ -23,7 +23,6 @@ Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
 Route::put('/level/update/{id}', [LevelController::class, 'update']);
 Route::delete('/level/delete/{id}', [LevelController::class, 'destroy']);
 
-
 Route::get('/lapor_kerusakan', [LaporanKerusakanController::class, 'index']);
 Route::get('/lapor_kerusakan/create', [LaporanKerusakanController::class, 'create']);
 Route::post('/lapor_kerusakan', [LaporanKerusakanController::class, 'store'])->name('laporan.store');

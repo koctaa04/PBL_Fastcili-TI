@@ -1,18 +1,17 @@
 <div id="modal-master" class="modal-dialog" role="document">
     <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Tambah Laporan Kerusakan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
         <form method="POST" action="{{ route('laporan.store') }}" enctype="multipart/form-data" id="form_create">
             @csrf
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Laporan Kerusakan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
             <div class="modal-body">
                 <div class="form-group">
                     <label for="fasilitas">Fasilitas</label>
-                    <select name="id_fasilitas" class="form-control" id="fasilitas">
+                    <select name="id_fasilitas" class="form-control" id="fasilitas" required>
                         <option value="">Pilih Fasilitas</option>
                         @foreach ($fasilitas as $f)
                             <option value="{{ $f->id_fasilitas }}">{{ $f->nama_fasilitas }}</option>
@@ -22,7 +21,7 @@
                 </div>
                 <div class="form-group">
                     <label>Deskripsi Kerusakan</label>
-                    <textarea name="deskripsi" class="form-control" required></textarea>
+                    <textarea name="deskripsi" class="form-control" required></textarea required>
                     <small class="text-danger error-text" id="error-deskripsi"></small>
                 </div>
                 <div class="form-group">
@@ -43,11 +42,15 @@
         e.preventDefault();
 
         $('.error-text').text('');
+        const formData = new FormData(this); // Ganti serialize()
 
         $.ajax({
             type: "POST",
             url: $(this).attr('action'),
-            data: $(this).serialize(),
+            // data: $(this).serialize(),
+            data: formData,
+            contentType: false,
+            processData: false,
             dataType: "json",
             beforeSend: function() {
                 $('#form_create button[type=submit]').prop('disabled', true).text('Menyimpan...');
