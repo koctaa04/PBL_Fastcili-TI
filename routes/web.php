@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LaporanKerusakanController;
+use App\Http\Controllers\RuanganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,13 @@ Route::post('/lapor_kerusakan', [LaporanKerusakanController::class, 'store'])->n
 Route::get('/lapor_kerusakan/edit/{id}', [LaporanKerusakanController::class, 'edit']);
 Route::put('/lapor_kerusakan/update/{id}', [LaporanKerusakanController::class, 'update']);
 Route::delete('/lapor_kerusakan/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
+
+Route::get('/ruangan', [RuanganController::class, 'index']);
+Route::get('/ruangan/create', [RuanganController::class, 'create']);
+Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
+Route::get('/ruangan/edit/{id}', [RuanganController::class, 'edit']);
+Route::put('/ruangan/update/{id}', [RuanganController::class, 'update']);
+Route::delete('/ruangan/delete/{id}', [RuanganController::class, 'destroy']);
 
 Route::get('/', function () {
 	return view('welcome');
