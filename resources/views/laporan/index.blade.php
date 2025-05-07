@@ -5,10 +5,11 @@
 
 @section('content')
     <div class="content">
-        <h3>Data Level</h3>
+        <h3>Daftar Laporan Kerusakan</h3>
         <div class="card p-4">
             <div class="card-header">
-                <button onclick="modalAction('{{ url('/lapor_kerusakan/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
+                <button onclick="modalAction('{{ url('/lapor_kerusakan/create') }}')"
+                    class="btn btn-sm btn-primary mt-1">Tambah
                     Data</button>
             </div>
             <div class="card-body">
@@ -32,11 +33,10 @@
                                     <th scope="row">{{ $lapor + 1 }}</th>
                                     <td>
                                         <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $l->foto_kerusakan) }}"
-                                             alt="Foto Kerusakan"
-                                             width="200"
-                                             onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                            alt="Foto Kerusakan" width="200"
+                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
                                     </td>
-                                    
+
                                     <td>{{ $l->fasilitas->nama_fasilitas }}</td>
                                     <td>{{ $l->deskripsi }}</td>
                                     <td>{{ $l->tanggal_lapor }}</td>
@@ -44,14 +44,14 @@
                                     <td>{{ $l->keterangan ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <button onclick="modalAction('{{ url('/laporan_kerusakan/edit/' . $l->id_laporan . '') }}')"
-                                                class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
-                                            <form class="form-delete"
-                                                action="{{ url('/laporan_kerusakan/delete/' . $l->id_laporan . '') }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
+                                            @if (!empty($l->keterangan) && $l->status->nama_status !== 'Selesai')
+                                                <button
+                                                    onclick="modalAction('{{ url('/lapor_kerusakan/edit/' . $l->id_laporan) }}')"
+                                                    class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
+                                            @else
+                                                <button class="btn btn-sm btn-warning" style="margin-right: 8px"
+                                                    disabled>Edit</button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
