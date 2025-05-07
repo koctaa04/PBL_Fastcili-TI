@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Gedung;
+use App\Models\Ruangan;
 use App\Models\Fasilitas;
 use Illuminate\Http\Request;
 use App\Models\StatusLaporan;
@@ -25,11 +27,26 @@ class LaporanKerusakanController extends Controller
     }
 
 
+    public function getRuangan($id)
+    {
+        $ruangan = Ruangan::where('id_gedung', $id)->get();
+        return response()->json($ruangan);
+    }
+
+    public function getFasilitas($id)
+    {
+        $fasilitas = Fasilitas::where('id_ruangan', $id)->get();
+        return response()->json($fasilitas);
+    }
+
+
+
     public function create()
     {
         $fasilitas = Fasilitas::all();
         $statusList = StatusLaporan::all();
-        return view('laporan.create', compact('fasilitas', 'statusList'));
+        $gedungList = Gedung::all(); // ambil semua data gedung
+        return view('laporan.create', compact('fasilitas', 'statusList', 'gedungList'));
     }
     public function store(Request $request)
     {
@@ -110,15 +127,15 @@ class LaporanKerusakanController extends Controller
             if ($laporan->foto_kerusakan && Storage::exists('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan)) {
                 Storage::delete('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan);
             }
-        
+
             // Simpan file baru
             $file = $request->file('foto_kerusakan');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->storeAs('public/uploads/laporan_kerusakan', $filename);
-        
+
             $laporan->foto_kerusakan = $filename;
         }
-        
+
 
         $laporan->save();
 

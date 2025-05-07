@@ -30,6 +30,12 @@ Route::get('/lapor_kerusakan/edit/{id}', [LaporanKerusakanController::class, 'ed
 Route::put('/lapor_kerusakan/update/{id}', [LaporanKerusakanController::class, 'update']);
 Route::delete('/lapor_kerusakan/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
 
+// Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
+// Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
+Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
+Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
+
+
 Route::get('/ruangan', [RuanganController::class, 'index']);
 Route::get('/ruangan/create', [RuanganController::class, 'create']);
 Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');

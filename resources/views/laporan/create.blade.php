@@ -9,24 +9,40 @@
         <form method="POST" action="{{ route('laporan.store') }}" enctype="multipart/form-data" id="form_create">
             @csrf
             <div class="modal-body">
+                <!-- Dropdown Gedung -->
                 <div class="form-group">
-                    <label for="fasilitas">Fasilitas</label>
-                    <select name="id_fasilitas" class="form-control" id="fasilitas" required>
-                        <option value="">Pilih Fasilitas</option>
-                        @foreach ($fasilitas as $f)
-                            <option value="{{ $f->id_fasilitas }}">{{ $f->nama_fasilitas }}</option>
+                    <label for="gedung">Gedung</label>
+                    <select name="id_gedung" id="gedung" class="form-control" required>
+                        <option value="">Pilih Gedung</option>
+                        @foreach ($gedungList as $g)
+                            <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
                         @endforeach
                     </select>
-                    <small class="text-danger error-text" id="error-id_fasilitas"></small>
                 </div>
+
+                <!-- Dropdown Ruangan (isi via AJAX) -->
+                <div class="form-group">
+                    <label for="ruangan">Ruangan</label>
+                    <select name="id_ruangan" id="ruangan" class="form-control" disabled required>
+                        <option value="">Pilih Ruangan</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown Fasilitas (isi via AJAX) -->
+                <div class="form-group">
+                    <label for="fasilitas">Fasilitas</label>
+                    <select name="id_fasilitas" id="fasilitas" class="form-control" disabled required>
+                        <option value="">Pilih Fasilitas</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Deskripsi Kerusakan</label>
-                    <textarea name="deskripsi" class="form-control" required></textarea required>
-                    <small class="text-danger error-text" id="error-deskripsi"></small>
+                    <textarea name="deskripsi" class="form-control" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="foto_kerusakan">Foto Kerusakan</label>
-                    <input type="file" name="foto_kerusakan" id="foto_kerusakan" class="form-control-file">
+                    <input type="file" name="foto_kerusakan" class="form-control-file" id="foto_kerusakan">
                 </div>
             </div>
             <div class="modal-footer">
@@ -34,6 +50,7 @@
                 <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </form>
+
     </div>
 </div>
 
@@ -42,7 +59,7 @@
         e.preventDefault();
 
         $('.error-text').text('');
-        const formData = new FormData(this); 
+        const formData = new FormData(this);
 
         $.ajax({
             type: "POST",
@@ -82,6 +99,60 @@
                         text: response.messages,
                     });
                 }
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        // Ketika gedung dipilih
+        $('#gedung').change(function() {
+            let gedungId = $(this).val();
+            $('#ruangan').html('<option value="">Loading...</option>').prop('disabled', true);
+            $('#fasilitas').html('<option value="">Pilih Fasilitas</option>').prop('disabled', true); // reset fasilitas
+
+            if (gedungId) {
+                $.ajax({
+                    url: '/get-ruangan/' + gedungId,
+                    type: 'GET',
+                    success: function(data) {
+                        let options = '<option value="">Pilih Ruangan</option>';
+                        $.each(data, function(i, ruangan) {
+                            options += '<option value="' + ruangan.id_ruangan +
+                                '">' + ruangan.nama_ruangan + '</option>';
+                        });
+                        $('#ruangan').html(options).prop('disabled', false);
+                    },
+                    error: function() {
+                        $('#ruangan').html('<option value="">Gagal memuat ruangan</option>')
+                            .prop('disabled', true);
+                    }
+                });
+            }
+        });
+
+        // Ketika ruangan dipilih
+        $('#ruangan').change(function() {
+            let ruanganId = $(this).val();
+            $('#fasilitas').html('<option value="">Loading...</option>').prop('disabled', true);
+
+            if (ruanganId) {
+                $.ajax({
+                    url: '/get-fasilitas/' + ruanganId,
+                    type: 'GET',
+                    success: function(data) {
+                        let options = '<option value="">Pilih Fasilitas</option>';
+                        $.each(data, function(i, fasilitas) {
+                            options += '<option value="' + fasilitas.id_fasilitas +
+                                '">' + fasilitas.nama_fasilitas + '</option>';
+                        });
+                        $('#fasilitas').html(options).prop('disabled', false);
+                    },
+                    error: function() {
+                        $('#fasilitas').html(
+                            '<option value="">Gagal memuat fasilitas</option>').prop(
+                            'disabled', true);
+                    }
+                });
             }
         });
     });
