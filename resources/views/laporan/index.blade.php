@@ -1,48 +1,57 @@
 @extends('layouts.app', [
     'class' => '',
-    'elementActive' => 'profile',
+    'elementActive' => 'laporan',
 ])
 
 @section('content')
     <div class="content">
-        <h3>Data User</h3>
+        <h3>Daftar Laporan Kerusakan</h3>
         <div class="card p-4">
             <div class="card-header">
-                <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
+                <button onclick="modalAction('{{ url('/lapor_kerusakan/create') }}')"
+                    class="btn btn-sm btn-primary mt-1">Tambah
                     Data</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_ruangan">
+                    <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Nama Level</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">No Induk</th>
-                                <th scope="col">Email</th>
+                                <th scope="col">Foto Kerusakan</th>
+                                <th scope="col">Nama Fasilitas</th>
+                                <th scope="col">Deskripsi</th>
+                                <th scope="col">Tanggal lapor</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Keterangan</th>
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $index => $u)
+                            @foreach ($laporan_kerusakan as $lapor => $l)
                                 <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
-                                    <td>{{ $u->level->nama_level }}</td>
-                                    <td>{{ $u->nama }}</td>
-                                    <td>{{ $u->no_induk }}</td>
-                                    <td>{{ $u->email }}</td>
+                                    <th scope="row">{{ $lapor + 1 }}</th>
+                                    <td>
+                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $l->foto_kerusakan) }}"
+                                            alt="Foto Kerusakan" width="200"
+                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                    </td>
+
+                                    <td>{{ $l->fasilitas->nama_fasilitas }}</td>
+                                    <td>{{ $l->deskripsi }}</td>
+                                    <td>{{ $l->tanggal_lapor }}</td>
+                                    <td>{{ $l->status->nama_status }}</td>
+                                    <td>{{ $l->keterangan ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <button
-                                                onclick="modalAction('{{ url('/users/edit/' . $u->id_user . '') }}')"
-                                                class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
-                                            <form class="form-delete"
-                                                action="{{ url('/users/delete/' . $u->id_user . '') }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
+                                            @if (!empty($l->keterangan) && $l->status->nama_status !== 'Selesai')
+                                                <button
+                                                    onclick="modalAction('{{ url('/lapor_kerusakan/edit/' . $l->id_laporan) }}')"
+                                                    class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
+                                            @else
+                                                <button class="btn btn-sm btn-warning" style="margin-right: 8px"
+                                                    disabled>Edit</button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -64,7 +73,7 @@
                 $('#myModal').modal('show');
             });
         }
-        var dataruangan;
+        var dataLaporan;
 
         $(document).on('submit', '.form-delete', function(e) {
             e.preventDefault(); // Cegah submit form langsung

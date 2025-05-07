@@ -43,14 +43,14 @@
                 </div>
             </li>
             <li class="{{ $elementActive == 'icons' ? 'active' : '' }}">
-                <a data-toggle="collapse" aria-expanded="true" href="#fasilitas">
+                <a data-toggle="collapse" aria-expanded="true" href="#fas">
                     <i class="nc-icon nc-bank"></i>
                     <p>
                             {{ __('Gedung & Fasilitas') }}
                         <b class="caret"></b>
                     </p>
                 </a>
-                <div class="collapse show" id="fasilitas">
+                <div class="collapse show" id="fas">
                     <ul class="nav">
                         <li class="{{ $elementActive == 'profile' ? 'active' : '' }}">
                             <a href="#">
@@ -67,7 +67,7 @@
                     </ul>
                 </div>
             </li>
-            <li class="{{ $elementActive == 'map' ? 'active' : '' }}">
+            <li class="{{ $elementActive == 'laporan' ? 'active' : '' }}">
                 <a data-toggle="collapse" aria-expanded="true" href="#laporan">
                     <i class="nc-icon nc-single-copy-04"></i>
                     <p>

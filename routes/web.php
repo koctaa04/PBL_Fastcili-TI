@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\MabacController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,12 +27,32 @@ Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
 Route::put('/level/update/{id}', [LevelController::class, 'update']);
 Route::delete('/level/delete/{id}', [LevelController::class, 'destroy']);
 
+Route::get('/lapor_kerusakan', [LaporanKerusakanController::class, 'index']);
+Route::get('/lapor_kerusakan/create', [LaporanKerusakanController::class, 'create']);
+Route::post('/lapor_kerusakan', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
+Route::get('/lapor_kerusakan/edit/{id}', [LaporanKerusakanController::class, 'edit']);
+Route::put('/lapor_kerusakan/update/{id}', [LaporanKerusakanController::class, 'update']);
+Route::delete('/lapor_kerusakan/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
+
+// Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
+// Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
+Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
+Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
+
+
 Route::get('/ruangan', [RuanganController::class, 'index']);
 Route::get('/ruangan/create', [RuanganController::class, 'create']);
 Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
 Route::get('/ruangan/edit/{id}', [RuanganController::class, 'edit']);
 Route::put('/ruangan/update/{id}', [RuanganController::class, 'update']);
 Route::delete('/ruangan/delete/{id}', [RuanganController::class, 'destroy']);
+
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/create', [UserController::class, 'create']);
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::get('/users/edit/{id}', [UserController::class, 'edit']);
+Route::put('/users/update/{id}', [UserController::class, 'update']);
+Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
 
 Route::get('/', function () {
 	return view('welcome');

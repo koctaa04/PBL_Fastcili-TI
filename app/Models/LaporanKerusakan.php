@@ -12,7 +12,7 @@ class LaporanKerusakan extends Model
     protected $primaryKey = 'id_laporan';
 
     protected $fillable = [
-        'id_user', 'id_fasilitas', 'id_status', 'deskripsi', 'foto', 'tanggal_laporan'
+        'id_user', 'id_fasilitas', 'id_status', 'deskripsi', 'foto_kerusakan', 'tanggal_lapor'
     ];
 
     public function user()
