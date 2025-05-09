@@ -64,6 +64,11 @@ html {
     box-shadow: none;
 }
 
+.card-header p {
+    color: gray;
+    font-size: small;
+}
+
 /* Content Container */
 .content-container {
     position: relative;
