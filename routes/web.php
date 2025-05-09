@@ -7,6 +7,8 @@ use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\MabacController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GedungController;
+use App\Http\Controllers\VerifikasiLaporanController;
+use App\Http\Controllers\FasilitasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +22,12 @@ use App\Http\Controllers\GedungController;
 */
 
 Route::get('/mabac', [MabacController::class, 'index']);
+
+Route::get('/verifikasi', [VerifikasiLaporanController::class, 'index']);
+Route::get('/verifikasi/true/{id}', [VerifikasiLaporanController::class, 'verif']);
+Route::post('/verifikasi/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
+Route::get('/verifikasi/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
+Route::put('/verifikasi/tolak/{id}', [VerifikasiLaporanController::class, 'tolak'])->name('laporan.tolak');
 
 Route::get('/level', [LevelController::class, 'index']);
 Route::get('/level/create', [LevelController::class, 'create']);
@@ -55,6 +63,13 @@ Route::post('/users', [UserController::class, 'store'])->name('users.store');
 Route::get('/users/edit/{id}', [UserController::class, 'edit']);
 Route::put('/users/update/{id}', [UserController::class, 'update']);
 Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
+
+Route::get('/fasilitas', [FasilitasController::class, 'index']);
+Route::get('/fasilitas/create', [FasilitasController::class, 'create']);
+Route::post('/fasilitas', [FasilitasController::class, 'store'])->name('fasilitas.store');
+Route::get('/fasilitas/edit/{id}', [FasilitasController::class, 'edit']);
+Route::put('/fasilitas/update/{id}', [FasilitasController::class, 'update']);
+Route::delete('/fasilitas/delete/{id}', [FasilitasController::class, 'destroy']);
 
 Route::get('/', function () {
 	return view('welcome');
