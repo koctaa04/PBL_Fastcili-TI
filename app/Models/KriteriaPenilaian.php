@@ -12,7 +12,14 @@ class KriteriaPenilaian extends Model
     protected $table = 'kriteria_penilaian';
     protected $primaryKey = 'id_kriteria';
 
-    protected $fillable = ['id_laporan', 'kriteria', 'nilai'];
+    protected $fillable = [
+        'id_laporan',
+        'tingkat_kerusakan',
+        'frekuensi_digunakan',
+        'dampak',
+        'estimasi_biaya',
+        'potensi_bahaya'
+    ];
 
     public function laporan()
     {
