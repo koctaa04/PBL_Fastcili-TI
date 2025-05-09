@@ -2,11 +2,11 @@
     <div class="logo">
         <a href="#" class="simple-text logo-mini">
             <div class="logo-image-small">
-                <img src="{{ asset('paper') }}/img/logo-small.png">
+                <img src="{{ asset('logo-round.png') }}">
             </div>
         </a>
         <a href="#" class="simple-text logo-normal">
-            {{ __('Creative Tim') }}
+            {{ __('Fastcili-TI') }}
         </a>
     </div>
     <div class="sidebar-wrapper">
@@ -17,7 +17,7 @@
                     <p>{{ __('Dashboard') }}</p>
                 </a>
             </li>
-            <li class="{{ $elementActive == 'user' || $elementActive == 'profile' ? 'active' : '' }}">
+            <li class="{{ $elementActive == 'user' || $elementActive == 'level' ? 'active' : '' }}">
                 <a data-toggle="collapse" aria-expanded="false" href="#kelolaPengguna">
                     <i class="nc-icon nc-single-02"></i>
                     <p>
@@ -27,14 +27,14 @@
                 </a>
                 <div class="collapse show" id="kelolaPengguna">
                     <ul class="nav">
-                        <li class="{{ $elementActive == 'profile' ? 'active' : '' }}">
-                            <a href="#">
+                        <li class="{{ $elementActive == 'level' ? 'active' : '' }}">
+                            <a href="{{ route('level.index') }}">
                                 <span class="sidebar-mini-icon">{{ __('L') }}</span>
                                 <span class="sidebar-normal">{{ __(' Level ') }}</span>
                             </a>
                         </li>
                         <li class="{{ $elementActive == 'user' ? 'active' : '' }}">
-                            <a href="#">
+                            <a href="{{ route('users.index') }}">
                                 <span class="sidebar-mini-icon">{{ __('U') }}</span>
                                 <span class="sidebar-normal">{{ __(' User ') }}</span>
                             </a>
@@ -42,26 +42,32 @@
                     </ul>
                 </div>
             </li>
-            <li class="{{ $elementActive == 'icons' ? 'active' : '' }}">
+            <li class="{{ $elementActive == 'gedung' || $elementActive == 'fasilitas'  || $elementActive == 'ruangan' ? 'active' : '' }}">
                 <a data-toggle="collapse" aria-expanded="true" href="#fas">
                     <i class="nc-icon nc-bank"></i>
                     <p>
-                            {{ __('Gedung & Fasilitas') }}
+                            {{ __('Fasilitas') }}
                         <b class="caret"></b>
                     </p>
                 </a>
                 <div class="collapse show" id="fas">
                     <ul class="nav">
-                        <li class="{{ $elementActive == 'profile' ? 'active' : '' }}">
-                            <a href="#">
+                        <li class="{{ $elementActive == 'fasilitas' ? 'active' : '' }}">
+                            <a href="{{ route('users.index') }}">
                                 <span class="sidebar-mini-icon">{{ __('F') }}</span>
                                 <span class="sidebar-normal">{{ __(' Fasilitas ') }}</span>
                             </a>
                         </li>
-                        <li class="{{ $elementActive == 'user' ? 'active' : '' }}">
-                            <a href="#">
+                        <li class="{{ $elementActive == 'gedung' ? 'active' : '' }}">
+                            <a href="{{ route('users.index') }}">
                                 <span class="sidebar-mini-icon">{{ __('G') }}</span>
                                 <span class="sidebar-normal">{{ __(' Gedung ') }}</span>
+                            </a>
+                        </li>
+                        <li class="{{ $elementActive == 'ruangan' ? 'active' : '' }}">
+                            <a href="{{ route('ruangan.index') }}">
+                                <span class="sidebar-mini-icon">{{ __('R') }}</span>
+                                <span class="sidebar-normal">{{ __(' Ruangan ') }}</span>
                             </a>
                         </li>
                     </ul>

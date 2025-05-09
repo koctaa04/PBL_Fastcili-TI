@@ -21,7 +21,7 @@ use App\Http\Controllers\FasilitasController;
 
 Route::get('/mabac', [MabacController::class, 'index']);
 
-Route::get('/level', [LevelController::class, 'index']);
+Route::get('/level', [LevelController::class, 'index'])->name('level.index');
 Route::get('/level/create', [LevelController::class, 'create']);
 Route::post('/level', [LevelController::class, 'store'])->name('level.store');
 Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
@@ -41,21 +41,21 @@ Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan'
 Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 
 
-Route::get('/ruangan', [RuanganController::class, 'index']);
+Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
 Route::get('/ruangan/create', [RuanganController::class, 'create']);
 Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
 Route::get('/ruangan/edit/{id}', [RuanganController::class, 'edit']);
 Route::put('/ruangan/update/{id}', [RuanganController::class, 'update']);
 Route::delete('/ruangan/delete/{id}', [RuanganController::class, 'destroy']);
 
-Route::get('/users', [UserController::class, 'index']);
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
 Route::get('/users/create', [UserController::class, 'create']);
 Route::post('/users', [UserController::class, 'store'])->name('users.store');
 Route::get('/users/edit/{id}', [UserController::class, 'edit']);
 Route::put('/users/update/{id}', [UserController::class, 'update']);
 Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
 
-Route::get('/fasilitas', [FasilitasController::class, 'index']);
+Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas.index');
 Route::get('/fasilitas/create', [FasilitasController::class, 'create']);
 Route::post('/fasilitas', [FasilitasController::class, 'store'])->name('fasilitas.store');
 Route::get('/fasilitas/edit/{id}', [FasilitasController::class, 'edit']);
