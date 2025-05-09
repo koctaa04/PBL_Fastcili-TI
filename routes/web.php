@@ -6,6 +6,7 @@ use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\MabacController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GedungController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,7 @@ Route::delete('/lapor_kerusakan/delete/{id}', [LaporanKerusakanController::class
 Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
 Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 
+Route::get('/gedung1', [GedungController::class, 'index']);
 
 Route::get('/ruangan', [RuanganController::class, 'index']);
 Route::get('/ruangan/create', [RuanganController::class, 'create']);
