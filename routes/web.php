@@ -7,6 +7,8 @@ use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\MabacController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifikasiLaporanController;
+use App\Http\Controllers\FasilitasController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -61,6 +63,13 @@ Route::get('/users/edit/{id}', [UserController::class, 'edit']);
 Route::put('/users/update/{id}', [UserController::class, 'update']);
 Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
 
+Route::get('/fasilitas', [FasilitasController::class, 'index']);
+Route::get('/fasilitas/create', [FasilitasController::class, 'create']);
+Route::post('/fasilitas', [FasilitasController::class, 'store'])->name('fasilitas.store');
+Route::get('/fasilitas/edit/{id}', [FasilitasController::class, 'edit']);
+Route::put('/fasilitas/update/{id}', [FasilitasController::class, 'update']);
+Route::delete('/fasilitas/delete/{id}', [FasilitasController::class, 'destroy']);
+
 Route::get('/', function () {
 	return view('welcome');
 });
@@ -79,7 +88,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::resource('user', 'App\Http\Controllers\UserController', ['except' => ['show']]);
 	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'App\Http\Controllers\ProfileController@edit']);
 	Route::put('profile', ['as' => 'profile.update', 'uses' => 'App\Http\Controllers\ProfileController@update']);
-	Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'App\Http\Controllers\ProfileController@password']);
+	Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'App\Http\Controllers\ProfileController@updatepassword']);
 });
 
 Route::group(['middleware' => 'auth'], function () {
