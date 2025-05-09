@@ -18,12 +18,15 @@ class User extends Authenticatable
      * @var array<int, string>
      */
 
-    
+
     protected $table = 'users';
     protected $primaryKey = 'id_user';
 
     protected $fillable = [
-        'id_level', 'nama_user', 'username', 'password', 'no_hp', 'alamat'
+        'id_level',
+        'nama',
+        'email',
+        'password'
     ];
 
     public function level()
