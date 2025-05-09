@@ -40,6 +40,19 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user && !$user->akses) {
+            return redirect()->back()
+                ->withInput($request->only('email', 'remember'))
+                ->with('alert-danger', 'Akun Anda tidak memiliki akses untuk login.');
+        }
+
+        parent::sendFailedLoginResponse($request);
+    }
+
     protected function authenticated(Request $request, $user)
     {
         if ($request->remember) {

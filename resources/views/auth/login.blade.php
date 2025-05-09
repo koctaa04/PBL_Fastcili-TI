@@ -20,9 +20,16 @@
                         <div class="card-header ">
                             <div class="card-header ">
                                 <h3 class="header text-center">{{ __('Login') }}</h3>
+                                <p class="text-center">Masukkan email dan password dari akun yang sudah terdaftar untuk mengakses sistem</p>
                             </div>
                         </div>
+                        
                         <div class="card-body ">
+                            @if(session('alert-danger'))
+                                <div class="alert alert-danger" role="alert">
+                                    {{ session('alert-danger') }}
+                                </div>
+                            @endif
 
                             <div class="input-group">
                                 <div class="input-group-prepend">
