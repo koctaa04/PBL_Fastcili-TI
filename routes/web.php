@@ -23,7 +23,7 @@ use App\Http\Controllers\FasilitasController;
 
 Route::get('/mabac', [MabacController::class, 'index']);
 
-Route::get('/verifikasi', [VerifikasiLaporanController::class, 'index']);
+Route::get('/verifikasi', [VerifikasiLaporanController::class, 'index'])->name('prioritas.index');
 Route::get('/verifikasi/true/{id}', [VerifikasiLaporanController::class, 'verif']);
 Route::post('/verifikasi/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
 Route::get('/verifikasi/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
@@ -36,7 +36,7 @@ Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
 Route::put('/level/update/{id}', [LevelController::class, 'update']);
 Route::delete('/level/delete/{id}', [LevelController::class, 'destroy']);
 
-Route::get('/lapor_kerusakan', [LaporanKerusakanController::class, 'index']);
+Route::get('/lapor_kerusakan', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
 Route::get('/lapor_kerusakan/create', [LaporanKerusakanController::class, 'create']);
 Route::post('/lapor_kerusakan', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
 Route::get('/lapor_kerusakan/edit/{id}', [LaporanKerusakanController::class, 'edit']);
