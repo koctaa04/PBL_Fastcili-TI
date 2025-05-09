@@ -5,6 +5,7 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\MabacController;
+use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\VerifikasiLaporanController;
@@ -43,8 +44,15 @@ Route::get('/lapor_kerusakan/edit/{id}', [LaporanKerusakanController::class, 'ed
 Route::put('/lapor_kerusakan/update/{id}', [LaporanKerusakanController::class, 'update']);
 Route::delete('/lapor_kerusakan/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
 
-// Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
-// Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
+Route::get('/perbaikan', [PerbaikanController::class, 'index']);
+// Route::get('/perbaikan/create', [PerbaikanController::class, 'create']);
+// Route::post('/perbaikan', [PerbaikanController::class, 'store'])->name('laporan.store');
+Route::get('/perbaikan/edit/{id}', [PerbaikanController::class, 'edit']);
+Route::put('/perbaikan/update/{id}', [PerbaikanController::class, 'update']);
+Route::get('/perbaikan/detail/{id}', [PerbaikanController::class, 'detail']);
+
+// Route::delete('/perbaikan/delete/{id}', [PerbaikanController::class, 'destroy']);
+
 Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
 Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 

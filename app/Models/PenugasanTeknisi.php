@@ -11,16 +11,23 @@ class PenugasanTeknisi extends Model
     protected $table = 'penugasan_teknisi';
     protected $primaryKey = 'id_penugasan';
 
-    protected $fillable = ['id_laporan', 'id_user', 'status_perbaikan', 'tanggal_selesai'];
+    protected $fillable = [
+        'id_laporan',
+        'id_user',
+        'tanggal_selesai',
+        'status_perbaikan',
+        'catatan_teknisi',
+        'dokumentasi'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
 
     public function laporan()
     {
-        return $this->belongsTo(LaporanKerusakan::class, 'id_laporan');
+        return $this->belongsTo(LaporanKerusakan::class, 'id_laporan', 'id_laporan');
     }
-
-    public function teknisi()
-    {
-        return $this->belongsTo(User::class, 'id_user');
-    }
-
+    
 }
