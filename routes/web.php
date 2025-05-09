@@ -6,7 +6,9 @@ use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\MabacController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VerifikasiLaporanController;
 use App\Http\Controllers\FasilitasController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +22,12 @@ use App\Http\Controllers\FasilitasController;
 */
 
 Route::get('/mabac', [MabacController::class, 'index']);
+
+Route::get('/verifikasi', [VerifikasiLaporanController::class, 'index']);
+Route::get('/verifikasi/true/{id}', [VerifikasiLaporanController::class, 'verif']);
+Route::post('/verifikasi/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
+Route::get('/verifikasi/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
+Route::put('/verifikasi/tolak/{id}', [VerifikasiLaporanController::class, 'tolak'])->name('laporan.tolak');
 
 Route::get('/level', [LevelController::class, 'index']);
 Route::get('/level/create', [LevelController::class, 'create']);
