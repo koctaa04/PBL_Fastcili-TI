@@ -50,7 +50,6 @@ The above copyright notice and this permission notice shall be included in all c
 
     @auth()
         @include('layouts.page_templates.auth')
-        @include('layouts.navbars.fixed-plugin')
     @endauth
 
     @guest
@@ -78,8 +77,6 @@ The above copyright notice and this permission notice shall be included in all c
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('scripts')
-
-    @include('layouts.navbars.fixed-plugin-js')
 </body>
 
 </html>
