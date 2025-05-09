@@ -5,40 +5,35 @@
 
 @section('content')
     <div class="content">
-        <h3>Data User</h3>
+        <h3>Data Level</h3>
         <div class="card p-4">
             <div class="card-header">
-                <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
+                <button onclick="modalAction('{{ url('/level/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
                     Data</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_ruangan">
+                    <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
+                                <th scope="col">Kode Level</th>
                                 <th scope="col">Nama Level</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">No Induk</th>
-                                <th scope="col">Email</th>
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $index => $u)
+                            @foreach ($level as $index => $l)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
-                                    <td>{{ $u->level->nama_level }}</td>
-                                    <td>{{ $u->nama }}</td>
-                                    <td>{{ $u->no_induk }}</td>
-                                    <td>{{ $u->email }}</td>
+                                    <td>{{ $l->kode_level }}</td>
+                                    <td>{{ $l->nama_level }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <button
-                                                onclick="modalAction('{{ url('/users/edit/' . $u->id_user . '') }}')"
+                                            <button onclick="modalAction('{{ url('/level/edit/' . $l->id_level . '') }}')"
                                                 class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
                                             <form class="form-delete"
-                                                action="{{ url('/users/delete/' . $u->id_user . '') }}" method="POST">
+                                                action="{{ url('/level/delete/' . $l->id_level . '') }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -64,7 +59,7 @@
                 $('#myModal').modal('show');
             });
         }
-        var dataruangan;
+        var dataLevel;
 
         $(document).on('submit', '.form-delete', function(e) {
             e.preventDefault(); // Cegah submit form langsung

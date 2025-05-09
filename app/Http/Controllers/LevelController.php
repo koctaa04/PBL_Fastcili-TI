@@ -2,35 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Level;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Level;
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends Controller
+class LevelController extends Controller
 {
     public function index()
     {
-        $user = User::all();
- 
-        return view('users.index', ['users' => $user]);
+        $level = Level::all();
+        return view('level.index', ['level' => $level]);
     }
 
     public function create()
     {
-        $level = Level::all();
-
-        return view('users.create', ['level' => $level]);
+        return view('level.create');
     }
 
     public function store(Request $request)
     {
         $rules = [
-            'id_level' => 'required|exists:level,id_level',
-            'nama' => 'required|string|max:20',
-            'no_induk' => 'required|string|max:20',
-            'email' => 'required|string|max:50',
+            'kode_level' => 'required|string|max:10|unique:level,kode_level',
+            'nama_level' => 'required|string|max:25'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -38,16 +31,16 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Validasi',
+                'message' => 'Validasi inputan gagal',
                 'msgField' => $validator->errors()
             ]);
         }
 
-        User::create($request->all());
+        Level::create($request->only(['kode_level', 'nama_level']));
 
         return response()->json([
             'success' => true,
-            'message' => 'Berhasil menambahkan data!'
+            'message' => 'Data level berhasil ditambahkan'
         ]);
 
         redirect('/');
@@ -55,19 +48,16 @@ class UserController extends Controller
 
     public function edit(string $id)
     {
-        $user = User::find($id);
-        $level = Level::all();
+        $level = Level::find($id);
 
-        return view('users.edit', ['users' => $user, 'level' => $level]);
+        return view('level.edit', ['level' => $level]);
     }
 
     public function update(Request $request, $id)
     {
         $rules = [
-            'id_level' => 'required|exists:level,id_level',
-            'nama' => 'required|string|max:20',
-            'no_induk' => 'required|string|max:20',
-            'email' => 'required|string|max:50',
+            'kode_level' => 'required|string|max:10|unique:level,kode_level,' . $id . ',id_level',
+            'nama_level' => 'required|string|max:25'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -75,24 +65,23 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Validasi',
+                'message' => 'Validasi inputan gagal',
                 'msgField' => $validator->errors()
             ]);
         }
 
-        $data = User::find($id);
+        $data = Level::find($id);
 
         if ($data) {
-            $
             $data->update($request->all());
             return response()->json([
                 'success' => true,
-                'message' => 'Berhasil mengubah data!'
+                'message' => 'Data level berhasil diubah'
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Data tidak ditemukan!'
+                'message' => 'Data tidak ditemukan',
             ]);
         }
 
@@ -101,21 +90,20 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $data = User::find($id);
+        $level = Level::find($id);
 
-        if ($data) {
-            $data->delete($request->all());
+        if ($level) {
+            $level->delete($request->all());
             return response()->json([
                 'success' => true,
-                'message' => 'Berhasil menghapus data!'
+                'message' => 'Data berhasil dihapus'
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Data tidak ditemukan!'
+                'message' => 'Data tidak ditemukan',
             ]);
         }
-
         redirect('/');
     }
 }

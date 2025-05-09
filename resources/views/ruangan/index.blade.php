@@ -5,10 +5,10 @@
 
 @section('content')
     <div class="content">
-        <h3>Data User</h3>
+        <h3>Data Ruangan</h3>
         <div class="card p-4">
             <div class="card-header">
-                <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
+                <button onclick="modalAction('{{ url('/ruangan/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
                     Data</button>
             </div>
             <div class="card-body">
@@ -17,28 +17,26 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Nama Level</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">No Induk</th>
-                                <th scope="col">Email</th>
+                                <th scope="col">Nama Gedung</th>
+                                <th scope="col">Kode Ruangan</th>
+                                <th scope="col">Nama Ruangan</th>
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $index => $u)
+                            @foreach ($ruangan as $index => $r)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
-                                    <td>{{ $u->level->nama_level }}</td>
-                                    <td>{{ $u->nama }}</td>
-                                    <td>{{ $u->no_induk }}</td>
-                                    <td>{{ $u->email }}</td>
+                                    <td>{{ $r->gedung->nama_gedung }}</td>
+                                    <td>{{ $r->kode_ruangan }}</td>
+                                    <td>{{ $r->nama_ruangan }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <button
-                                                onclick="modalAction('{{ url('/users/edit/' . $u->id_user . '') }}')"
+                                                onclick="modalAction('{{ url('/ruangan/edit/' . $r->id_ruangan . '') }}')"
                                                 class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
                                             <form class="form-delete"
-                                                action="{{ url('/users/delete/' . $u->id_user . '') }}" method="POST">
+                                                action="{{ url('/ruangan/delete/' . $r->id_ruangan . '') }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>

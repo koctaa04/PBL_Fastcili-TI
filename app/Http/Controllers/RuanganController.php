@@ -2,35 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Level;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Ruangan;
+use App\Models\Gedung;
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends Controller
+class RuanganController extends Controller
 {
     public function index()
     {
-        $user = User::all();
- 
-        return view('users.index', ['users' => $user]);
+        $ruangan = Ruangan::all();
+
+        return view('ruangan.index', ['ruangan' => $ruangan]);
     }
 
     public function create()
     {
-        $level = Level::all();
+        $gedung = Gedung::all();
 
-        return view('users.create', ['level' => $level]);
+        return view('ruangan.create', ['gedung' => $gedung]);
     }
 
     public function store(Request $request)
     {
         $rules = [
-            'id_level' => 'required|exists:level,id_level',
-            'nama' => 'required|string|max:20',
-            'no_induk' => 'required|string|max:20',
-            'email' => 'required|string|max:50',
+            'id_gedung' => 'required|exists:gedung,id_gedung',
+            'kode_ruangan' => 'required|string|max:20',
+            'nama_ruangan' => 'required|string|max:50'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -43,7 +41,7 @@ class UserController extends Controller
             ]);
         }
 
-        User::create($request->all());
+        Ruangan::create($request->all());
 
         return response()->json([
             'success' => true,
@@ -55,19 +53,18 @@ class UserController extends Controller
 
     public function edit(string $id)
     {
-        $user = User::find($id);
-        $level = Level::all();
+        $ruangan = Ruangan::find($id);
+        $gedung = Gedung::all();
 
-        return view('users.edit', ['users' => $user, 'level' => $level]);
+        return view('ruangan.edit', ['ruangan' => $ruangan, 'gedung' => $gedung]);
     }
 
     public function update(Request $request, $id)
     {
         $rules = [
-            'id_level' => 'required|exists:level,id_level',
-            'nama' => 'required|string|max:20',
-            'no_induk' => 'required|string|max:20',
-            'email' => 'required|string|max:50',
+            'id_gedung' => 'required|exists:gedung,id_gedung',
+            'kode_ruangan' => 'required|string|max:20',
+            'nama_ruangan' => 'required|string|max:50'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -80,10 +77,9 @@ class UserController extends Controller
             ]);
         }
 
-        $data = User::find($id);
+        $data = Ruangan::find($id);
 
         if ($data) {
-            $
             $data->update($request->all());
             return response()->json([
                 'success' => true,
@@ -101,7 +97,7 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $data = User::find($id);
+        $data = Ruangan::find($id);
 
         if ($data) {
             $data->delete($request->all());
