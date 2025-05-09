@@ -10,14 +10,22 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nama Ruangan</label>
-                    <select class="form-control" name="id_ruangan" id="id_ruangan" required>
-                        <option value="">--- Pilih Ruangan ---</option>
-                        @foreach ($ruangan as $r)
-                            <option value="{{ $r->id_ruangan }}">{{ $r->nama_ruangan }}</option>
+                    <label for="gedung">Gedung</label>
+                    <select name="id_gedung" id="gedung" class="form-control" required>
+                        <option value="">Pilih Gedung</option>
+                        @foreach ($gedung as $g)
+                            <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
                         @endforeach
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label for="ruangan">Ruangan</label>
+                    <select name="id_ruangan" id="ruangan" class="form-control" disabled required>
+                        <option value="">Pilih Ruangan</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Nama Fasilitas</label>
                     <input type="text" class="form-control" name="nama_fasilitas" id="nama_fasilitas" required>
@@ -79,6 +87,33 @@
                         text: response.messages,
                     });
                 }
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        // Ketika gedung dipilih
+        $('#gedung').change(function() {
+            let gedungId = $(this).val();
+            $('#ruangan').html('<option value="">Loading...</option>').prop('disabled', true);
+
+            if (gedungId) {
+                $.ajax({
+                    url: '/get-ruangan/' + gedungId,
+                    type: 'GET',
+                    success: function(data) {
+                        let options = '<option value="">Pilih Ruangan</option>';
+                        $.each(data, function(i, ruangan) {
+                            options += '<option value="' + ruangan.id_ruangan +
+                                '">' + ruangan.nama_ruangan + '</option>';
+                        });
+                        $('#ruangan').html(options).prop('disabled', false);
+                    },
+                    error: function() {
+                        $('#ruangan').html('<option value="">Gagal memuat ruangan</option>')
+                            .prop('disabled', true);
+                    }
+                });
             }
         });
     });

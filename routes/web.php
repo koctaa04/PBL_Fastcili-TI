@@ -78,6 +78,7 @@ Route::post('/fasilitas', [FasilitasController::class, 'store'])->name('fasilita
 Route::get('/fasilitas/edit/{id}', [FasilitasController::class, 'edit']);
 Route::put('/fasilitas/update/{id}', [FasilitasController::class, 'update']);
 Route::delete('/fasilitas/delete/{id}', [FasilitasController::class, 'destroy']);
+Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan']);
 
 Route::get('/', function () {
 	return view('welcome');
