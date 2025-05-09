@@ -2,47 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileRequest;
-use App\Http\Requests\PasswordRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the form for editing the profile.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function edit()
+    public function index()
     {
         return view('profile.edit');
     }
 
-    /**
-     * Update the profile
-     *
-     * @param  \App\Http\Requests\ProfileRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(ProfileRequest $request)
+    public function edit()
     {
-        auth()->user()->update($request->all());
-
-        return back()->withStatus(__('Profile successfully updated.'));
+        $user = Auth::user();
+        return view('profile.edit', compact('user'));
     }
 
-    /**
-     * Change the password
-     *
-     * @param  \App\Http\Requests\PasswordRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function password(PasswordRequest $request)
+    public function update(Request $request)
     {
-        auth()->user()->update(['password' => Hash::make($request->get('password'))]);
+        $user = Auth::user();
 
-        return back()->withPasswordStatus(__('Password successfully updated.'));
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id_user . ',id_user',
+            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user->nama = $request->nama;
+        $user->email = $request->email;
+
+        if ($request->hasFile('foto_profil')) {
+            // Hapus foto lama jika ada
+            $oldPhotoPath = public_path('uploads/foto_profil/' . $user->foto_profil);
+            if ($user->foto_profil && File::exists($oldPhotoPath)) {
+                File::delete($oldPhotoPath);
+            }
+
+            // Simpan foto baru
+            $file = $request->file('foto_profil');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/foto_profil'), $filename);
+            $user->foto_profil = $filename;
+        }
+
+        $user->save();
+
+        return redirect()->route('profile.edit')->with('status', 'Profil berhasil diperbarui!');
     }
-    
-    
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'old_password' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return back()->withErrors(['old_password' => 'Kata sandi lama tidak cocok.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('password_status', 'Kata sandi berhasil diperbarui.');
+    }
 }

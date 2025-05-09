@@ -23,7 +23,7 @@ class User extends Authenticatable
     protected $primaryKey = 'id_user';
 
     protected $fillable = [
-        'id_level', 'nama', 'password', 'no_induk', 'email'
+        'id_level', 'nama', 'password', 'no_induk', 'email', 'foto_profil'
     ];
 
     public function level()
