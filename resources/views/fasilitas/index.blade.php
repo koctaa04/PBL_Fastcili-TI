@@ -17,6 +17,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
+                                <th scope="col">Nama Gedung</th>
                                 <th scope="col">Nama Ruangan</th>
                                 <th scope="col">Nama Fasilitas</th>
                                 <th scope="col">Jumlah</th>
@@ -27,6 +28,7 @@
                             @foreach ($fasilitas as $index => $f)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
+                                    <td>{{ $f->ruangan->gedung->nama_gedung }}</td>
                                     <td>{{ $f->ruangan->nama_ruangan }}</td>
                                     <td>{{ $f->nama_fasilitas }}</td>
                                     <td>{{ $f->jumlah }}</td>

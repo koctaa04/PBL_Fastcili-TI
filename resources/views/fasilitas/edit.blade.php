@@ -9,15 +9,6 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nama Ruangan</label>
-                    <select class="form-control" name="id_ruangan" id="id_ruangan" required>
-                        @foreach ($ruangan as $r)
-                            <option value="{{ $r->id_ruangan }}" @if ($r->id_ruangan == $fasilitas->id_ruangan) selected @endif>
-                                {{ $r->nama_ruangan }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group">
                     <label>Nama Fasilitas</label>
                     <input type="text" class="form-control" name="nama_fasilitas" value="{{ $fasilitas->nama_fasilitas }}"
                         required>

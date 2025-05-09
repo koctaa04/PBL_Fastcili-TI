@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Fasilitas;
+use App\Models\Gedung;
 use App\Models\Ruangan;
 use Illuminate\Support\Facades\Validator;
 
@@ -11,16 +12,24 @@ class FasilitasController extends Controller
 {
     public function index()
     {
-        $fasilitas = Fasilitas::all();
+        $fasilitas = Fasilitas::with('ruangan.gedung')->get();
+        $gedung = Gedung::all();
 
-        return view('fasilitas.index', ['fasilitas' => $fasilitas]);
+        return view('fasilitas.index', ['fasilitas' => $fasilitas, 'gedung' => $gedung]);
+    }
+
+    public function getRuangan($id)
+    {
+        $ruangan = Ruangan::where('id_gedung', $id)->get();
+        return response()->json($ruangan);
     }
 
     public function create()
     {
         $ruangan = Ruangan::all();
+        $gedung = Gedung::all();
 
-        return view('fasilitas.create', ['ruangan' => $ruangan]);
+        return view('fasilitas.create', ['ruangan' => $ruangan, 'gedung' => $gedung]);
     }
 
     public function store(Request $request)
@@ -62,7 +71,6 @@ class FasilitasController extends Controller
     public function update(Request $request, $id)
     {
         $rules = [
-            'id_ruangan' => 'required|exists:ruangan,id_ruangan',
             'nama_fasilitas' => 'required|string|max:50',
             'jumlah' => 'required|integer'
         ];
