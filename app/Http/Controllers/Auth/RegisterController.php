@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Models\Level;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -41,6 +42,18 @@ class RegisterController extends Controller
     }
 
     /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
+    {
+        $levels = Level::where('id_level', '>', 1)->get();
+        return view('auth.register', compact('levels'));
+    }
+
+
+    /**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
@@ -49,9 +62,10 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
+            'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'id_level' => ['required', 'exists:level,id_level'],
             'agree_terms_and_conditions' => ['required'],
         ]);
     }
@@ -64,9 +78,15 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        // Validasi tambahan untuk memastikan id_level > 1
+        if ($data['id_level'] <= 1) {
+            abort(403, 'Level tidak valid');
+        }
+
         return User::create([
-            'name' => $data['name'],
+            'nama' => $data['nama'],
             'email' => $data['email'],
+            'id_level' => $data['id_level'],
             'password' => Hash::make($data['password']),
         ]);
     }
