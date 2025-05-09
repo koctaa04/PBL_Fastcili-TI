@@ -1,0 +1,117 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Fasilitas;
+use App\Models\Ruangan;
+use Illuminate\Support\Facades\Validator;
+
+class FasilitasController extends Controller
+{
+    public function index()
+    {
+        $fasilitas = Fasilitas::all();
+
+        return view('fasilitas.index', ['fasilitas' => $fasilitas]);
+    }
+
+    public function create()
+    {
+        $ruangan = Ruangan::all();
+
+        return view('fasilitas.create', ['ruangan' => $ruangan]);
+    }
+
+    public function store(Request $request)
+    {
+        $rules = [
+            'id_ruangan' => 'required|exists:ruangan,id_ruangan',
+            'nama_fasilitas' => 'required|string|max:50',
+            'jumlah' => 'required|integer'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Validasi',
+                'msgField' => $validator->errors()
+            ]);
+        }
+
+        Fasilitas::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menambahkan data!'
+        ]);
+
+        redirect('/');
+    }
+
+    public function edit(string $id)
+    {
+        $fasilitas = Fasilitas::find($id);
+        $ruangan = Ruangan::all();
+
+        return view('fasilitas.edit', ['fasilitas' => $fasilitas, 'ruangan' => $ruangan]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $rules = [
+            'id_ruangan' => 'required|exists:ruangan,id_ruangan',
+            'nama_fasilitas' => 'required|string|max:50',
+            'jumlah' => 'required|integer'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Validasi',
+                'msgField' => $validator->errors()
+            ]);
+        }
+
+        $data = Fasilitas::find($id);
+
+        if ($data) {
+            $data->update($request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengubah data!'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan!'
+            ]);
+        }
+
+        redirect('/');
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $data = Fasilitas::find($id);
+
+        if ($data) {
+            $data->delete($request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menghapus data!'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan!'
+            ]);
+        }
+
+        redirect('/');
+    }
+}
