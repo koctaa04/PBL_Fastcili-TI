@@ -5,6 +5,7 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\MabacController;
+use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\VerifikasiLaporanController;
@@ -23,28 +24,35 @@ use App\Http\Controllers\FasilitasController;
 
 Route::get('/mabac', [MabacController::class, 'index']);
 
-Route::get('/verifikasi', [VerifikasiLaporanController::class, 'index']);
+Route::get('/verifikasi', [VerifikasiLaporanController::class, 'index'])->name('prioritas.index');
 Route::get('/verifikasi/true/{id}', [VerifikasiLaporanController::class, 'verif']);
 Route::post('/verifikasi/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
 Route::get('/verifikasi/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
 Route::put('/verifikasi/tolak/{id}', [VerifikasiLaporanController::class, 'tolak'])->name('laporan.tolak');
 
-Route::get('/level', [LevelController::class, 'index']);
+Route::get('/level', [LevelController::class, 'index'])->name('level.index');
 Route::get('/level/create', [LevelController::class, 'create']);
 Route::post('/level', [LevelController::class, 'store'])->name('level.store');
 Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
 Route::put('/level/update/{id}', [LevelController::class, 'update']);
 Route::delete('/level/delete/{id}', [LevelController::class, 'destroy']);
 
-Route::get('/lapor_kerusakan', [LaporanKerusakanController::class, 'index']);
+Route::get('/lapor_kerusakan', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
 Route::get('/lapor_kerusakan/create', [LaporanKerusakanController::class, 'create']);
 Route::post('/lapor_kerusakan', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
 Route::get('/lapor_kerusakan/edit/{id}', [LaporanKerusakanController::class, 'edit']);
 Route::put('/lapor_kerusakan/update/{id}', [LaporanKerusakanController::class, 'update']);
 Route::delete('/lapor_kerusakan/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
 
-// Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
-// Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
+Route::get('/perbaikan', [PerbaikanController::class, 'index']);
+// Route::get('/perbaikan/create', [PerbaikanController::class, 'create']);
+// Route::post('/perbaikan', [PerbaikanController::class, 'store'])->name('laporan.store');
+Route::get('/perbaikan/edit/{id}', [PerbaikanController::class, 'edit']);
+Route::put('/perbaikan/update/{id}', [PerbaikanController::class, 'update']);
+Route::get('/perbaikan/detail/{id}', [PerbaikanController::class, 'detail']);
+
+// Route::delete('/perbaikan/delete/{id}', [PerbaikanController::class, 'destroy']);
+
 Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
 Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 
@@ -55,26 +63,27 @@ Route::get('/gedung1/edit/{id}', [GedungController::class, 'edit']);
 Route::put('/gedung1/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
 Route::delete('/gedung1/delete/{id}', [GedungController::class, 'destroy']);
 
-Route::get('/ruangan', [RuanganController::class, 'index']);
+Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
 Route::get('/ruangan/create', [RuanganController::class, 'create']);
 Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
 Route::get('/ruangan/edit/{id}', [RuanganController::class, 'edit']);
 Route::put('/ruangan/update/{id}', [RuanganController::class, 'update']);
 Route::delete('/ruangan/delete/{id}', [RuanganController::class, 'destroy']);
 
-Route::get('/users', [UserController::class, 'index']);
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
 Route::get('/users/create', [UserController::class, 'create']);
 Route::post('/users', [UserController::class, 'store'])->name('users.store');
 Route::get('/users/edit/{id}', [UserController::class, 'edit']);
 Route::put('/users/update/{id}', [UserController::class, 'update']);
 Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
 
-Route::get('/fasilitas', [FasilitasController::class, 'index']);
+Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas.index');
 Route::get('/fasilitas/create', [FasilitasController::class, 'create']);
 Route::post('/fasilitas', [FasilitasController::class, 'store'])->name('fasilitas.store');
 Route::get('/fasilitas/edit/{id}', [FasilitasController::class, 'edit']);
 Route::put('/fasilitas/update/{id}', [FasilitasController::class, 'update']);
 Route::delete('/fasilitas/delete/{id}', [FasilitasController::class, 'destroy']);
+Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan']);
 
 Route::get('/', function () {
 	return view('welcome');

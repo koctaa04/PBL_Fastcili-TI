@@ -14,11 +14,11 @@ class FasilitasSeeder extends Seeder
     public function run(): void
     {
         Fasilitas::insert([
-            ['id_ruangan' => 1, 'nama_fasilitas' => 'Proyektor'],
-            ['id_ruangan' => 1, 'nama_fasilitas' => 'PC Server'],
-            ['id_ruangan' => 2, 'nama_fasilitas' => 'Kipas Angin'],
-            ['id_ruangan' => 3, 'nama_fasilitas' => 'Whiteboard'],
-            ['id_ruangan' => 4, 'nama_fasilitas' => 'Kursi Kuliah'],
+            ['id_ruangan' => 1, 'nama_fasilitas' => 'Proyektor', 'jumlah' => 5],
+            ['id_ruangan' => 1, 'nama_fasilitas' => 'PC Server', 'jumlah' => 5],
+            ['id_ruangan' => 2, 'nama_fasilitas' => 'Kipas Angin', 'jumlah' => 5],
+            ['id_ruangan' => 3, 'nama_fasilitas' => 'Whiteboard', 'jumlah' => 5],
+            ['id_ruangan' => 4, 'nama_fasilitas' => 'Kursi Kuliah', 'jumlah' => 5],
         ]);
     }
 }

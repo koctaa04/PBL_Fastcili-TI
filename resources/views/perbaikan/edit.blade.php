@@ -1,23 +1,24 @@
 <div class="modal-dialog" role="document">
     <div class="modal-content">
-        <form method="POST" action="{{ url('/fasilitas/update/' . $fasilitas->id_fasilitas) }}" id="form_edit">
+        <form method="POST" action="{{ url('/perbaikan/update/' . $laporan_kerusakan->id_penugasan) }}" id="form_edit" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="modal-header">
-                <h5 class="modal-title">Edit Data Fasilitas</h5>
+                <h5 class="modal-title">Edit Data Perbaikan</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body">            
                 <div class="form-group">
-                    <label>Nama Fasilitas</label>
-                    <input type="text" class="form-control" name="nama_fasilitas" value="{{ $fasilitas->nama_fasilitas }}"
-                        required>
+                    <label>Catatan Teknisi</label>
+                    <textarea name="catatan_teknisi" class="form-control" rows="3">{{ $laporan_kerusakan->catatan_teknisi }}</textarea>
                 </div>
+        
                 <div class="form-group">
-                    <label>Jumlah</label>
-                    <input type="text" class="form-control" name="jumlah" value="{{ $fasilitas->jumlah }}"
-                        required>
+                    <label for="dokumentasi_perbaikan">Dokumentasi Perbaikan</label>
+                    <input type="file" name="dokumentasi" id="dokumentasi_perbaikan" class="form-control-file">
+                    {{-- <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto.</small> --}}
                 </div>
+            
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -31,11 +32,14 @@
         e.preventDefault();
 
         $('.error-text').text('');
+        const formData = new FormData(this);
 
         $.ajax({
             type: "POST",
             url: $(this).attr('action'),
-            data: $(this).serialize(),
+            data: formData,
+            contentType: false,
+            processData: false,
             dataType: "json",
             beforeSend: function() {
                 $('#form_edit button[type=submit]').prop('disabled', true).text('Menyimpan...');

@@ -1,48 +1,79 @@
 @extends('layouts.app', [
     'class' => '',
-    'elementActive' => 'user',
+    'elementActive' => 'laporan',
 ])
 
 @section('content')
     <div class="content">
-        <h3>Data User</h3>
+        <h3>Daftar Perbaikan</h3>
         <div class="card p-4">
-            <div class="card-header">
-                <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
-                    Data</button>
-            </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_ruangan">
+                    <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Nama Level</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">No Induk</th>
-                                <th scope="col">Email</th>
+                                <th scope="col">Foto Kerusakan</th>
+                                <th scope="col">Nama Fasilitas</th>
+                                <th scope="col">Deskripsi</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Catatan Teknisi</th>
+                                <th scope="col">Dokumentasi Perbaikan</th>
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $index => $u)
+                            @foreach ($laporan_kerusakan as $index => $laporan)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
-                                    <td>{{ $u->level->nama_level }}</td>
-                                    <td>{{ $u->nama }}</td>
-                                    <td>{{ $u->no_induk }}</td>
-                                    <td>{{ $u->email }}</td>
+
+                                    {{-- Foto Kerusakan --}}
+                                    <td>
+                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                                            alt="Foto Kerusakan" height="65"
+                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                    </td>
+
+                                    {{-- Nama Fasilitas --}}
+                                    <td>{{ $laporan->laporan->fasilitas->nama_fasilitas ?? '-' }}</td>
+
+                                    {{-- Deskripsi --}}
+                                    <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
+
+                                    <td>
+                                        <span class="badge badge-pill {{ $laporan->status_perbaikan == 'Sedang Dikerjakan' ? 'badge-warning' : 'badge-success' }}">
+                                            {{ $laporan->status_perbaikan }}
+                                        </span>
+                                    </td>                                    
+
+                                    {{-- Catatan Teknisi --}}
+                                    <td>{{ $laporan->catatan_teknisi ?? '-' }}</td>
+
+                                    {{-- Dokumentasi --}}
+                                    <td>
+                                        <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
+                                            alt="Foto Kerusakan" height="65"
+                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                    </td>
+
+                                    {{-- Tombol Aksi --}}
                                     <td>
                                         <div class="d-flex">
-                                            <button
-                                                onclick="modalAction('{{ url('/users/edit/' . $u->id_user . '') }}')"
-                                                class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
-                                            <form class="form-delete"
-                                                action="{{ url('/users/delete/' . $u->id_user . '') }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
+                                            @php
+                                                $isLaporanAllowed = is_null($laporan->dokumentasi);
+                                                $laporanUrl = url('/perbaikan/edit/' . $laporan->id_penugasan);
+                                                $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
+                                            @endphp
+
+                                            <button onclick="{{ $isLaporanAllowed ? "modalAction('$laporanUrl')" : '' }}"
+                                                class="btn btn-sm btn-warning mr-2" {{ $isLaporanAllowed ? '' : 'disabled' }}>
+                                                Laporan
+                                            </button>
+
+                                            <button onclick="modalAction('{{ $detailUrl }}')"
+                                                class="btn btn-sm btn-info">
+                                                Detail
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -64,7 +95,7 @@
                 $('#myModal').modal('show');
             });
         }
-        var dataruangan;
+        var dataLaporan;
 
         $(document).on('submit', '.form-delete', function(e) {
             e.preventDefault(); // Cegah submit form langsung
