@@ -49,6 +49,11 @@ Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan'
 Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 
 Route::get('/gedung1', [GedungController::class, 'index']);
+Route::get('/gedung1/create', [GedungController::class, 'create']);
+Route::post('/gedung1', [GedungController::class, 'store'])->name('gedung.store');
+Route::get('/gedung1/edit/{id}', [GedungController::class, 'edit']);
+Route::put('/gedung1/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
+Route::delete('/gedung1/delete/{id}', [GedungController::class, 'destroy']);
 
 Route::get('/ruangan', [RuanganController::class, 'index']);
 Route::get('/ruangan/create', [RuanganController::class, 'create']);

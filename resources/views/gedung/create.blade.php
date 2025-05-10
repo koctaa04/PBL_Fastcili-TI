@@ -1,21 +1,26 @@
-<div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <form method="POST" action="{{ url('/level/update/' . $level->id_level) }}" id="form_edit">
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">Tambah Gedung</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+    <div class="modal-body">
+        <form action="{{ route('gedung.store') }}" id="form_create">
             @csrf
-            @method('PUT')
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Data Level</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <div class="form-group">
+                <label>Nama Gedung</label>
+                <input type="text" name="nama_gedung" class="form-control" required>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Kode Level</label>
-                    <input type="text" class="form-control" name="kode_level" value="{{ $level->kode_level }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Nama Level</label>
-                    <input type="text" class="form-control" name="nama_level" value="{{ $level->nama_level }}" required>
-                </div>
+            <div class="form-group mt-2">
+                <label>Kode Gedung</label>
+                <input type="text" name="kode_gedung" class="form-control" required>
+            </div>
+            <div class="form-group mt-2">
+                <label>Deskripsi</label>
+                <textarea name="deskripsi" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="foto" class="form-label">Foto Gedung</label>
+                <input type="file" class="form-control" name="foto" id="foto" accept="image/*" required>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -24,8 +29,9 @@
         </form>
     </div>
 </div>
+
 <script>
-    $(document).on('submit', '#form_edit', function(e) {
+    $(document).on('submit', '#form_create', function(e) {
         e.preventDefault();
 
         $('.error-text').text('');
@@ -36,10 +42,10 @@
             data: $(this).serialize(),
             dataType: "json",
             beforeSend: function() {
-                $('#form_edit button[type=submit]').prop('disabled', true).text('Menyimpan...');
+                $('#form_create button[type=submit]').prop('disabled', true).text('Menyimpan...');
             },
             success: function(response) {
-                $('#form_edit button[type=submit]').prop('disabled', false).text('Simpan');
+                $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
                 if (response.success) {
                     $('#myModal').modal('hide');
                     Swal.fire({
@@ -53,7 +59,7 @@
                 }
             },
             error: function(xhr) {
-                $('#form_edit button[type=submit]').prop('disabled', false).text('Simpan');
+                $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
                 if (xhr.responseJSON && xhr.responseJSON.msgField) {
                     let errors = xhr.responseJSON.msgField;
                     $.each(errors, function(field, messages) {
