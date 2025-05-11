@@ -56,12 +56,12 @@ Route::get('/perbaikan/detail/{id}', [PerbaikanController::class, 'detail']);
 Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
 Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 
-Route::get('/gedung1', [GedungController::class, 'index']);
-Route::get('/gedung1/create', [GedungController::class, 'create']);
-Route::post('/gedung1', [GedungController::class, 'store'])->name('gedung.store');
-Route::get('/gedung1/edit/{id}', [GedungController::class, 'edit']);
-Route::put('/gedung1/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
-Route::delete('/gedung1/delete/{id}', [GedungController::class, 'destroy']);
+Route::get('/gedung', [GedungController::class, 'index'])->name('gedung.index');
+Route::get('/gedung/create', [GedungController::class, 'create']);
+Route::post('/gedung', [GedungController::class, 'store'])->name('gedung.store');
+Route::get('/gedung/edit/{id}', [GedungController::class, 'edit']);
+Route::put('/gedung/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
+Route::delete('/gedung/delete/{id}', [GedungController::class, 'destroy']);
 
 Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
 Route::get('/ruangan/create', [RuanganController::class, 'create']);
