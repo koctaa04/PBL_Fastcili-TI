@@ -40,7 +40,7 @@ class GedungController extends Controller
             ]);
         }
 
-        
+
         // Upload foto jika ada
         $filename = null;
         if ($request->hasFile('foto_gedung')) {
@@ -75,31 +75,35 @@ class GedungController extends Controller
     {
         $gedung = Gedung::findOrFail($id);
 
+        // Validasi input selain file
         $validated = $request->validate([
             'nama_gedung' => 'required|string|max:255',
-            'kode_gedung' => 'required|string|max:50',
-            'deskripsi' => 'nullable|string',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'deskripsi' => 'required|string',
+            'foto_gedung' => 'nullable|image|max:2048' // Tidak wajib karena bisa tidak diubah
         ]);
 
+        // Cek apakah ada file baru yang diunggah
         if ($request->hasFile('foto_gedung')) {
-            // Hapus foto lama jika ada
-            $oldPhotoPath = public_path('uploads/foto_gedung/' . $gedung->foto_gedung);
-            if ($gedung->foto_gedung && Storage::exists($oldPhotoPath)) {
-                Storage::delete($oldPhotoPath);
+            // Hapus file lama jika ada
+            if ($gedung->foto_gedung && Storage::exists('public/uploads/gedung/' . $gedung->foto_gedung)) {
+                Storage::delete('public/uploads/gedung/' . $gedung->foto_gedung);
             }
 
-            // Simpan foto baru
+            // Simpan file baru
             $file = $request->file('foto_gedung');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/foto_gedung'), $filename);
+            $file->storeAs('public/uploads/gedung', $filename);
+
+            // Update nama file ke model
             $gedung->foto_gedung = $filename;
         }
 
-        $gedung->update($validated);
-        
+        // Update field lain
+        $gedung->nama_gedung = $validated['nama_gedung'];
+        $gedung->deskripsi = $validated['deskripsi'];
+        $gedung->save();
+
         return response()->json(['success' => true, 'message' => 'Gedung berhasil diperbarui']);
-        redirect('/');
     }
 
     public function destroy(Request $request, $id)

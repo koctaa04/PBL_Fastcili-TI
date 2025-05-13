@@ -9,14 +9,14 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
+                    <label>Kode Gedung</label>
+                    <input type="text" class="form-control" name="kode_gedung" value="{{ $gedung->kode_gedung }}" required disabled>
+                    <span class="text-danger error-text" id="error-kode_gedung"></span>
+                </div>
+                <div class="form-group">
                     <label>Nama Gedung</label>
                     <input type="text" class="form-control" name="nama_gedung" value="{{ $gedung->nama_gedung }}" required>
                     <span class="text-danger error-text" id="error-nama_gedung"></span>
-                </div>
-                <div class="form-group">
-                    <label>Kode Gedung</label>
-                    <input type="text" class="form-control" name="kode_gedung" value="{{ $gedung->kode_gedung }}" required>
-                    <span class="text-danger error-text" id="error-kode_gedung"></span>
                 </div>
                 <div class="form-group">
                     <label>Deskripsi</label>
@@ -26,6 +26,8 @@
                 <div class="mb-3">
                     <label for="foto" class="form-label">Foto Gedung</label>
                     <input type="file" class="form-control" name="foto_gedung" id="foto" accept="image/*" >
+                    <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto.</small>
+
                 </div>
             </div>
             <div class="modal-footer">
