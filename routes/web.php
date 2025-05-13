@@ -1,15 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LevelController;
-use App\Http\Controllers\LaporanKerusakanController;
-use App\Http\Controllers\RuanganController;
-use App\Http\Controllers\MabacController;
-use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LevelController;
+use App\Http\Controllers\MabacController;
 use App\Http\Controllers\GedungController;
-use App\Http\Controllers\VerifikasiLaporanController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\PerbaikanController;
+use App\Http\Controllers\LaporanKerusakanController;
+use App\Http\Controllers\VerifikasiLaporanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,70 +23,14 @@ use App\Http\Controllers\FasilitasController;
 |
 */
 
-Route::get('/mabac', [MabacController::class, 'index']);
 
-Route::get('/verifikasi', [VerifikasiLaporanController::class, 'index'])->name('prioritas.index');
-Route::get('/verifikasi/true/{id}', [VerifikasiLaporanController::class, 'verif']);
-Route::post('/verifikasi/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
-Route::get('/verifikasi/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
-Route::put('/verifikasi/tolak/{id}', [VerifikasiLaporanController::class, 'tolak'])->name('laporan.tolak');
-
-Route::get('/level', [LevelController::class, 'index'])->name('level.index');
-Route::get('/level/create', [LevelController::class, 'create']);
-Route::post('/level', [LevelController::class, 'store'])->name('level.store');
-Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
-Route::put('/level/update/{id}', [LevelController::class, 'update']);
-Route::delete('/level/delete/{id}', [LevelController::class, 'destroy']);
-
-Route::get('/lapor_kerusakan', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
-Route::get('/lapor_kerusakan/create', [LaporanKerusakanController::class, 'create']);
-Route::post('/lapor_kerusakan', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
-Route::get('/lapor_kerusakan/edit/{id}', [LaporanKerusakanController::class, 'edit']);
-Route::put('/lapor_kerusakan/update/{id}', [LaporanKerusakanController::class, 'update']);
-Route::delete('/lapor_kerusakan/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
-
-Route::get('/perbaikan', [PerbaikanController::class, 'index']);
-// Route::get('/perbaikan/create', [PerbaikanController::class, 'create']);
-// Route::post('/perbaikan', [PerbaikanController::class, 'store'])->name('laporan.store');
-Route::get('/perbaikan/edit/{id}', [PerbaikanController::class, 'edit']);
-Route::put('/perbaikan/update/{id}', [PerbaikanController::class, 'update']);
-Route::get('/perbaikan/detail/{id}', [PerbaikanController::class, 'detail']);
-
-// Route::delete('/perbaikan/delete/{id}', [PerbaikanController::class, 'destroy']);
-
-Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
-Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
-
-Route::get('/gedung', [GedungController::class, 'index'])->name('gedung.index');
-Route::get('/gedung/create', [GedungController::class, 'create']);
-Route::post('/gedung', [GedungController::class, 'store'])->name('gedung.store');
-Route::get('/gedung/edit/{id}', [GedungController::class, 'edit']);
-Route::put('/gedung/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
-Route::delete('/gedung/delete/{id}', [GedungController::class, 'destroy']);
-
-Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
-Route::get('/ruangan/create', [RuanganController::class, 'create']);
-Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
-Route::get('/ruangan/edit/{id}', [RuanganController::class, 'edit']);
-Route::put('/ruangan/update/{id}', [RuanganController::class, 'update']);
-Route::delete('/ruangan/delete/{id}', [RuanganController::class, 'destroy']);
-
-Route::get('/users', [UserController::class, 'index'])->name('users.index');
-Route::get('/users/create', [UserController::class, 'create']);
-Route::post('/users', [UserController::class, 'store'])->name('users.store');
-Route::get('/users/edit/{id}', [UserController::class, 'edit']);
-Route::put('/users/update/{id}', [UserController::class, 'update']);
-Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
-
-Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas.index');
-Route::get('/fasilitas/create', [FasilitasController::class, 'create']);
-Route::post('/fasilitas', [FasilitasController::class, 'store'])->name('fasilitas.store');
-Route::get('/fasilitas/edit/{id}', [FasilitasController::class, 'edit']);
-Route::put('/fasilitas/update/{id}', [FasilitasController::class, 'update']);
-Route::delete('/fasilitas/delete/{id}', [FasilitasController::class, 'destroy']);
-Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan']);
-
+/** -----------------------------
+ *  Welcome Page
+ *  ---------------------------- */
 Route::get('/', function () {
+	if (Auth::check()) {
+		return redirect()->route('home');
+	}
 	return view('welcome');
 });
 
@@ -100,10 +45,118 @@ Route::get('password/reset/{token}', 'App\Http\Controllers\Auth\ResetPasswordCon
 Route::post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.update');
 
 Route::group(['middleware' => 'auth'], function () {
-	Route::resource('user', 'App\Http\Controllers\UserController', ['except' => ['show']]);
-	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'App\Http\Controllers\ProfileController@edit']);
-	Route::put('profile', ['as' => 'profile.update', 'uses' => 'App\Http\Controllers\ProfileController@update']);
-	Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'App\Http\Controllers\ProfileController@updatepassword']);
+	/** -----------------------------
+	 *  Profile & User Management
+	 *  ---------------------------- */
+	Route::resource('user', UserController::class)->except(['show']);
+
+	Route::prefix('profile')->group(function () {
+		Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
+		Route::put('/', [ProfileController::class, 'update'])->name('profile.update');
+		Route::put('/password', [ProfileController::class, 'updatepassword'])->name('profile.password');
+	});
+
+	/** -----------------------------
+	 *  Kelola Level
+	 *  ---------------------------- */
+	Route::prefix('level')->group(function () {
+		Route::get('/', [LevelController::class, 'index'])->name('level.index');
+		Route::get('/create', [LevelController::class, 'create']);
+		Route::post('/', [LevelController::class, 'store'])->name('level.store');
+		Route::get('/edit/{id}', [LevelController::class, 'edit']);
+		Route::put('/update/{id}', [LevelController::class, 'update']);
+		Route::delete('/delete/{id}', [LevelController::class, 'destroy']);
+	});
+
+	/** -----------------------------
+	 *  Kelola Pengguna
+	 *  ---------------------------- */
+	Route::prefix('users')->group(function () {
+		Route::get('/', [UserController::class, 'index'])->name('users.index');
+		Route::get('/create', [UserController::class, 'create']);
+		Route::post('/', [UserController::class, 'store'])->name('users.store');
+		Route::get('/edit/{id}', [UserController::class, 'edit']);
+		Route::put('/update/{id}', [UserController::class, 'update']);
+		Route::delete('/delete/{id}', [UserController::class, 'destroy']);
+	});
+
+	/** -----------------------------
+	 *  Gedung
+	 *  ---------------------------- */
+	Route::prefix('gedung')->group(function () {
+		Route::get('/', [GedungController::class, 'index'])->name('gedung.index');
+		Route::get('/create', [GedungController::class, 'create']);
+		Route::post('/', [GedungController::class, 'store'])->name('gedung.store');
+		Route::get('/edit/{id}', [GedungController::class, 'edit']);
+		Route::put('/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
+		Route::delete('/delete/{id}', [GedungController::class, 'destroy']);
+	});
+
+	/** -----------------------------
+	 *  Ruangan
+	 *  ---------------------------- */
+	Route::prefix('ruangan')->group(function () {
+		Route::get('/', [RuanganController::class, 'index'])->name('ruangan.index');
+		Route::get('/create', [RuanganController::class, 'create']);
+		Route::post('/', [RuanganController::class, 'store'])->name('ruangan.store');
+		Route::get('/edit/{id}', [RuanganController::class, 'edit']);
+		Route::put('/update/{id}', [RuanganController::class, 'update']);
+		Route::delete('/delete/{id}', [RuanganController::class, 'destroy']);
+	});
+
+	/** -----------------------------
+	 *  Fasilitas
+	 *  ---------------------------- */
+	Route::prefix('fasilitas')->group(function () {
+		Route::get('/', [FasilitasController::class, 'index'])->name('fasilitas.index');
+		Route::get('/create', [FasilitasController::class, 'create']);
+		Route::post('/', [FasilitasController::class, 'store'])->name('fasilitas.store');
+		Route::get('/edit/{id}', [FasilitasController::class, 'edit']);
+		Route::put('/update/{id}', [FasilitasController::class, 'update']);
+		Route::delete('/delete/{id}', [FasilitasController::class, 'destroy']);
+		Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan']);
+	});
+
+
+	/** -----------------------------
+	 *  Laporan Kerusakan
+	 *  ---------------------------- */
+	Route::prefix('lapor_kerusakan')->group(function () {
+		Route::get('/', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
+		Route::get('/create', [LaporanKerusakanController::class, 'create']);
+		Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
+		Route::get('/edit/{id}', [LaporanKerusakanController::class, 'edit']);
+		Route::put('/update/{id}', [LaporanKerusakanController::class, 'update']);
+		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
+		Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
+		Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
+	});
+
+	/** -----------------------------
+	 *  Verifikasi Laporan (Untuk Sarpras verifikasi laporan)
+	 *  ---------------------------- */
+	Route::prefix('verifikasi')->group(function () {
+		Route::get('/', [VerifikasiLaporanController::class, 'index'])->name('prioritas.index');
+		Route::get('/true/{id}', [VerifikasiLaporanController::class, 'verif']);
+		Route::post('/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
+		Route::get('/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
+		Route::put('/tolak/{id}', [VerifikasiLaporanController::class, 'tolak'])->name('laporan.tolak');
+	});
+
+	/** -----------------------------
+	 *  MABAC
+	 *  ---------------------------- */
+	Route::get('/mabac', [MabacController::class, 'index'])->name('mabac.index');
+
+	/** -----------------------------
+	 *  Perbaikan (Untuk Teknisi)
+	 *  ---------------------------- */
+	Route::prefix('perbaikan')->group(function () {
+		Route::get('/', [PerbaikanController::class, 'index'])->name('perbaikan_teknisi.index');
+		Route::get('/edit/{id}', [PerbaikanController::class, 'edit']);
+		Route::put('/update/{id}', [PerbaikanController::class, 'update']);
+		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
+	});
 });
 
 Route::group(['middleware' => 'auth'], function () {
