@@ -22,10 +22,12 @@ class GedungController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $rules = [
             'kode_gedung' => 'required|string|max:10|unique:gedung,kode_gedung',
             'nama_gedung' => 'required|string|max:50',
-            'deskripsi' => 'nullable|string|max:255',
+            'deskripsi' => 'required|string|max:255',
+            'foto_gedung' => 'required|image|max:2048'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -33,13 +35,29 @@ class GedungController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi inputan gagal',
+                'message' => 'Validasi gagal',
                 'msgField' => $validator->errors()
             ]);
         }
 
-        Gedung::create($request->only(['kode_gedung', 'nama_gedung', 'deskripsi']));
+        
+        // Upload foto jika ada
+        $filename = null;
+        if ($request->hasFile('foto_gedung')) {
+            $file = $request->file('foto_gedung');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/uploads/gedung'), $filename);
+        }
 
+        // Gedung::create($request->only(['kode_gedung', 'nama_gedung', 'deskripsi', 'deskripsi']));
+
+        // Simpan data ke database
+        Gedung::create([
+            'kode_gedung' => $request->kode_gedung,
+            'nama_gedung' => $request->nama_gedung,
+            'deskripsi' => $request->deskripsi,
+            'foto_gedung' => $filename,
+        ]);
         return response()->json([
             'success' => true,
             'message' => 'Data gedung berhasil ditambahkan'
