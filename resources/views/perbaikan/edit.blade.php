@@ -13,7 +13,7 @@
                     <textarea name="catatan_teknisi" class="form-control" rows="3">{{ $laporan_kerusakan->catatan_teknisi }}</textarea>
                 </div>
         
-                <div class="form-group">
+                <div class="">
                     <label for="dokumentasi_perbaikan">Dokumentasi Perbaikan</label>
                     <input type="file" name="dokumentasi" id="dokumentasi_perbaikan" class="form-control-file">
                     {{-- <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto.</small> --}}
