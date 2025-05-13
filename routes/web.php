@@ -91,7 +91,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
 		Route::delete('/delete/{id}', [GedungController::class, 'destroy']);
 	});
-
+	
 	/** -----------------------------
 	 *  Ruangan
 	 *  ---------------------------- */
@@ -157,6 +157,10 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 	});
+
+	// Route untuk mengambil list data Ruangan dan Fasilitas yang digunakan untuk pilihan di form 
+	Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
+	Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
 });
 
 Route::group(['middleware' => 'auth'], function () {
