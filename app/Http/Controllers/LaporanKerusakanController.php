@@ -120,6 +120,7 @@ class LaporanKerusakanController extends Controller
 
         // Update deskripsi
         $laporan->deskripsi = $request->deskripsi;
+        $laporan->id_status = 1;
 
         // Cek apakah ada file baru yang diunggah
         if ($request->hasFile('foto_kerusakan')) {
