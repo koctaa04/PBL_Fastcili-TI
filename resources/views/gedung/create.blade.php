@@ -36,11 +36,14 @@
         e.preventDefault();
 
         $('.error-text').text('');
+        const formData = new FormData(this);
 
         $.ajax({
             type: "POST",
             url: $(this).attr('action'),
-            data: $(this).serialize(),
+            data: formData,
+            contentType: false,
+            processData: false,
             dataType: "json",
             beforeSend: function() {
                 $('#form_create button[type=submit]').prop('disabled', true).text('Menyimpan...');
