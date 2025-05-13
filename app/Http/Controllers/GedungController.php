@@ -111,7 +111,14 @@ class GedungController extends Controller
         $gedung = Gedung::find($id);
 
         if ($gedung) {
+            // Hapus foto jika ada dan file-nya masih ada di storage
+            if ($gedung->foto_gedung && Storage::exists('public/uploads/gedung/' . $gedung->foto_gedung)) {
+                Storage::delete('public/uploads/gedung/' . $gedung->foto_gedung);
+            }
+
+            // Hapus data gedung
             $gedung->delete();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data berhasil dihapus'
