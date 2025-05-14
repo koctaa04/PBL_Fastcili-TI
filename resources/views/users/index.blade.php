@@ -16,7 +16,7 @@
                     <table class="table table-bordered table-striped table-row-bordered" id="table_ruangan">
                         <thead>
                             <tr class="text-center">
-                                <th scope="col">#</th>
+                                <th scope="col">Profil</th>
                                 <th scope="col">Nama Level</th>
                                 <th scope="col">Nama</th>
                                 <th scope="col">Akses</th>
@@ -27,7 +27,13 @@
                         <tbody>
                             @foreach ($users as $index => $u)
                                 <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
+                                    <td class="text-center">
+                                        @if ($u->foto_profil)   
+                                            <img src="{{ asset('uploads/foto_profil/' . $u->foto_profil) }}" width="50" style="border-radius:10px;">
+                                        @else
+                                        <img src="{{ asset('default-avatar.jpg') }}" width="50" style="border-radius:10px;">
+                                        @endif
+                                    </td>
                                     <td>{{ $u->level->nama_level }}</td>
                                     <td>{{ $u->nama }}</td>
                                     <td class="text-center">
