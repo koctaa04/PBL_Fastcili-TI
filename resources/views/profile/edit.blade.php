@@ -27,10 +27,10 @@
                                 @if (auth()->user()->foto_profil)
                                     <img class="avatar border-gray rounded-circle" 
                                          src="{{ asset('uploads/foto_profil/' . auth()->user()->foto_profil) }}" 
-                                         alt="Foto Profil" width="150" height="150">
+                                         alt="Foto Profil" width="120" height="120">
                                 @else
                                     <img class="avatar border-gray rounded-circle" 
-                                         src="{{ asset('default-avatar.png') }}" 
+                                         src="{{ asset('default-avatar.jpg') }}" 
                                          alt="Foto Default" width="120" height="120">
                                 @endif
                     

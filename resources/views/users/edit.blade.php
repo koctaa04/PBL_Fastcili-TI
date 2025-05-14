@@ -23,11 +23,6 @@
                         required>
                 </div>
                 <div class="form-group">
-                    <label>No Induk</label>
-                    <input type="text" class="form-control" name="no_induk" value="{{ $users->no_induk }}"
-                        required>
-                </div>
-                <div class="form-group">
                     <label>Email</label>
                     <input type="text" class="form-control" name="email" value="{{ $users->email }}"
                         required>

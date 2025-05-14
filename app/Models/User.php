@@ -27,7 +27,8 @@ class User extends Authenticatable
         'nama',
         'email',
         'password',
-        'foto_profil'
+        'foto_profil',
+        'akses'
     ];
 
     public function level()

@@ -13,13 +13,13 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_ruangan">
+                    <table class="table table-bordered table-striped table-row-bordered" id="table_ruangan">
                         <thead>
-                            <tr>
-                                <th scope="col">#</th>
+                            <tr class="text-center">
+                                <th scope="col">Profil</th>
                                 <th scope="col">Nama Level</th>
                                 <th scope="col">Nama</th>
-                                <th scope="col">No Induk</th>
+                                <th scope="col">Akses</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Aksi</th>
                             </tr>
@@ -27,10 +27,22 @@
                         <tbody>
                             @foreach ($users as $index => $u)
                                 <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
+                                    <td class="text-center">
+                                        @if ($u->foto_profil)   
+                                            <img src="{{ asset('uploads/foto_profil/' . $u->foto_profil) }}" width="50" style="border-radius:10px;">
+                                        @else
+                                        <img src="{{ asset('default-avatar.jpg') }}" width="50" style="border-radius:10px;">
+                                        @endif
+                                    </td>
                                     <td>{{ $u->level->nama_level }}</td>
                                     <td>{{ $u->nama }}</td>
-                                    <td>{{ $u->no_induk }}</td>
+                                    <td class="text-center">
+                                        @if ($u->akses == 1)
+                                            <i class="fas fa-user-check text-success"></i>
+                                        @else
+                                            <i class="fas fa-user-times text-danger"></i>
+                                        @endif
+                                    </td>
                                     <td>{{ $u->email }}</td>
                                     <td>
                                         <div class="d-flex">
@@ -43,6 +55,10 @@
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                             </form>
+                                            <button onclick="toggleAccess('{{ url('/users/toggle-access/' . $u->id_user . '') }}')" 
+                                                class="btn btn-sm {{ $u->akses ? 'btn-secondary' : 'btn-success' }} ml-2">
+                                                {{ $u->akses ? 'Nonaktifkan' : 'Aktifkan' }}
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -64,10 +80,65 @@
                 $('#myModal').modal('show');
             });
         }
-        var dataruangan;
+        
+        function toggleAccess(url) {
+            // Extract ID from URL
+            const id = url.split('/').pop();
+            const currentAccess = $(`button[onclick*="${id}"]`).hasClass('btn-success') ? 0 : 1;
+            
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: `Anda yakin ingin ${currentAccess ? 'menonaktifkan' : 'mengaktifkan'} akses ini?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, lanjutkan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            _method: 'POST'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sukses!',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: response.message
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            let errorMsg = 'Terjadi kesalahan saat memproses permintaan';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: errorMsg
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
         $(document).on('submit', '.form-delete', function(e) {
-            e.preventDefault(); // Cegah submit form langsung
+            e.preventDefault();
             let form = this;
             let url = $(this).data('url');
 
