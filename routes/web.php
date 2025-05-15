@@ -107,6 +107,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/edit/{id}', [RuanganController::class, 'edit']);
 		Route::put('/update/{id}', [RuanganController::class, 'update']);
 		Route::delete('/delete/{id}', [RuanganController::class, 'destroy']);
+		Route::get('/ruangan/data', [RuanganController::class, 'getData'])->name('ruangan.data');
 	});
 
 	/** -----------------------------
@@ -162,4 +163,16 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 	});
+
+	/** -----------------------------
+	 *  Verifikasi laporan perbaikan dan Penugasan Teknisi
+	 *  ---------------------------- */
+	Route::get('/laporan/penugasan/{id}', [LaporanKerusakanController::class, 'tugaskanTeknisi']);
+	Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
+	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
+	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+
+	// Route untuk mengambil list data Ruangan dan Fasilitas yang digunakan untuk pilihan di form 
+	Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
+	Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
 });

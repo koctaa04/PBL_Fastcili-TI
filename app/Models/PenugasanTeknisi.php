@@ -17,7 +17,8 @@ class PenugasanTeknisi extends Model
         'tanggal_selesai',
         'status_perbaikan',
         'catatan_teknisi',
-        'dokumentasi'
+        'dokumentasi',
+        'komentar_sarpras'
     ];
 
     public function user()
