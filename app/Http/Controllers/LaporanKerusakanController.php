@@ -117,6 +117,7 @@ class LaporanKerusakanController extends Controller
         // $laporan = LaporanKerusakan::with(['user', 'fasilitas', 'status'])->get();
         // return view('laporan.index', ['laporan_kerusakan' => $laporan]);
 
+        // Muncul laporan sesuai user yang login
         $laporan = LaporanKerusakan::with(['user', 'fasilitas', 'status'])
             ->where('id_user', auth()->user()->id_user)
             ->get();
