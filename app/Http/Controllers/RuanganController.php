@@ -6,14 +6,31 @@ use Illuminate\Http\Request;
 use App\Models\Ruangan;
 use App\Models\Gedung;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 
 class RuanganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $ruangan = Ruangan::all();
+        $ruangan = Ruangan::when($request->id_gedung, function ($query, $id_gedung) {
+            return $query->where('id_gedung', $id_gedung);
+        })->with('gedung')->get();
+        $gedung = Gedung::all();
 
-        return view('ruangan.index', ['ruangan' => $ruangan]);
+        return view('ruangan.index', ['ruangan' => $ruangan, 'gedung' => $gedung]);
+    }
+
+    public function filter(Request $request)
+    {
+        $query = Ruangan::with('gedung');
+
+        if ($request->id_gedung) {
+            $query->where('id_gedung', $request->id_gedung);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->make(true);
     }
 
     public function create()
