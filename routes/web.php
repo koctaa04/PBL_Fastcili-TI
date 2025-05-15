@@ -161,6 +161,15 @@ Route::group(['middleware' => 'auth'], function () {
 	// Route untuk mengambil list data Ruangan dan Fasilitas yang digunakan untuk pilihan di form 
 	Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
 	Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
+
+
+	// web.php
+Route::get('/laporan/penugasan/{id}', [LaporanKerusakanController::class, 'tugaskanTeknisi']);
+Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
+
+Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
+Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+
 });
 
 Route::group(['middleware' => 'auth'], function () {

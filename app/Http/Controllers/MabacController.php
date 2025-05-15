@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LaporanKerusakan;
+use App\Models\PenugasanTeknisi;
 use App\Models\KriteriaPenilaian;
 use Illuminate\Support\Facades\DB;
 
@@ -38,7 +39,8 @@ class MabacController extends Controller
         // Melakukan Normalisasi (X)
         foreach ($alternatif as $item) {
             $normalizedMatrix[] = [
-                'id_laporan' => $item->laporan->deskripsi,
+                'id_laporan' => $item->laporan->id_laporan,
+                'deskripsi' => $item->laporan->deskripsi,
                 'status' => $item->laporan->status->nama_status,
                 'tingkat_kerusakan' => ($item->tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan) / ($minMaxValues->max_tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan),
                 'frekuensi_digunakan' => ($item->frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan) / ($minMaxValues->max_frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan),
@@ -52,6 +54,7 @@ class MabacController extends Controller
         foreach ($normalizedMatrix as $i) {
             $weightedMatrix[] = [
                 'id_laporan' => $i['id_laporan'],
+                'deskripsi' => $i['deskripsi'],
                 'status' => $i['status'],
                 'tingkat_kerusakan' => ($i['tingkat_kerusakan'] * $weight[0]) + $weight[0],
                 'frekuensi_digunakan' => ($i['frekuensi_digunakan'] * $weight[1]) + $weight[1],
@@ -87,6 +90,7 @@ class MabacController extends Controller
         foreach ($weightedMatrix as $i) {
             $perkiraanBatas[] = [
                 'id_laporan' => $i['id_laporan'],
+                'deskripsi' => $i['deskripsi'],
                 'status' => $i['status'],
                 'tingkat_kerusakan' => $i['tingkat_kerusakan'] - $G['tingkat_kerusakan'],
                 'frekuensi_digunakan' => $i['frekuensi_digunakan'] - $G['frekuensi_digunakan'],
@@ -100,9 +104,9 @@ class MabacController extends Controller
             $totalPerkiraan = $k['tingkat_kerusakan'] + $k['frekuensi_digunakan'] + $k['dampak'] + $k['estimasi_biaya'] + $k['potensi_bahaya'];
 
             $S[] = [
-                'status' => $k['status'],
                 'id_laporan' => $k['id_laporan'],
-
+                'deskripsi' => $k['deskripsi'],
+                'status' => $k['status'],
                 'S' => $totalPerkiraan
             ];
         }
@@ -119,6 +123,15 @@ class MabacController extends Controller
             $ranked[] = $item;
         }
 
+        foreach ($ranked as &$item) {
+            // Ambil data penugasan teknisi berdasarkan id_laporan
+            $penugasan = PenugasanTeknisi::where('id_laporan', $item['id_laporan'])->first();
+
+            // Tambahkan data penugasan ke masing-masing item hasil ranking
+            $item['penugasan'] = $penugasan;
+        }
+
+        // Kirim data ke views
         return view('laporan_prioritas.index', ['ranked' => $ranked]);
     }
 }

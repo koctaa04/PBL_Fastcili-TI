@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('tanggal_selesai')->nullable();
             $table->string('status_perbaikan');
             $table->text('catatan_teknisi')->nullable();
+            $table->text('komentar_sarpras')->nullable();
             $table->string('dokumentasi')->nullable();
             $table->timestamps();
 

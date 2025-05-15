@@ -44,7 +44,7 @@
                                     <td>{{ $l->keterangan ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            @if ($l->id_status !== 1)
+                                            @if ($l->id_status == 5)
                                                 <button
                                                     onclick="modalAction('{{ url('/lapor_kerusakan/edit/' . $l->id_laporan) }}')"
                                                     class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
