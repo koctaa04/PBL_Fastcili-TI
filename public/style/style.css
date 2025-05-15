@@ -1,0 +1,11 @@
+.table-responsive {
+    overflow-y: hidden;
+}
+
+.table-hover tbody tr:hover {
+    background: linear-gradient(
+        11deg,
+        rgba(249, 241, 220, 0.816) 38%,
+        rgba(255, 187, 61, 0.91) 100%
+    );
+}
