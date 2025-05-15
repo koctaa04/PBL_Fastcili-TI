@@ -7,20 +7,28 @@
     <div class="content">
         <h3>Data User</h3>
         <div class="card p-4">
-            <div class="card-header">
-                <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
-                    Data</button>
+            <div class="card-header d-flex justify-content-center align-items-center mb-3">
+                <div class="card-tools d-flex justify-content-center flex-wrap">
+                    <button onclick="modalAction('{{ url('/users/import') }}')" 
+                            class="btn btn-lg btn-warning mr-5 mb-2">
+                        Import Data User (.xlsx)
+                    </button>
+                    <button onclick="modalAction('{{ url('/users/create') }}')" 
+                            class="btn btn-lg btn-success mb-2">
+                        Tambah Data User
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-row-bordered" id="table_ruangan">
+                    <table class="table table-bordered table-striped table-hover table-row-bordered" id="table_ruangan">
                         <thead>
                             <tr class="text-center">
                                 <th scope="col">Profil</th>
-                                <th scope="col">Nama Level</th>
                                 <th scope="col">Nama</th>
-                                <th scope="col">Akses</th>
                                 <th scope="col">Email</th>
+                                <th scope="col">Nama Level</th>
+                                <th scope="col">Akses</th>
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
@@ -34,8 +42,9 @@
                                         <img src="{{ asset('default-avatar.jpg') }}" width="50" style="border-radius:10px;">
                                         @endif
                                     </td>
-                                    <td>{{ $u->level->nama_level }}</td>
                                     <td>{{ $u->nama }}</td>
+                                    <td>{{ $u->email }}</td>
+                                    <td>{{ $u->level->nama_level }}</td>
                                     <td class="text-center">
                                         @if ($u->akses == 1)
                                             <i class="fas fa-user-check text-success"></i>
@@ -43,12 +52,11 @@
                                             <i class="fas fa-user-times text-danger"></i>
                                         @endif
                                     </td>
-                                    <td>{{ $u->email }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <button
                                                 onclick="modalAction('{{ url('/users/edit/' . $u->id_user . '') }}')"
-                                                class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
+                                                class="btn btn-sm btn-info" style="margin-right: 8px">Edit</button>
                                             <form class="form-delete"
                                                 action="{{ url('/users/delete/' . $u->id_user . '') }}" method="POST">
                                                 @csrf
