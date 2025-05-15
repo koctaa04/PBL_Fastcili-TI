@@ -24,11 +24,6 @@
                     <small class="text-danger error-text" id="error-nama"></small>
                 </div>
                 <div class="form-group">
-                    <label>No Induk</label>
-                    <input type="text" class="form-control" name="no_induk" id="no_induk" required>
-                    <small class="text-danger error-text" id="error-no_induk"></small>
-                </div>
-                <div class="form-group">
                     <label>Email</label>
                     <input type="text" class="form-control" name="email" id="email" required>
                     <small class="text-danger error-text" id="error-email"></small>

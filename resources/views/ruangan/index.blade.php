@@ -8,8 +8,23 @@
         <h3>Data Ruangan</h3>
         <div class="card p-4">
             <div class="card-header">
-                <button onclick="modalAction('{{ url('/ruangan/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
-                    Data</button>
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-md-auto">
+                        <button onclick="modalAction('{{ url('/ruangan/create') }}')" class="btn btn-sm btn-primary">Tambah
+                            Data</button>
+                    </div>
+                    <div class="col-md-auto">
+                        <div class="form-group mb-0 d-flex align-items-center">
+                            <label for="id_gedung" class="mr-2 mb-0">Filter:</label>
+                            <select class="form-control form-control-sm" id="id_gedung" name="id_gedung">
+                                <option value="">- Semua -</option>
+                                @foreach ($gedung as $item)
+                                    <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -62,12 +77,10 @@
                 $('#myModal').modal('show');
             });
         }
-        var dataruangan;
 
         $(document).on('submit', '.form-delete', function(e) {
-            e.preventDefault(); // Cegah submit form langsung
+            e.preventDefault();
             let form = this;
-            let url = $(this).data('url');
 
             Swal.fire({
                 title: 'Apakah Anda yakin ingin menghapus data ini?',
@@ -115,6 +128,22 @@
                     });
                 }
             });
+        });
+
+        $(document).ready(function() {
+            $('#id_gedung').on('change', function() {
+                var selectedGedung = $(this).val();
+                var currentUrl = window.location.href.split('?')[0];
+                var newUrl = currentUrl;
+
+                if (selectedGedung !== "") {
+                    newUrl += '?id_gedung=' + selectedGedung;
+                }
+
+                window.location.href = newUrl;
+            });
+
+            var dataruangan = $('#table_ruangan').DataTable();
         });
     </script>
 @endpush

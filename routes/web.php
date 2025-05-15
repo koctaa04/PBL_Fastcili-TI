@@ -11,6 +11,7 @@ use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\VerifikasiLaporanController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +37,6 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'App\Http\Controllers\HomeController@index')->name('home');
 
 // Password Reset Routes...
 Route::get('password/reset', 'App\Http\Controllers\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
@@ -45,6 +45,8 @@ Route::get('password/reset/{token}', 'App\Http\Controllers\Auth\ResetPasswordCon
 Route::post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.update');
 
 Route::group(['middleware' => 'auth'], function () {
+	Route::get('/home', [HomeController::class, 'index'])->name('home');
+
 	/** -----------------------------
 	 *  Profile & User Management
 	 *  ---------------------------- */
@@ -78,6 +80,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/edit/{id}', [UserController::class, 'edit']);
 		Route::put('/update/{id}', [UserController::class, 'update']);
 		Route::delete('/delete/{id}', [UserController::class, 'destroy']);
+		Route::post('/toggle-access/{id}', [UserController::class, 'toggleAccess']);
 	});
 
 	/** -----------------------------
@@ -102,6 +105,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/edit/{id}', [RuanganController::class, 'edit']);
 		Route::put('/update/{id}', [RuanganController::class, 'update']);
 		Route::delete('/delete/{id}', [RuanganController::class, 'destroy']);
+		Route::get('/ruangan/data', [RuanganController::class, 'getData'])->name('ruangan.data');
 	});
 
 	/** -----------------------------
@@ -169,8 +173,4 @@ Route::group(['middleware' => 'auth'], function () {
 	// Route untuk mengambil list data Ruangan dan Fasilitas yang digunakan untuk pilihan di form 
 	Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
 	Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
-});
-
-Route::group(['middleware' => 'auth'], function () {
-	Route::get('{page}', ['as' => 'page.index', 'uses' => 'App\Http\Controllers\PageController@index']);
 });

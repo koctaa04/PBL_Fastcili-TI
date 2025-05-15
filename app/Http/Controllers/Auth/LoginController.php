@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -40,19 +41,52 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 
-    protected function sendFailedLoginResponse(Request $request)
+    /**
+     * Validate the user login request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function validateLogin(Request $request)
     {
-        $user = \App\Models\User::where('email', $request->email)->first();
-
-        if ($user && !$user->akses) {
-            return redirect()->back()
-                ->withInput($request->only('email', 'remember'))
-                ->with('alert-danger', 'Akun Anda tidak memiliki akses untuk login.');
-        }
-
-        parent::sendFailedLoginResponse($request);
+        $request->validate([
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+        ]);
     }
 
+    /**
+     * Attempt to log the user into the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function attemptLogin(Request $request)
+    {
+        // Cek status akses user sebelum login
+        $user = \App\Models\User::where('email', $request->email)
+            ->where('akses', 1)
+            ->first();
+
+        if (!$user) {
+            return false;
+        }
+
+        return Auth::attempt(
+            $this->credentials($request),
+            $request->filled('remember')
+        );
+    }
+
+    /**
+     * The user has been authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
     protected function authenticated(Request $request, $user)
     {
         if ($request->remember) {
@@ -66,5 +100,30 @@ class LoginController extends Controller
         }
 
         return redirect()->intended($this->redirectPath());
+    }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user && $user->akses == 0) {
+            return redirect()->back()
+                ->withInput($request->only('email', 'remember'))
+                ->withErrors([
+                    $this->username() => 'Akun Anda tidak memiliki akses untuk login. Silakan hubungi administrator.',
+                ]);
+        }
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 }
