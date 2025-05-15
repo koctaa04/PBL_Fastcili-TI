@@ -4,7 +4,8 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
     <div class="modal-body">
-        <form action="{{ route('gedung.store') }}" id="form_create">
+
+        <form method="POST" action="{{ route('gedung.store') }}" enctype="multipart/form-data" id="form_create">
             @csrf
             <div class="form-group">
                 <label>Nama Gedung</label>
@@ -20,7 +21,7 @@
             </div>
             <div class="mb-3">
                 <label for="foto" class="form-label">Foto Gedung</label>
-                <input type="file" class="form-control" name="foto" id="foto" accept="image/*" required>
+                <input type="file" class="form-control" name="foto_gedung" id="foto" accept="image/*" required>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -35,11 +36,14 @@
         e.preventDefault();
 
         $('.error-text').text('');
+        const formData = new FormData(this);
 
         $.ajax({
             type: "POST",
             url: $(this).attr('action'),
-            data: $(this).serialize(),
+            data: formData,
+            contentType: false,
+            processData: false,
             dataType: "json",
             beforeSend: function() {
                 $('#form_create button[type=submit]').prop('disabled', true).text('Menyimpan...');

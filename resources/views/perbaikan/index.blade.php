@@ -19,6 +19,7 @@
                                 <th scope="col">Status</th>
                                 <th scope="col">Catatan Teknisi</th>
                                 <th scope="col">Dokumentasi Perbaikan</th>
+                                <th scope="col">Catatan Sarpras</th>
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
@@ -41,34 +42,46 @@
                                     <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
 
                                     <td>
-                                        <span class="badge badge-pill {{ $laporan->status_perbaikan == 'Sedang Dikerjakan' ? 'badge-warning' : 'badge-success' }}">
+                                        <span
+                                            class="badge badge-pill {{ $laporan->status_perbaikan == 'Sedang dikerjakan' ? 'badge-warning' : 'badge-success' }}">
                                             {{ $laporan->status_perbaikan }}
                                         </span>
-                                    </td>                                    
+                                    </td>
 
                                     {{-- Catatan Teknisi --}}
                                     <td>{{ $laporan->catatan_teknisi ?? '-' }}</td>
 
                                     {{-- Dokumentasi --}}
                                     <td>
-                                        <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
-                                            alt="Foto Kerusakan" height="65"
-                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                        @if ($laporan->dokumentasi)
+                                            <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
+                                                alt="Foto Kerusakan" height="65">
+                                        @else
+                                            <span class="text-danger">Belum ada dokumentasi</span>
+                                        @endif
                                     </td>
+
+                                    {{-- Catatan Teknisi --}}
+                                    <td>{{ $laporan->komentar_sarpras ?? '-' }}</td>
 
                                     {{-- Tombol Aksi --}}
                                     <td>
                                         <div class="d-flex">
                                             @php
-                                                $isLaporanAllowed = is_null($laporan->dokumentasi);
+                                                $isEditable = $laporan->status_perbaikan != 'Selesai Dikerjakan';
+                                                $isRejected = !is_null($laporan->komentar_sarpras);
+                                                $isReported = !is_null($laporan->dokumentasi);
+
                                                 $laporanUrl = url('/perbaikan/edit/' . $laporan->id_penugasan);
                                                 $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
                                             @endphp
 
-                                            <button onclick="{{ $isLaporanAllowed ? "modalAction('$laporanUrl')" : '' }}"
-                                                class="btn btn-sm btn-warning mr-2" {{ $isLaporanAllowed ? '' : 'disabled' }}>
-                                                Laporan
-                                            </button>
+                                            @if ($isEditable)
+                                                <button onclick="modalAction('{{ $laporanUrl }}')"
+                                                    class="btn btn-sm btn-warning mr-2">
+                                                    {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                                </button>
+                                            @endif
 
                                             <button onclick="modalAction('{{ $detailUrl }}')"
                                                 class="btn btn-sm btn-info">
@@ -76,6 +89,7 @@
                                             </button>
                                         </div>
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
