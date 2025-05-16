@@ -9,13 +9,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Yajra\DataTables\DataTables;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::all();
-        return view('users.index', ['users' => $user]);
+        $user = User::when($request->id_level, function ($query, $id_level) {
+            return $query->where('id_level', $id_level);
+        })->with('level')->get();
+        $level = level::all();
+
+        return view('users.index', ['users' => $user, 'level' => $level]);
     }
 
     public function create()
@@ -164,24 +169,19 @@ class UserController extends Controller
 
     public function import_ajax(Request $request)
     {
-        // Validasi request harus AJAX/JSON
-        if (!$request->ajax() && !$request->wantsJson()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid request type'
-            ], 400);
-        }
-
         $validator = Validator::make($request->all(), [
             'file_user' => ['required', 'mimes:xlsx', 'max:1024']
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validasi gagal',
-                'msgField' => $validator->errors()
-            ], 422);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         try {
@@ -220,27 +220,37 @@ class UserController extends Controller
             }
 
             if (!empty($errors)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Terdapat error validasi data',
-                    'msgField' => $errors
-                ], 422);
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Terdapat error validasi data',
+                        'errors' => $errors
+                    ], 422);
+                }
+                return redirect()->back()->with('error', implode('<br>', $errors));
             }
 
             if (!empty($insert)) {
                 User::insert($insert);
             }
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Data user berhasil diimport',
-                'count' => count($insert)
-            ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data user berhasil diimport',
+                    'count' => count($insert)
+                ]);
+            }
+            return redirect()->route('users.index')->with('success', 'Data user berhasil diimport (' . count($insert) . ' data)');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }
