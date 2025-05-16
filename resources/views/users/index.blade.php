@@ -7,7 +7,7 @@
     <div class="content">
         <h3>Data User</h3>
         <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-3">
+            <div class="card-header d-flex justify-content-center align-items-center mb-5">
                 <div class="card-tools d-flex justify-content-center flex-wrap">
                     <button onclick="modalAction('{{ url('/users/import') }}')" 
                             class="btn btn-lg btn-warning mr-5 mb-2">
@@ -20,10 +20,28 @@
                 </div>
             </div>
             <div class="card-body">
+                {{-- Filtering --}}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label class="col-1 control-label col-form-label">Filter:</label>
+                            <div class="col-3">
+                                <select class="form-control" id="id_level" name="id_level" required>
+                                    <option value="">- Semua Level -</option>
+                                    @foreach($level as $item)
+                                        <option value="{{ $item->id_level }}">{{ $item->nama_level }} </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Level User</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-row-bordered" id="table_ruangan">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_user">
                         <thead>
-                            <tr class="text-center">
+                            <tr>
                                 <th scope="col">Profil</th>
                                 <th scope="col">Nama</th>
                                 <th scope="col">Email</th>
@@ -83,6 +101,38 @@
 
 @push('scripts')
     <script>
+        var dataUser;
+        $(document).ready(function() {
+            // Preselect filter option if exists in URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var selectedLevel = urlParams.get('id_level');
+            if (selectedLevel) {
+                $('#id_level').val(selectedLevel);
+            }
+
+            $('#id_level').on('change', function() {
+                var selectedLevel = $(this).val();
+                var currentUrl = window.location.href.split('?')[0];
+                var newUrl = currentUrl;
+
+                if (selectedLevel !== "") {
+                    newUrl += '?id_level=' + selectedLevel;
+                }
+
+                window.location.href = newUrl;
+            });
+
+            dataUser = $('#table_user').DataTable({
+                columnDefs: [
+                    { 
+                        targets: [0, 3, 4, 5], // Index of Profil, Akses, and Aksi columns
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+        });
+
         function modalAction(url = '') {
             $('#myModal').load(url, function() {
                 $('#myModal').modal('show');
