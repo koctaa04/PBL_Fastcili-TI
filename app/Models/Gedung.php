@@ -12,7 +12,7 @@ class Gedung extends Model
     protected $table = 'gedung';
     protected $primaryKey = 'id_gedung';
 
-    protected $fillable = ['kode_gedung', 'nama_gedung'];
+    protected $fillable = ['kode_gedung', 'nama_gedung', 'deskripsi', 'foto_gedung'];
 
     public function ruangan()
     {

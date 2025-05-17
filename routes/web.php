@@ -80,6 +80,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/edit/{id}', [UserController::class, 'edit']);
 		Route::put('/update/{id}', [UserController::class, 'update']);
 		Route::delete('/delete/{id}', [UserController::class, 'destroy']);
+		Route::get('/import', [UserController::class, 'import'])->name('users.import');
+		Route::post('/import_ajax', [UserController::class, 'import_ajax'])->name('users.import.ajax');
 		Route::post('/toggle-access/{id}', [UserController::class, 'toggleAccess']);
 	});
 
@@ -175,4 +177,15 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
 		Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 	});
+	/** -----------------------------
+	 *  Verifikasi laporan perbaikan dan Penugasan Teknisi
+	 *  ---------------------------- */
+	Route::get('/laporan/penugasan/{id}', [LaporanKerusakanController::class, 'tugaskanTeknisi']);
+	Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
+	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
+	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+
+	// Route untuk mengambil list data Ruangan dan Fasilitas yang digunakan untuk pilihan di form 
+	Route::get('/get-ruangan/{id_gedung}', [LaporanKerusakanController::class, 'getRuangan']);
+	Route::get('/get-fasilitas/{id_ruangan}', [LaporanKerusakanController::class, 'getFasilitas']);
 });

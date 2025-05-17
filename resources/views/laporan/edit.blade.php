@@ -18,7 +18,7 @@
                     <textarea name="deskripsi" class="form-control" required>{{ $laporan->deskripsi }}</textarea>
                     <small class="text-danger error-text" id="error-deskripsi"></small>
                 </div>
-                <div class="form-group">
+                <div class="">
                     <label for="foto_kerusakan">Foto Kerusakan</label>
                     <input type="file" name="foto_kerusakan" id="foto_kerusakan" class="form-control-file">
                     <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto.</small>

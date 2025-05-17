@@ -5,15 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Level;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Yajra\DataTables\DataTables;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::all();
-        return view('users.index', ['users' => $user]);
+        $user = User::when($request->id_level, function ($query, $id_level) {
+            return $query->where('id_level', $id_level);
+        })->with('level')->get();
+        $level = level::all();
+
+        return view('users.index', ['users' => $user, 'level' => $level]);
     }
 
     public function create()
@@ -152,6 +159,98 @@ class UserController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function import()
+    {
+        return view('users.import');
+    }
+
+    public function import_ajax(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file_user' => ['required', 'mimes:xlsx', 'max:1024']
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            $file = $request->file('file_user');
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray();
+
+            $insert = [];
+            $errors = [];
+
+            foreach ($data as $index => $row) {
+                if ($index === 0) continue; // Skip header
+
+                // Validasi data
+                if (!Level::find($row[0])) {
+                    $errors[] = "Baris $index: Level ID {$row[0]} tidak ditemukan";
+                    continue;
+                }
+
+                if (User::where('email', $row[1])->exists()) {
+                    $errors[] = "Baris $index: Email {$row[1]} sudah terdaftar";
+                    continue;
+                }
+
+                $insert[] = [
+                    'id_level' => $row[0],
+                    'email' => $row[1],
+                    'nama' => $row[2],
+                    'password' => Hash::make($row[3]),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            if (!empty($errors)) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Terdapat error validasi data',
+                        'errors' => $errors
+                    ], 422);
+                }
+                return redirect()->back()->with('error', implode('<br>', $errors));
+            }
+
+            if (!empty($insert)) {
+                User::insert($insert);
+            }
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data user berhasil diimport',
+                    'count' => count($insert)
+                ]);
+            }
+            return redirect()->route('users.index')->with('success', 'Data user berhasil diimport (' . count($insert) . ' data)');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

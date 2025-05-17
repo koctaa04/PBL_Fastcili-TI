@@ -40,7 +40,7 @@
                     <label>Deskripsi Kerusakan</label>
                     <textarea name="deskripsi" class="form-control" required></textarea>
                 </div>
-                <div class="form-group">
+                <div class="">
                     <label for="foto_kerusakan">Foto Kerusakan</label>
                     <input type="file" name="foto_kerusakan" class="form-control-file" id="foto_kerusakan">
                 </div>

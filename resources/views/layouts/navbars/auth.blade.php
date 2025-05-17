@@ -131,6 +131,36 @@
                     <a data-toggle="collapse" aria-expanded="false" href="#teknisi">
                         <i class="nc-icon nc-bank"></i>
                         <p>
+                        <b class="caret"></b>
+                    </p>
+                </a>
+                <div class="collapse {{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'mabac' ? 'show' : '' }}" id="laporan">
+                    <ul class="nav">
+                        <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
+                            <a href="{{ route('perbaikan.index') }}">
+                                <span class="sidebar-mini-icon">{{ __('L') }}</span>
+                                <span class="sidebar-normal">{{ __(' Lapor Kerusakan ') }}</span>
+                            </a>
+                        </li>
+                        <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
+                            <a href="{{ route('prioritas.index') }}">
+                                <span class="sidebar-mini-icon">{{ __('V') }}</span>
+                                <span class="sidebar-normal">{{ __(' Verifikasi Laporan ') }}</span>
+                            </a>
+                        </li>
+                        <li class="{{ $elementActive == 'mabac' ? 'active' : '' }}">
+                            <a href="{{ route('mabac.index') }}">
+                                <span class="sidebar-mini-icon">{{ __('P') }}</span>
+                                <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
+                <a data-toggle="collapse" aria-expanded="false" href="#teknisi">
+                    <i class="nc-icon nc-bank"></i>
+                    <p>
                             {{ __('Teknisi') }}
                             <b class="caret"></b>
                         </p>
