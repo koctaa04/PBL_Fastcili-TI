@@ -161,4 +161,18 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 	});
+
+	Route::middleware(['authorize:1,3,4'])->group(function () {
+		Route::get('/pelapor', [HomeController::class, 'pelapor'])->name('pelapor');
+		Route::get('/pelapor/create', [LaporanKerusakanController::class, 'createPelapor']);
+		Route::post('/', [LaporanKerusakanController::class, 'storePelapor'])->name('pelapor.store');
+		Route::get('/edit/{id}', [LaporanKerusakanController::class, 'editPelapor'])->name('pelapor.edit');
+		Route::put('/update/{id}', [LaporanKerusakanController::class, 'updatePelapor'])->name('pelapor.update');
+		Route::get('/rate/{id}', [LaporanKerusakanController::class, 'rate'])->name('pelapor.rate');
+		Route::put('/rating/{id}', [LaporanKerusakanController::class, 'rating'])->name('pelapor.rating');
+		Route::get('/detail/{id}', [LaporanKerusakanController::class, 'detail'])->name('pelapor.detail');
+		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
+		Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
+		Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
+	});
 });
