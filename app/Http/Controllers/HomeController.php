@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LaporanKerusakan;
+use Illuminate\Support\Facades\Auth;
+
 class HomeController extends Controller
 {
     /**
@@ -22,5 +25,15 @@ class HomeController extends Controller
     public function index()
     {
         return view('pages.dashboard');
+    }
+
+
+    public function pelapor()
+    {
+        $laporan = LaporanKerusakan::where('id_user', Auth::id())->get();
+        $status = LaporanKerusakan::where('id_user', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->first();
+        return view('users.pelapor.index', compact('laporan', 'status'));
     }
 }

@@ -99,7 +99,12 @@ class LoginController extends Controller
             Cookie::queue(Cookie::forget('remember_password'));
         }
 
-        return redirect()->intended($this->redirectPath());
+        // return redirect()->intended($this->redirectPath());
+        if (in_array($user->id_level, [1, 2])) {
+            return redirect()->route('home');
+        }
+
+        return redirect()->route('pelapor');
     }
 
     /**

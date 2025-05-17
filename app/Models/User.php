@@ -46,6 +46,11 @@ class User extends Authenticatable
         return $this->hasMany(PenugasanTeknisi::class, 'id_user');
     }
 
+    public function getRole()
+    {
+        return $this->id_level;
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
