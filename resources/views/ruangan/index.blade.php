@@ -17,9 +17,12 @@
                         <div class="form-group mb-0 d-flex align-items-center">
                             <label for="id_gedung" class="mr-2 mb-0">Filter:</label>
                             <select class="form-control form-control-sm" id="id_gedung" name="id_gedung">
-                                <option value="">- Semua -</option>
+                                <option value="">-- Semua --</option>
                                 @foreach ($gedung as $item)
-                                    <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }}</option>
+                                    <option value="{{ $item->id_gedung }}"
+                                        {{ request('id_gedung') == $item->id_gedung ? 'selected' : '' }}>
+                                        {{ $item->nama_gedung }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -138,6 +141,8 @@
 
                 if (selectedGedung !== "") {
                     newUrl += '?id_gedung=' + selectedGedung;
+                } else {
+                    newUrl = currentUrl;
                 }
 
                 window.location.href = newUrl;

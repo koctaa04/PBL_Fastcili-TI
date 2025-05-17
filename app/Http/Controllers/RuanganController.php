@@ -12,25 +12,17 @@ class RuanganController extends Controller
 {
     public function index(Request $request)
     {
-        $ruangan = Ruangan::when($request->id_gedung, function ($query, $id_gedung) {
-            return $query->where('id_gedung', $id_gedung);
-        })->with('gedung')->get();
+        $id_gedung = $request->query('id_gedung');
+
+        if (!empty($id_gedung)) {
+            $ruangan = Ruangan::where('id_gedung', $id_gedung)->get();
+        } else {
+            $ruangan = Ruangan::all(); // tampilkan semua
+        }
+
         $gedung = Gedung::all();
 
         return view('ruangan.index', ['ruangan' => $ruangan, 'gedung' => $gedung]);
-    }
-
-    public function filter(Request $request)
-    {
-        $query = Ruangan::with('gedung');
-
-        if ($request->id_gedung) {
-            $query->where('id_gedung', $request->id_gedung);
-        }
-
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->make(true);
     }
 
     public function create()
