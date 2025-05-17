@@ -8,12 +8,31 @@
         <h3>Data Fasilitas</h3>
         <div class="card p-4">
             <div class="card-header">
-                <button onclick="modalAction('{{ url('/fasilitas/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
-                    Data</button>
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-md-auto">
+                        <button onclick="modalAction('{{ url('/fasilitas/create') }}')"
+                            class="btn btn-sm btn-primary mt-1">Tambah
+                            Data</button>
+                    </div>
+                    <div class="col-md-auto">
+                        <div class="form-group mb-0 d-flex align-items-center">
+                            <label for="id_ruangan" class="mr-2 mb-0">Filter:</label>
+                            <select class="form-control form-control-sm" id="id_ruangan" name="id_ruangan">
+                                <option value="">-- Semua --</option>
+                                @foreach ($ruangan as $item)
+                                    <option value="{{ $item->id_ruangan }}"
+                                        {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
+                                        {{ $item->nama_ruangan }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_ruangan">
+                    <table class="table table-bordered table-striped table-hover table-sm" id="table_fasilitas">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -38,7 +57,8 @@
                                                 onclick="modalAction('{{ url('/fasilitas/edit/' . $f->id_fasilitas . '') }}')"
                                                 class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
                                             <form class="form-delete"
-                                                action="{{ url('/fasilitas/delete/' . $f->id_fasilitas . '') }}" method="POST">
+                                                action="{{ url('/fasilitas/delete/' . $f->id_fasilitas . '') }}"
+                                                method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -117,6 +137,24 @@
                     });
                 }
             });
+        });
+
+        $(document).ready(function() {
+            $('#id_ruangan').on('change', function() {
+                var selectedRuangan = $(this).val();
+                var currentUrl = window.location.href.split('?')[0];
+                var newUrl = currentUrl;
+
+                if (selectedRuangan !== "") {
+                    newUrl += '?id_ruangan=' + selectedRuangan;
+                } else {
+                    newUrl = currentUrl;
+                }
+
+                window.location.href = newUrl;
+            });
+
+            var datafasilitas = $('#table_fasilitas').DataTable();
         });
     </script>
 @endpush
