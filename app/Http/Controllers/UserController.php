@@ -177,7 +177,7 @@ class UserController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Validasi gagal',
+                    'message' => 'Validasi data import gagal',
                     'errors' => $validator->errors()
                 ], 422);
             }
@@ -200,12 +200,12 @@ class UserController extends Controller
 
                 // Validasi data
                 if (!Level::find($row[0])) {
-                    $errors[] = "Baris $index: Level ID {$row[0]} tidak ditemukan";
+                    $errors[] = "Level ID {$row[0]} tidak ditemukan";
                     continue;
                 }
 
                 if (User::where('email', $row[1])->exists()) {
-                    $errors[] = "Baris $index: Email {$row[1]} sudah terdaftar";
+                    $errors[] = "Email {$row[1]} sudah terdaftar";
                     continue;
                 }
 
@@ -224,11 +224,14 @@ class UserController extends Controller
                     return response()->json([
                         'status' => false,
                         'message' => 'Terdapat error validasi data',
-                        'errors' => $errors
+                        'msgField' => $this->convertErrorsToFields($errors), // tambahan agar bisa ditampilkan di bawah input
+                        'errors' => $errors // semua pesan error ditampilkan
                     ], 422);
                 }
+
                 return redirect()->back()->with('error', implode('<br>', $errors));
             }
+
 
             if (!empty($insert)) {
                 User::insert($insert);
@@ -252,5 +255,24 @@ class UserController extends Controller
             }
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+    protected function convertErrorsToFields(array $errors)
+    {
+        $result = [];
+
+        foreach ($errors as $error) {
+            // Coba deteksi field dari string error
+            if (str_contains($error, 'email')) {
+                $result['email'] = [$error];
+            } elseif (str_contains($error, 'level') || str_contains($error, 'level_id')) {
+                $result['level_id'] = [$error];
+            } elseif (str_contains($error, 'nama')) {
+                $result['name'] = [$error];
+            } else {
+                $result['file_user'] = [$error]; // fallback ke file_user
+            }
+        }
+
+        return $result;
     }
 }
