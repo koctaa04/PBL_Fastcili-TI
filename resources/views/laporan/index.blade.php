@@ -14,7 +14,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
+                    <table class="table table-bordered table-striped table-hover table-sm" id="table_laporan">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -126,6 +126,10 @@
                     });
                 }
             });
+        });
+
+        $(document).ready(function() {
+            var datalaporan = $('#table_laporan').DataTable();
         });
     </script>
 @endpush

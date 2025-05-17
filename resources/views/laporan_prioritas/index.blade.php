@@ -9,7 +9,7 @@
         <div class="card p-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
+                    <table class="table table-bordered table-striped table-hover table-sm" id="table_prioritas">
                         <thead>
                             <tr>
                                 <th scope="col">Rank</th>
@@ -42,7 +42,6 @@
                                             </button>
                                         @elseif ($r['status'] == 'Selesai')
                                             <span class="text-muted">Sudah Selesai</span>
-
                                         @elseif ($statusPerbaikan === 'Selesai Dikerjakan')
                                             <button
                                                 onclick="modalAction('{{ url('/laporan/verifikasi/' . $r['id_laporan']) }}')"
@@ -72,5 +71,9 @@
                 $('#myModal').modal('show');
             });
         }
+
+        $(document).ready(function() {
+            var datalaporan = $('#table_prioritas').DataTable();
+        });
     </script>
 @endpush
