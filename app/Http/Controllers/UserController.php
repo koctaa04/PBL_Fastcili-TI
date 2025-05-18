@@ -15,12 +15,45 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $user = User::when($request->id_level, function ($query, $id_level) {
-            return $query->where('id_level', $id_level);
-        })->with('level')->get();
-        $level = level::all();
+        if ($request->ajax()) {
+            $users = User::when($request->id_level, function ($query, $id_level) {
+                return $query->where('id_level', $id_level);
+            })
+                ->with('level')
+                ->get();
 
-        return view('users.index', ['users' => $user, 'level' => $level]);
+            return datatables()->of($users)
+                ->addColumn('profil', function ($user) {
+                    return $user->foto_profil
+                        ? '<img src="' . asset('uploads/foto_profil/' . $user->foto_profil) . '" width="50" style="border-radius:10px;">'
+                        : '<img src="' . asset('default-avatar.jpg') . '" width="50" style="border-radius:10px;">';
+                })
+                ->addColumn('akses', function ($user) {
+                    return $user->akses
+                        ? '<i class="fas fa-user-check text-success"></i>'
+                        : '<i class="fas fa-user-times text-danger"></i>';
+                })
+                ->addColumn('aksi', function ($user) {
+                    return '
+                    <div class="d-flex">
+                        <button onclick="modalAction(\'' . url('/users/edit/' . $user->id_user) . '\')" class="btn btn-sm btn-info mr-2">Edit</button>
+                        <form class="form-delete" action="' . url('/users/delete/' . $user->id_user) . '" method="POST">
+                            <input type="hidden" name="_token" value="' . csrf_token() . '">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                        <button onclick="toggleAccess(\'' . url('/users/toggle-access/' . $user->id_user) . '\')" class="btn btn-sm ' . ($user->akses ? 'btn-secondary' : 'btn-success') . ' ml-2">
+                            ' . ($user->akses ? 'Nonaktifkan' : 'Aktifkan') . '
+                        </button>
+                    </div>
+                ';
+                })
+                ->rawColumns(['profil', 'akses', 'aksi'])
+                ->toJson();
+        }
+
+        $level = Level::all();
+        return view('users.index', ['level' => $level]);
     }
 
     public function create()
