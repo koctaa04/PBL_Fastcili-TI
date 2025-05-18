@@ -82,16 +82,6 @@
                 window.location.href = newUrl;
             });
 
-            // dataUser = $('#table_user').DataTable({
-            //     columnDefs: [
-            //         { 
-            //             targets: [0, 3, 4, 5], // Index of Profil, Akses, and Aksi columns
-            //             orderable: false,
-            //             searchable: false
-            //         }
-            //     ]
-            // });
-
             dataUser = $('#table_user').DataTable({
                 processing: true,
                 serverSide: false, // karena kita menggunakan server-side processing sederhana
@@ -213,26 +203,34 @@
                                 Swal.fire({
                                     icon: "success",
                                     title: "Berhasil!",
-                                    text: response.messages,
-                                    timer: 4000,
+                                    text: response.message,
+                                    timer: 3000,
                                     showConfirmButton: true
                                 });
                                 dataUser.ajax.reload();
                             } else {
-                                alert('Gagal menghapus data.');
-                            }
-                        },
-                        error: function(xhr) {
-                            if (xhr.responseJSON && xhr.responseJSON.msgField) {
-                                let errors = xhr.responseJSON.msgField;
-                                $.each(errors, function(field, messages) {
-                                    $('#error-' + field).text(messages[0]);
-                                });
-                            } else {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",
-                                    text: response.messages,
+                                    text: response.message,
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            let response = xhr.responseJSON;
+                            if (response && response.msgField) {
+                                let errors = response.msgField;
+                                $.each(errors, function(field, message) {
+                                    $('#error-' + field).text(message[0]);
+                                });
+                            } else {
+                                let errorMsg = response && response.message 
+                                    ? response.message 
+                                    : 'Terjadi kesalahan saat menghapus data';
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Gagal!",
+                                    text: errorMsg,
                                 });
                             }
                         }

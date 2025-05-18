@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
@@ -22,7 +22,7 @@ class UserController extends Controller
                 ->with('level')
                 ->get();
 
-            return datatables()->of($users)
+            return Datatables::of($users)
                 ->addColumn('profil', function ($user) {
                     return $user->foto_profil
                         ? '<img src="' . asset('uploads/foto_profil/' . $user->foto_profil) . '" width="50" style="border-radius:10px;">'
@@ -38,7 +38,6 @@ class UserController extends Controller
                     <div class="d-flex">
                         <button onclick="modalAction(\'' . url('/users/edit/' . $user->id_user) . '\')" class="btn btn-sm btn-info mr-2">Edit</button>
                         <form class="form-delete" action="' . url('/users/delete/' . $user->id_user) . '" method="POST">
-                            <input type="hidden" name="_token" value="' . csrf_token() . '">
                             <input type="hidden" name="_method" value="DELETE">
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                         </form>
