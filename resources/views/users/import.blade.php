@@ -82,9 +82,7 @@
                             title: 'Berhasil!',
                             text: response.message || response.messages,
                         });
-                        // $('#table_user').DataTable().ajax.reload();
-                        location.reload();
-
+                        dataUser.ajax.reload();
                     } else {
                         Swal.fire({
                             icon: 'error',
