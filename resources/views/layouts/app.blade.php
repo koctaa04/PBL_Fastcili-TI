@@ -87,6 +87,8 @@ The above copyright notice and this permission notice shall be included in all c
     $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
     </script>
 
+    <script src="{{ asset('script/script.js') }}"></script>r
+
     @stack('scripts')
 </body>
 
