@@ -10,12 +10,23 @@ use Illuminate\Support\Facades\Validator;
 
 class FasilitasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $fasilitas = Fasilitas::with('ruangan.gedung')->get();
-        $gedung = Gedung::all();
+        $query = Fasilitas::with('ruangan.gedung');
 
-        return view('fasilitas.index', ['fasilitas' => $fasilitas, 'gedung' => $gedung]);
+        if ($request->has('id_ruangan') && $request->id_ruangan != '') {
+            $query->where('id_ruangan', $request->id_ruangan);
+        }
+
+        $fasilitas = $query->get();
+        $gedung = Gedung::all();
+        $ruangan = Ruangan::all();
+
+        return view('fasilitas.index', [
+            'fasilitas' => $fasilitas,
+            'gedung' => $gedung,
+            'ruangan' => $ruangan
+        ]);
     }
 
     public function getRuangan($id)
