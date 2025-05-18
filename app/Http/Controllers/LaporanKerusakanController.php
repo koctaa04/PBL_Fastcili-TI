@@ -269,7 +269,7 @@ class LaporanKerusakanController extends Controller
         $statusList = StatusLaporan::all();
         $gedungList = Gedung::all();
 
-        return view('users.pelapor.create', compact('fasilitas', 'statusList', 'gedungList'));
+        return view('pages.pelapor.create', compact('fasilitas', 'statusList', 'gedungList'));
     }
 
     public function storePelapor(Request $request)
@@ -337,7 +337,7 @@ class LaporanKerusakanController extends Controller
     {
         $laporan = LaporanKerusakan::find($id);
 
-        return view('users.pelapor.edit', ['laporan' => $laporan]);
+        return view('pages.pelapor.edit', ['laporan' => $laporan]);
     }
 
     public function updatePelapor(Request $request, $id)
@@ -402,7 +402,7 @@ class LaporanKerusakanController extends Controller
     {
         $laporan = LaporanKerusakan::find($id);
 
-        return view('users.pelapor.rating', ['laporan' => $laporan]);
+        return view('pages.pelapor.rating', ['laporan' => $laporan]);
     }
 
     public function rating(Request $request, $id)
@@ -431,6 +431,6 @@ class LaporanKerusakanController extends Controller
     {
         $laporan = LaporanKerusakan::find($id);
 
-        return view('users.pelapor.detail', ['laporan' => $laporan]);
+        return view('pages.pelapor.detail', ['laporan' => $laporan]);
     }
 }
