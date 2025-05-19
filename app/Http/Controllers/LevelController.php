@@ -5,13 +5,32 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Level;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class LevelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $level = Level::all();
-        return view('level.index', ['level' => $level]);
+        if ($request->ajax()) {
+            $levels = Level::all();
+
+            return DataTables::of($levels)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($levels) {
+                    return '
+                    <div class="d-flex">
+                        <button onclick="modalAction(\'' . url('/level/edit/' . $levels->id_level) . '\')" class="btn btn-sm btn-info mr-2">Edit</button>
+                        <form class="form-delete" action="' . url('/level/delete/' . $levels->id_level) . '" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </div>
+                ';
+                })
+                ->rawColumns(['aksi'])
+                ->toJson();
+        }
+        return view('level.index');
     }
 
     public function create()
@@ -90,20 +109,28 @@ class LevelController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $level = Level::find($id);
-
-        if ($level) {
-            $level->delete($request->all());
-            return response()->json([
-                'success' => true,
-                'message' => 'Data berhasil dihapus'
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan',
-            ]);
+        if ($request->ajax() || $request->wantsJson()) {
+            try {
+                $level = Level::find($id);
+                if ($level) {
+                    $level->delete();
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Data berhasil dihapus'
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data tidak ditemukan'
+                    ], 404);
+                }
+            } catch (\Illuminate\Database\QueryException $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data gagal dihapus karena masih terdapat user yang menggunakan level ini'
+                ], 422);
+            }
         }
-        redirect('/');
+        return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
     }
 }

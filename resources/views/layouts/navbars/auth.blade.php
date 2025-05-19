@@ -138,7 +138,7 @@
             @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 3)
                 <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#teknisi">
-                        <i class="nc-icon nc-bank"></i>
+                        <i class="nc-icon nc-settings"></i>
                         <p>
                             {{ __('Teknisi') }}
                             <b class="caret"></b>
