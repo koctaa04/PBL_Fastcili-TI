@@ -12,22 +12,15 @@
                         <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-globe text-warning"></i>
+                                    <i class="nc-icon nc-paper"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Capacity</p>
-                                    <p class="card-title">150GB
-                                        <p>
+                                    <p class="card-category">Total Laporan Masuk</p>
+                                    <p class="card-title">{{$jmlLaporan}}<p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card-footer ">
-                        <hr>
-                        <div class="stats">
-                            <i class="fa fa-refresh"></i> Update Now
                         </div>
                     </div>
                 </div>
@@ -38,22 +31,15 @@
                         <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-money-coins text-success"></i>
+                                    <i class="nc-icon nc-book-bookmark"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Revenue</p>
-                                    <p class="card-title">$ 1,345
-                                        <p>
+                                    <p class="card-category">Laporan Terverifikasi</p>
+                                    <p class="card-title">{{$laporanTerverifikasi}}<p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card-footer ">
-                        <hr>
-                        <div class="stats">
-                            <i class="fa fa-calendar-o"></i> Last day
                         </div>
                     </div>
                 </div>
@@ -64,22 +50,15 @@
                         <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-vector text-danger"></i>
+                                    <i class="nc-icon nc-bullet-list-67"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Errors</p>
-                                    <p class="card-title">23
-                                        <p>
+                                    <p class="card-category">Laporan Aktif</p>
+                                    <p class="card-title">{{$laporanAktif}}<p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card-footer ">
-                        <hr>
-                        <div class="stats">
-                            <i class="fa fa-clock-o"></i> In the last hour
                         </div>
                     </div>
                 </div>
@@ -90,22 +69,15 @@
                         <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-favourite-28 text-primary"></i>
+                                    <i class="nc-icon nc-single-copy-04"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Followers</p>
-                                    <p class="card-title">+45K
-                                        <p>
+                                    <p class="card-category">Laporan Selesai</p>
+                                    <p class="card-title">{{$laporanSelesai}}<p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card-footer ">
-                        <hr>
-                        <div class="stats">
-                            <i class="fa fa-refresh"></i> Update now
                         </div>
                     </div>
                 </div>
@@ -115,17 +87,49 @@
             <div class="col-md-12">
                 <div class="card ">
                     <div class="card-header ">
-                        <h5 class="card-title">Users Behavior</h5>
-                        <p class="card-category">24 Hours performance</p>
+                        <h5 class="card-title">Laporan Masuk</h5>
+                        <p class="card-category">Laporan per bulan</p>
                     </div>
                     <div class="card-body ">
-                        <canvas id=chartHours width="400" height="100"></canvas>
+                        <canvas id=laporanPerBulan width="400" height="125"></canvas>
                     </div>
-                    <div class="card-footer ">
-                        <hr>
-                        <div class="stats">
-                            <i class="fa fa-history"></i> Updated 3 minutes ago
-                        </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Top 5 Prioritas Perbaikan</h5>
+                        <p class="card-category">Berdasarkan hasil perhitungan SPK</p>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Peringkat</th>
+                                    <th>ID Laporan</th>
+                                    <th>Deskripsi</th>
+                                    <th>Status</th>
+                                    <th>Nilai SPK</th>
+                                    <th>Teknisi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(collect($spkRank)->take(5) as $item)
+                                    <tr>
+                                        <td>{{ $item['rank'] }}</td>
+                                        <td>{{ $item['id_laporan'] }}</td>
+                                        <td>{{ $item['deskripsi'] }}</td>
+                                        <td>{{ $item['status'] }}</td>
+                                        <td>{{ number_format($item['S'], 4) }}</td>
+                                        <td>
+                                            {{ $item['penugasan']->nama_teknisi ?? 'Belum Ditugaskan' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -134,44 +138,21 @@
             <div class="col-md-4">
                 <div class="card ">
                     <div class="card-header ">
-                        <h5 class="card-title">Email Statistics</h5>
-                        <p class="card-category">Last Campaign Performance</p>
+                        <h5 class="card-title">Status Laporan</h5>
+                        <p class="card-category">Laporan per status</p>
                     </div>
                     <div class="card-body ">
-                        <canvas id="chartEmail"></canvas>
-                    </div>
-                    <div class="card-footer ">
-                        <div class="legend">
-                            <i class="fa fa-circle text-primary"></i> Opened
-                            <i class="fa fa-circle text-warning"></i> Read
-                            <i class="fa fa-circle text-danger"></i> Deleted
-                            <i class="fa fa-circle text-gray"></i> Unopened
-                        </div>
-                        <hr>
-                        <div class="stats">
-                            <i class="fa fa-calendar"></i> Number of emails sent
-                        </div>
+                        <canvas id="statusLaporanChart"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-md-8">
                 <div class="card card-chart">
                     <div class="card-header">
-                        <h5 class="card-title">NASDAQ: AAPL</h5>
-                        <p class="card-category">Line Chart with Points</p>
+                        <h5 class="card-title">Laporan per gedung</h5>
                     </div>
                     <div class="card-body">
-                        <canvas id="speedChart" width="400" height="100"></canvas>
-                    </div>
-                    <div class="card-footer">
-                        <div class="chart-legend">
-                            <i class="fa fa-circle text-info"></i> Tesla Model S
-                            <i class="fa fa-circle text-warning"></i> BMW 5 Series
-                        </div>
-                        <hr />
-                        <div class="card-stats">
-                            <i class="fa fa-check"></i> Data information certified
-                        </div>
+                        <canvas id="laporanGedungChart" width="400" height="100"></canvas>
                     </div>
                 </div>
             </div>
@@ -182,8 +163,79 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Javascript method's body can be found in assets/assets-for-demo/js/demo.js
-            demo.initChartsPages();
+            //grafik laporan per bulan
+            const ctx1 = document.getElementById('laporanPerBulan').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($laporanPerBulan->keys()) !!},
+                    datasets: [{
+                        label: 'Jumlah Laporan Masuk',
+                        data: {!! json_encode($laporanPerBulan->values()) !!},
+                        borderColor: 'rgba(218, 165, 32, 1)',
+                        backgroundColor: 'rgba(218, 165, 32, 1)',
+                        fill: true,
+                        tension: 0.1,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            //pie chart status laporan
+            const ctx2 = document.getElementById('statusLaporanChart');
+            new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: {!! json_encode($statusLaporan->keys()) !!},
+                    datasets: [{
+                        data: {!! json_encode($statusLaporan->values()) !!},
+                        backgroundColor: ['#ffc107', '#17a2b8', '#fd7e14', '#28a745', '#dc3545']
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+
+            //graik laporan per gedung
+            const ctx3 = document.getElementById('laporanGedungChart');
+            new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($laporanPerGedung->keys()) !!},
+                    datasets: [{
+                        label: 'Jumlah Laporan',
+                        data: {!! json_encode($laporanPerGedung->values()) !!},
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         });
     </script>
 @endpush
