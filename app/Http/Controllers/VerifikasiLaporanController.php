@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class VerifikasiLaporanController extends Controller
 {
-    public function index()
+    public function     index()
     {
         $laporan = LaporanKerusakan::with(['user:id_user,nama', 'status:id_status,nama_status'])
             ->where('id_status', 1)
