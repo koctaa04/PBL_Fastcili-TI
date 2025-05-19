@@ -21,11 +21,11 @@
             </div>
             <div class="card-body">
                 {{-- Filtering --}}
-                <div class="row">
+                <div class="row pr-auto">
                     <div class="col-md-12">
-                        <div class="form-group row">
-                            <label class="col-1 control-label col-form-label">Filter:</label>
-                            <div class="col-3">
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Filter:</label>
+                            <div class="col-8">
                                 <select class="form-control" id="id_level" name="id_level" required>
                                     <option value="">- Semua Level -</option>
                                     @foreach($level as $item)
@@ -42,54 +42,14 @@
                     <table class="table table-striped table-hover table-row-bordered" id="table_user">
                         <thead>
                             <tr>
-                                <th scope="col">Profil</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Nama Level</th>
-                                <th scope="col">Akses</th>
-                                <th scope="col">Aksi</th>
+                                <th width="10%">Profil</th>
+                                <th width="20%">Nama</th>
+                                <th width="25%">Email</th>
+                                <th width="20%">Nama Level</th>
+                                <th width="10%">Akses</th>
+                                <th width="15%">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($users as $index => $u)
-                                <tr>
-                                    <td class="text-center">
-                                        @if ($u->foto_profil)   
-                                            <img src="{{ asset('uploads/foto_profil/' . $u->foto_profil) }}" width="50" style="border-radius:10px;">
-                                        @else
-                                        <img src="{{ asset('default-avatar.jpg') }}" width="50" style="border-radius:10px;">
-                                        @endif
-                                    </td>
-                                    <td>{{ $u->nama }}</td>
-                                    <td>{{ $u->email }}</td>
-                                    <td>{{ $u->level->nama_level }}</td>
-                                    <td class="text-center">
-                                        @if ($u->akses == 1)
-                                            <i class="fas fa-user-check text-success"></i>
-                                        @else
-                                            <i class="fas fa-user-times text-danger"></i>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="d-flex">
-                                            <button
-                                                onclick="modalAction('{{ url('/users/edit/' . $u->id_user . '') }}')"
-                                                class="btn btn-sm btn-info" style="margin-right: 8px">Edit</button>
-                                            <form class="form-delete"
-                                                action="{{ url('/users/delete/' . $u->id_user . '') }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
-                                            <button onclick="toggleAccess('{{ url('/users/toggle-access/' . $u->id_user . '') }}')" 
-                                                class="btn btn-sm {{ $u->akses ? 'btn-secondary' : 'btn-success' }} ml-2">
-                                                {{ $u->akses ? 'Nonaktifkan' : 'Aktifkan' }}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -123,13 +83,34 @@
             });
 
             dataUser = $('#table_user').DataTable({
+                processing: true,
+                serverSide: false, // karena kita menggunakan server-side processing sederhana
+                ajax: {
+                    url: window.location.href,
+                    data: function(d) {
+                        d.id_level = $('#id_level').val();
+                    }
+                },
+                columns: [
+                    { data: 'profil', name: 'profil', className: 'text-center'},
+                    { data: 'nama', name: 'nama', className: 'text-center' },
+                    { data: 'email', name: 'email', className: 'text-center' },
+                    { data: 'level.nama_level', name: 'level.nama_level', className: 'text-center' },
+                    { data: 'akses', name: 'akses', className: 'text-center'},
+                    { data: 'aksi', name: 'aksi', className: 'text-center'}
+                ],
                 columnDefs: [
                     { 
-                        targets: [0, 3, 4, 5], // Index of Profil, Akses, and Aksi columns
+                        targets: [0, 3, 4, 5],
                         orderable: false,
                         searchable: false
                     }
                 ]
+            });
+
+            // Ubah event change filter
+            $('#id_level').on('change', function() {
+                dataUser.ajax.reload();
             });
         });
 
@@ -166,10 +147,10 @@
                                     icon: 'success',
                                     title: 'Sukses!',
                                     text: response.message,
-                                    timer: 1500,
-                                    showConfirmButton: false
+                                    timer: 4000,
+                                    showConfirmButton: true
                                 }).then(() => {
-                                    location.reload();
+                                    dataUser.ajax.reload();
                                 });
                             } else {
                                 Swal.fire({
@@ -222,24 +203,34 @@
                                 Swal.fire({
                                     icon: "success",
                                     title: "Berhasil!",
-                                    text: response.messages,
+                                    text: response.message,
+                                    timer: 3000,
+                                    showConfirmButton: true
                                 });
-                                location.reload();
-                            } else {
-                                alert('Gagal menghapus data.');
-                            }
-                        },
-                        error: function(xhr) {
-                            if (xhr.responseJSON && xhr.responseJSON.msgField) {
-                                let errors = xhr.responseJSON.msgField;
-                                $.each(errors, function(field, messages) {
-                                    $('#error-' + field).text(messages[0]);
-                                });
+                                dataUser.ajax.reload();
                             } else {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",
-                                    text: response.messages,
+                                    text: response.message,
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            let response = xhr.responseJSON;
+                            if (response && response.msgField) {
+                                let errors = response.msgField;
+                                $.each(errors, function(field, message) {
+                                    $('#error-' + field).text(message[0]);
+                                });
+                            } else {
+                                let errorMsg = response && response.message 
+                                    ? response.message 
+                                    : 'Terjadi kesalahan saat menghapus data';
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Gagal!",
+                                    text: errorMsg,
                                 });
                             }
                         }
