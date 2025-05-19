@@ -61,57 +61,8 @@
         }
         var datalaporan;
 
-        // $(document).on('submit', '.form-delete', function(e) {
-        //     e.preventDefault(); // Cegah submit form langsung
-        //     let form = this;
-        //     let url = $(this).data('url');
-
-        //     Swal.fire({
-        //         title: 'Apakah Anda yakin ingin menghapus data ini?',
-        //         text: "Data yang dihapus tidak dapat dikembalikan!",
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#d33',
-        //         cancelButtonColor: '#6c757d',
-        //         confirmButtonText: 'Ya, hapus!',
-        //         cancelButtonText: 'Batal'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             $.ajax({
-        //                 type: "POST",
-        //                 url: $(this).attr('action'),
-        //                 data: $(this).serialize(),
-        //                 dataType: "json",
-        //                 success: function(response) {
-        //                     if (response.success) {
-        //                         $('#myModal').modal('hide');
-        //                         Swal.fire({
-        //                             icon: "success",
-        //                             title: "Berhasil!",
-        //                             text: response.messages,
-        //                         });
-        //                         location.reload();
-        //                     } else {
-        //                         alert('Gagal menghapus data.');
-        //                     }
-        //                 },
-        //                 error: function(xhr) {
-        //                     if (xhr.responseJSON && xhr.responseJSON.msgField) {
-        //                         let errors = xhr.responseJSON.msgField;
-        //                         $.each(errors, function(field, messages) {
-        //                             $('#error-' + field).text(messages[0]);
-        //                         });
-        //                     } else {
-        //                         Swal.fire({
-        //                             icon: "error",
-        //                             title: "Gagal!",
-        //                             text: response.messages,
-        //                         });
-        //                     }
-        //                 }
-        //             });
-        //         }
-        //     });
-        // });
+        $(document).ready(function() {
+            var datalaporan = $('#table_laporan').DataTable();
+        });
     </script>
 @endpush

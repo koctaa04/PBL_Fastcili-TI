@@ -9,3 +9,5 @@
         @include('layouts.footer')
     </div>
 </div>
+
+<script src="{{ asset('script/script.js') }}"></script>

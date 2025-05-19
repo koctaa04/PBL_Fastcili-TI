@@ -10,7 +10,8 @@
         </a>
     </div>
     <div class="sidebar-wrapper" style="display: flex; flex-direction: column; height: 100%; overflow-x: hidden;">
-        <ul class="nav" style="flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none;">
+        <ul class="nav"
+            style="flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none;">
             <style>
                 .nav::-webkit-scrollbar {
                     display: none;
@@ -19,45 +20,60 @@
                 }
             </style>
             <li class="{{ $elementActive == 'dashboard' ? 'active' : '' }}">
-                <a href="{{ route('home', 'dashboard') }}">
-                    <i class="nc-icon nc-sun-fog-29"></i>
-                    <p>{{ __('Dashboard') }}</p>
-                </a>
+                @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                    <a href="{{ route('home', 'dashboard') }}">
+                        <i class="nc-icon nc-sun-fog-29"></i>
+                        <p>{{ __('Dashboard') }}</p>
+                    </a>
+                @else
+                    <a href="{{ route('pelapor', 'dashboard') }}">
+                        <i class="nc-icon nc-sun-fog-29"></i>
+                        <p>{{ __('Dashboard') }}</p>
+                    </a>
+                @endif
             </li>
-            <li class="{{ $elementActive == 'user' || $elementActive == 'level' ? 'active' : '' }}">
-                <a data-toggle="collapse" aria-expanded="false" href="#kelolaPengguna">
-                    <i class="nc-icon nc-single-02"></i>
-                    <p>
+
+            {{-- Kelola Pengguna --}}
+            @if (auth()->user()->id_level == 1)
+                <li class="{{ $elementActive == 'user' || $elementActive == 'level' ? 'active' : '' }}">
+                    <a data-toggle="collapse" aria-expanded="false" href="#kelolaPengguna">
+                        <i class="nc-icon nc-single-02"></i>
+                        <p>
                             {{ __('Kelola Pengguna') }}
-                        <b class="caret"></b>
-                    </p>
-                </a>
-                <div class="collapse {{ $elementActive == 'user' || $elementActive == 'level' ? 'show' : '' }}" id="kelolaPengguna">
-                    <ul class="nav">
-                        <li class="{{ $elementActive == 'level' ? 'active' : '' }}">
-                            <a href="{{ route('level.index') }}">
-                                <span class="sidebar-mini-icon">{{ __('L') }}</span>
-                                <span class="sidebar-normal">{{ __(' Level ') }}</span>
-                            </a>
-                        </li>
-                        <li class="{{ $elementActive == 'user' ? 'active' : '' }}">
-                            <a href="{{ route('users.index') }}">
-                                <span class="sidebar-mini-icon">{{ __('U') }}</span>
-                                <span class="sidebar-normal">{{ __(' User ') }}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-            <li class="{{ $elementActive == 'gedung' || $elementActive == 'fasilitas'  || $elementActive == 'ruangan' ? 'active' : '' }}">
+                            <b class="caret"></b>
+                        </p>
+                    </a>
+                    <div class="collapse {{ $elementActive == 'user' || $elementActive == 'level' ? 'show' : '' }}"
+                        id="kelolaPengguna">
+                        <ul class="nav">
+                            <li class="{{ $elementActive == 'level' ? 'active' : '' }}">
+                                <a href="{{ route('level.index') }}">
+                                    <span class="sidebar-mini-icon">{{ __('L') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Level ') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ $elementActive == 'user' ? 'active' : '' }}">
+                                <a href="{{ route('users.index') }}">
+                                    <span class="sidebar-mini-icon">{{ __('U') }}</span>
+                                    <span class="sidebar-normal">{{ __(' User ') }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            @endif
+
+            {{-- Fasilitas --}}
+            <li class="{{ $elementActive == 'gedung' || $elementActive == 'fasilitas' || $elementActive == 'ruangan' ? 'active' : '' }}">
                 <a data-toggle="collapse" aria-expanded="false" href="#fas">
                     <i class="nc-icon nc-bank"></i>
                     <p>
-                            {{ __('Fasilitas') }}
+                        {{ __('Fasilitas') }}
                         <b class="caret"></b>
                     </p>
                 </a>
-                <div class="collapse {{ $elementActive == 'gedung' || $elementActive == 'fasilitas' || $elementActive == 'ruangan' ? 'show' : '' }}" id="fas">
+                <div class="collapse {{ $elementActive == 'gedung' || $elementActive == 'fasilitas' || $elementActive == 'ruangan' ? 'show' : '' }}"
+                    id="fas">
                     <ul class="nav">
                         <li class="{{ $elementActive == 'fasilitas' ? 'active' : '' }}">
                             <a href="{{ route('fasilitas.index') }}">
@@ -80,63 +96,75 @@
                     </ul>
                 </div>
             </li>
-            <li class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'mabac' ?  'active' : '' }}">
-                <a data-toggle="collapse" aria-expanded="false" href="#laporan">
-                    <i class="nc-icon nc-single-copy-04"></i>
-                    <p>
+            
+            {{-- Laporan --}}
+            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                <li
+                    class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'mabac' ? 'active' : '' }}">
+                    <a data-toggle="collapse" aria-expanded="false" href="#laporan">
+                        <i class="nc-icon nc-single-copy-04"></i>
+                        <p>
                             {{ __('Laporan') }}
-                        <b class="caret"></b>
-                    </p>
-                </a>
-                <div class="collapse {{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'mabac' ? 'show' : '' }}" id="laporan">
-                    <ul class="nav">
-                        <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
-                            <a href="{{ route('perbaikan.index') }}">
-                                <span class="sidebar-mini-icon">{{ __('L') }}</span>
-                                <span class="sidebar-normal">{{ __(' Lapor Kerusakan ') }}</span>
-                            </a>
-                        </li>
-                        <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
-                            <a href="{{ route('prioritas.index') }}">
-                                <span class="sidebar-mini-icon">{{ __('V') }}</span>
-                                <span class="sidebar-normal">{{ __(' Verifikasi Laporan ') }}</span>
-                            </a>
-                        </li>
-                        <li class="{{ $elementActive == 'mabac' ? 'active' : '' }}">
-                            <a href="{{ route('mabac.index') }}">
-                                <span class="sidebar-mini-icon">{{ __('P') }}</span>
-                                <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-            <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
-                <a data-toggle="collapse" aria-expanded="false" href="#teknisi">
-                    <i class="nc-icon nc-bank"></i>
-                    <p>
+                            <b class="caret"></b>
+                        </p>
+                    </a>
+                    <div class="collapse {{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'mabac' ? 'show' : '' }}"
+                        id="laporan">
+                        <ul class="nav">
+                            <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
+                                <a href="{{ route('perbaikan.index') }}">
+                                    <span class="sidebar-mini-icon">{{ __('L') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Lapor Kerusakan ') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
+                                <a href="{{ route('prioritas.index') }}">
+                                    <span class="sidebar-mini-icon">{{ __('V') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Verifikasi Laporan ') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ $elementActive == 'mabac' ? 'active' : '' }}">
+                                <a href="{{ route('mabac.index') }}">
+                                    <span class="sidebar-mini-icon">{{ __('P') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            @endif
+            
+            {{-- Teknisi --}}
+            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 3)
+                <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
+                    <a data-toggle="collapse" aria-expanded="false" href="#teknisi">
+                        <i class="nc-icon nc-settings"></i>
+                        <p>
                             {{ __('Teknisi') }}
-                        <b class="caret"></b>
-                    </p>
-                </a>
-                <div class="collapse {{ $elementActive == 'perbaikan_teknisi' ? 'show' : '' }}" id="teknisi">
-                    <ul class="nav">
-                        <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
-                            <a href="{{ route('perbaikan_teknisi.index') }}">
-                                <span class="sidebar-mini-icon">{{ __('P') }}</span>
-                                <span class="sidebar-normal">{{ __(' Penugasan Teknisi ') }}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+                            <b class="caret"></b>
+                        </p>
+                    </a>
+                    <div class="collapse {{ $elementActive == 'perbaikan_teknisi' ? 'show' : '' }}" id="teknisi">
+                        <ul class="nav">
+                            <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
+                                <a href="{{ route('perbaikan_teknisi.index') }}">
+                                    <span class="sidebar-mini-icon">{{ __('P') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Daftar Perbaikan ') }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            @endif
             <!-- Logout Button -->
             <div style="margin-top: auto; padding-top: 20px;">
                 <li class="active-pro {{ $elementActive == 'tables' ? 'active' : '' }}">
-                    <form class="dropdown-item" action="{{ route('logout') }}" id="formLogOut" method="POST" style="display: none;">
+                    <form class="dropdown-item" action="{{ route('logout') }}" id="formLogOut" method="POST"
+                        style="display: none;">
                         @csrf
                     </form>
-                    <a onclick="document.getElementById('formLogOut').submit();" class="bg-danger" style="display: block; margin-bottom: 20px;">
+                    <a onclick="document.getElementById('formLogOut').submit();" class="bg-danger"
+                        style="display: block; margin-bottom: 20px;">
                         <i class="nc-icon nc-button-power text-white"></i>
                         <p class="text-white">{{ __('Log out') }}</p>
                     </a>
@@ -145,4 +173,3 @@
         </ul>
     </div>
 </div>
-

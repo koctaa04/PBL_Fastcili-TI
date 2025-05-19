@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Gedung;
 use App\Models\LaporanKerusakan;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\Gedung;
 use App\Models\StatusLaporan;
 use App\Models\PenugasanTeknisi;
 use App\Models\KriteriaPenilaian;
@@ -218,5 +220,15 @@ class HomeController extends Controller
         }
 
         return $ranked;
+    }
+
+
+    public function pelapor()
+    {
+        $laporan = LaporanKerusakan::where('id_user', Auth::id())->get();
+        $status = LaporanKerusakan::where('id_user', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->first();
+        return view('pages.pelapor.index', compact('laporan', 'status'));
     }
 }

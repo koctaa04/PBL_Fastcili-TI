@@ -7,42 +7,25 @@
     <div class="content">
         <h3>Data Level</h3>
         <div class="card p-4">
-            <div class="card-header">
-                <button onclick="modalAction('{{ url('/level/create') }}')" class="btn btn-sm btn-primary mt-1">Tambah
-                    Data</button>
+            <div class="card-header d-flex justify-content-center align-items-center mb-5">
+                <div class="card-tools d-flex justify-content-center flex-wrap">
+                    <button onclick="modalAction('{{ url('/level/create') }}')" 
+                            class="btn btn-lg btn-success mb-2">
+                        Tambah Data Level
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_level">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Kode Level</th>
-                                <th scope="col">Nama Level</th>
-                                <th scope="col">Aksi</th>
+                                <th width="10%">#</th>
+                                <th width="30%">Kode Level</th>
+                                <th width="45%">Nama Level</th>
+                                <th width="15%">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($level as $index => $l)
-                                <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
-                                    <td>{{ $l->kode_level }}</td>
-                                    <td>{{ $l->nama_level }}</td>
-                                    <td>
-                                        <div class="d-flex">
-                                            <button onclick="modalAction('{{ url('/level/edit/' . $l->id_level . '') }}')"
-                                                class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
-                                            <form class="form-delete"
-                                                action="{{ url('/level/delete/' . $l->id_level . '') }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -54,12 +37,83 @@
 
 @push('scripts')
     <script>
+        var dataLevel;
+        $(document).ready(function() {
+            dataLevel = $('#table_level').DataTable({
+                processing: true,
+                serverSide: false, // karena kita menggunakan server-side processing sederhana
+                ajax: {
+                    url: window.location.href,
+                    data: function(d) {
+                        
+                    }
+                },
+                columns: [
+                    { data: 'DT_RowIndex', className: 'text-center'},
+                    { data: 'kode_level', className: 'text-center'},
+                    { data: 'nama_level', className: 'text-center' },
+                    { data: 'aksi', name: 'aksi', className: 'text-center'}
+                ],
+                columnDefs: [
+                    { 
+                        targets: [0, 1],
+                        orderable: false,
+                        searchable: true
+                    }
+                ]
+            });
+
+            $("#form-delete").validate({
+                rules: {},
+                submitHandler: function(form) {
+                    $.ajax({
+                        url: form.action,
+                        type: form.method,
+                        data: $(form).serialize(),
+                        success: function(response) {
+                            if (response.status) {
+                                $('#myModal').modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil',
+                                    text: response.message
+                                });
+                                dataLevel.ajax.reload();
+                            } else {
+                                $('.error-text').text('');
+                                $.each(response.msgField, function(prefix, val) {
+                                    $('#error-' + prefix).text(val[0]);
+                                });
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Terjadi Kesalahan',
+                                    text: response.message
+                                });
+                            }
+                        },
+                    });
+                    return false;
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        });
+
         function modalAction(url = '') {
             $('#myModal').load(url, function() {
                 $('#myModal').modal('show');
             });
         }
-        var dataLevel;
+
 
         $(document).on('submit', '.form-delete', function(e) {
             e.preventDefault(); // Cegah submit form langsung
@@ -88,24 +142,34 @@
                                 Swal.fire({
                                     icon: "success",
                                     title: "Berhasil!",
-                                    text: response.messages,
+                                    text: response.message,
+                                    timer: 3000,
+                                    showConfirmButton: true
                                 });
-                                location.reload();
-                            } else {
-                                alert('Gagal menghapus data.');
-                            }
-                        },
-                        error: function(xhr) {
-                            if (xhr.responseJSON && xhr.responseJSON.msgField) {
-                                let errors = xhr.responseJSON.msgField;
-                                $.each(errors, function(field, messages) {
-                                    $('#error-' + field).text(messages[0]);
-                                });
+                                dataLevel.ajax.reload();
                             } else {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",
-                                    text: response.messages,
+                                    text: response.message,
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            let response = xhr.responseJSON;
+                            if (response && response.msgField) {
+                                let errors = response.msgField;
+                                $.each(errors, function(field, message) {
+                                    $('#error-' + field).text(message[0]);
+                                });
+                            } else {
+                                let errorMsg = response && response.message 
+                                    ? response.message 
+                                    : 'Terjadi kesalahan saat menghapus data';
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Gagal!",
+                                    text: errorMsg,
                                 });
                             }
                         }

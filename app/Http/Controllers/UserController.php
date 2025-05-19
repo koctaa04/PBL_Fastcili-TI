@@ -9,13 +9,50 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::all();
-        return view('users.index', ['users' => $user]);
+        if ($request->ajax()) {
+            $users = User::when($request->id_level, function ($query, $id_level) {
+                return $query->where('id_level', $id_level);
+            })
+                ->with('level')
+                ->get();
+
+            return Datatables::of($users)
+                ->addColumn('profil', function ($user) {
+                    return $user->foto_profil
+                        ? '<img src="' . asset('uploads/foto_profil/' . $user->foto_profil) . '" width="50" style="border-radius:10px;">'
+                        : '<img src="' . asset('default-avatar.jpg') . '" width="50" style="border-radius:10px;">';
+                })
+                ->addColumn('akses', function ($user) {
+                    return $user->akses
+                        ? '<i class="fas fa-user-check text-success"></i>'
+                        : '<i class="fas fa-user-times text-danger"></i>';
+                })
+                ->addColumn('aksi', function ($user) {
+                    return '
+                    <div class="d-flex">
+                        <button onclick="modalAction(\'' . url('/users/edit/' . $user->id_user) . '\')" class="btn btn-sm btn-info mr-2">Edit</button>
+                        <form class="form-delete" action="' . url('/users/delete/' . $user->id_user) . '" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                        <button onclick="toggleAccess(\'' . url('/users/toggle-access/' . $user->id_user) . '\')" class="btn btn-sm ' . ($user->akses ? 'btn-secondary' : 'btn-success') . ' ml-2">
+                            ' . ($user->akses ? 'Nonaktifkan' : 'Aktifkan') . '
+                        </button>
+                    </div>
+                ';
+                })
+                ->rawColumns(['profil', 'akses', 'aksi'])
+                ->toJson();
+        }
+
+        $level = Level::all();
+        return view('users.index', ['level' => $level]);
     }
 
     public function create()
@@ -164,24 +201,19 @@ class UserController extends Controller
 
     public function import_ajax(Request $request)
     {
-        // Validasi request harus AJAX/JSON
-        if (!$request->ajax() && !$request->wantsJson()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid request type'
-            ], 400);
-        }
-
         $validator = Validator::make($request->all(), [
             'file_user' => ['required', 'mimes:xlsx', 'max:1024']
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validasi gagal',
-                'msgField' => $validator->errors()
-            ], 422);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi data import gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         try {
@@ -200,12 +232,12 @@ class UserController extends Controller
 
                 // Validasi data
                 if (!Level::find($row[0])) {
-                    $errors[] = "Baris $index: Level ID {$row[0]} tidak ditemukan";
+                    $errors[] = "Level ID {$row[0]} tidak ditemukan";
                     continue;
                 }
 
                 if (User::where('email', $row[1])->exists()) {
-                    $errors[] = "Baris $index: Email {$row[1]} sudah terdaftar";
+                    $errors[] = "Email {$row[1]} sudah terdaftar";
                     continue;
                 }
 
@@ -220,27 +252,59 @@ class UserController extends Controller
             }
 
             if (!empty($errors)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Terdapat error validasi data',
-                    'msgField' => $errors
-                ], 422);
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Terdapat error validasi data',
+                        'msgField' => $this->convertErrorsToFields($errors), // tambahan agar bisa ditampilkan di bawah input
+                        'errors' => $errors // semua pesan error ditampilkan
+                    ], 422);
+                }
+
+                return redirect()->back()->with('error', implode('<br>', $errors));
             }
+
 
             if (!empty($insert)) {
                 User::insert($insert);
             }
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Data user berhasil diimport',
-                'count' => count($insert)
-            ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data user berhasil diimport',
+                    'count' => count($insert)
+                ]);
+            }
+            return redirect()->route('users.index')->with('success', 'Data user berhasil diimport (' . count($insert) . ' data)');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+    protected function convertErrorsToFields(array $errors)
+    {
+        $result = [];
+
+        foreach ($errors as $error) {
+            // Coba deteksi field dari string error
+            if (str_contains($error, 'email')) {
+                $result['email'] = [$error];
+            } elseif (str_contains($error, 'level') || str_contains($error, 'level_id')) {
+                $result['level_id'] = [$error];
+            } elseif (str_contains($error, 'nama')) {
+                $result['name'] = [$error];
+            } else {
+                $result['file_user'] = [$error]; // fallback ke file_user
+            }
+        }
+
+        return $result;
     }
 }
