@@ -44,22 +44,26 @@
                                 <div class="d-flex justify-content-end mt-4">
                                     @if ($status->id_status == 5)
                                         <a href="{{ route('pelapor.edit', ['id' => $status->id_laporan]) }}"
-                                            class="btn btn-warning btn-sm me-2">Edit</a>
+                                            class="btn btn-warning btn-sm me-2">
+                                            Edit
+                                        </a>
                                     @elseif ($status->id_status == 4)
                                         <button
                                             onclick="modalAction('{{ route('pelapor.rate', ['id' => $status->id_laporan]) }}')"
-                                            class="btn btn-primary btn-sm me-2">Beri
-                                            Nilai</button>
-                                    @endif
-                                    <form class="form-delete"
-                                        action="{{ url('/lapor_kerusakan/delete/' . $status->id_laporan) }}"
-                                        method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            Batalkan Laporan
+                                            class="btn btn-primary btn-sm me-2">
+                                            Beri Nilai
                                         </button>
-                                    </form>
+                                    @elseif ($status->id_status == 1 || $status->id_status == 5)
+                                        <form class="form-delete"
+                                            action="{{ url('/lapor_kerusakan/delete/' . $status->id_laporan) }}"
+                                            method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                Batalkan Laporan
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>
