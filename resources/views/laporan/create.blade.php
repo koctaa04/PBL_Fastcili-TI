@@ -6,51 +6,76 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <form method="POST" action="{{ route('laporan.store') }}" enctype="multipart/form-data" id="form_create">
-            @csrf
-            <div class="modal-body">
-                <!-- Dropdown Gedung -->
+        <div class="modal-body">
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            @if (session('warning'))
+                <div class="alert alert-warning">{{ session('warning') }}</div>
+            @endif
+            <form method="POST" action="{{ route('laporan.store') }}" enctype="multipart/form-data" id="form_create">
+                @csrf
                 <div class="form-group">
                     <label for="gedung">Gedung</label>
-                    <select name="id_gedung" id="gedung" class="form-control" required>
+                    <select name="id_gedung" id="gedung"
+                        class="form-control @error('id_gedung') is-invalid @enderror" required>
                         <option value="">Pilih Gedung</option>
                         @foreach ($gedungList as $g)
                             <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
                         @endforeach
                     </select>
+                    @error('id_gedung')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                <!-- Dropdown Ruangan (isi via AJAX) -->
                 <div class="form-group">
                     <label for="ruangan">Ruangan</label>
-                    <select name="id_ruangan" id="ruangan" class="form-control" disabled required>
+                    <select name="id_ruangan" id="ruangan" class="form-control" required disabled>
                         <option value="">Pilih Ruangan</option>
                     </select>
                 </div>
 
-                <!-- Dropdown Fasilitas (isi via AJAX) -->
                 <div class="form-group">
                     <label for="fasilitas">Fasilitas</label>
-                    <select name="id_fasilitas" id="fasilitas" class="form-control" disabled required>
+                    <select name="id_fasilitas" id="fasilitas"
+                        class="form-control @error('id_fasilitas') is-invalid @enderror" required disabled>
                         <option value="">Pilih Fasilitas</option>
                     </select>
+                    @error('id_fasilitas')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+
+                    <!-- Notifikasi jika sudah ada laporan aktif -->
+                    <div id="peringatan-serupa" class="mt-2 text-danger d-none">
+                        ⚠️ Fasilitas ini sudah memiliki laporan aktif yang sedang diproses.
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Deskripsi Kerusakan</label>
-                    <textarea name="deskripsi" class="form-control" required></textarea>
+                    <textarea name="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" required></textarea>
+                    @error('deskripsi')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
+
                 <div class="">
                     <label for="foto_kerusakan">Foto Kerusakan</label>
-                    <input type="file" name="foto_kerusakan" class="form-control-file" id="foto_kerusakan">
+                    <input type="file" name="foto_kerusakan"
+                        class="form-control-file @error('foto_kerusakan') is-invalid @enderror" id="foto_kerusakan">
+                    @error('foto_kerusakan')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-            </div>
-        </form>
 
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            <button type="submit" class="btn btn-primary">Kirim Laporan</button>
+        </div>
     </div>
 </div>
 
@@ -108,7 +133,8 @@
         $('#gedung').change(function() {
             let gedungId = $(this).val();
             $('#ruangan').html('<option value="">Loading...</option>').prop('disabled', true);
-            $('#fasilitas').html('<option value="">Pilih Fasilitas</option>').prop('disabled', true); // reset fasilitas
+            $('#fasilitas').html('<option value="">Pilih Fasilitas</option>').prop('disabled',
+                true); // reset fasilitas
 
             if (gedungId) {
                 $.ajax({
@@ -151,6 +177,18 @@
                         $('#fasilitas').html(
                             '<option value="">Gagal memuat fasilitas</option>').prop(
                             'disabled', true);
+                    }
+                });
+            }
+        });
+        // Cek apakah fasilitas sudah punya laporan aktif
+        $('#fasilitas').on('change', function() {
+            let idFasilitas = $(this).val();
+            $('#peringatan-serupa').addClass('d-none');
+            if (idFasilitas) {
+                $.get('/api/laporan/check-active/' + idFasilitas, function(res) {
+                    if (res.exists) {
+                        $('#peringatan-serupa').removeClass('d-none');
                     }
                 });
             }

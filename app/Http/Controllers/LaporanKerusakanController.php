@@ -114,15 +114,15 @@ class LaporanKerusakanController extends Controller
 
     public function index()
     {
-        // $laporan = LaporanKerusakan::with(['user', 'fasilitas', 'status'])->get();
+
+        // $laporan = LaporanKerusakan::with(['user', 'fasilitas', 'status'])
+        //     ->where('id_user', auth()->user()->id_user)
+        //     ->get();
+
         // return view('laporan.index', ['laporan_kerusakan' => $laporan]);
 
-        // Muncul laporan sesuai user yang login
-        $laporan = LaporanKerusakan::with(['user', 'fasilitas', 'status'])
-            ->where('id_user', auth()->user()->id_user)
-            ->get();
 
-        return view('laporan.index', ['laporan_kerusakan' => $laporan]);
+        return view('laporan.index');
     }
 
 
@@ -149,6 +149,20 @@ class LaporanKerusakanController extends Controller
     }
     public function store(Request $request)
     {
+        // Ambil status yang belum selesai
+        $statusNonSelesai = [1, 2, 3]; // misal: 1=Diajukan, 2=Diproses, 3=Diperbaiki
+
+        $laporanSudahAda = LaporanKerusakan::where('id_fasilitas', $request->id_fasilitas)
+            ->whereIn('id_status', $statusNonSelesai)
+            ->first();
+
+        if ($laporanSudahAda) {
+            // Sudah ada laporan yang sedang diproses untuk fasilitas ini
+            return redirect()->back()->with('warning', 'Sudah ada laporan yang sedang diproses untuk fasilitas ini. Mohon periksa daftar laporan sebelum membuat yang baru.');
+        }
+
+
+
         $rules = [
             'id_fasilitas' => 'required|exists:fasilitas,id_fasilitas',
             'deskripsi' => 'required|string',

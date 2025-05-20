@@ -28,7 +28,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($laporan_kerusakan as $lapor => $l)
+                            {{-- @foreach ($laporan_kerusakan as $lapor => $l)
                                 <tr>
                                     <th scope="row">{{ $lapor + 1 }}</th>
                                     <td>
@@ -55,7 +55,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endforeach --}}
                         </tbody>
                     </table>
                 </div>
