@@ -14,6 +14,8 @@ class MabacController extends Controller
     {
         // Mengambil nilai min dan max untuk setiap kriteria
         $minMaxValues = DB::table('kriteria_penilaian')
+            ->join('laporan_kerusakan', 'kriteria_penilaian.id_laporan', '=', 'laporan_kerusakan.id_laporan')
+            ->where('laporan_kerusakan.id_status', 2)
             ->select(
                 DB::raw('MIN(tingkat_kerusakan) as min_tingkat_kerusakan'),
                 DB::raw('MAX(tingkat_kerusakan) as max_tingkat_kerusakan'),
