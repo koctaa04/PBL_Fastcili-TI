@@ -11,7 +11,7 @@ class Fasilitas extends Model
     protected $table = 'fasilitas';
     protected $primaryKey = 'id_fasilitas';
 
-    protected $fillable = ['id_ruangan', 'nama_fasilitas', 'jumlah', 'keterangan'];
+    protected $fillable = ['id_ruangan', 'nama_fasilitas', 'jumlah'];
 
     public function ruangan()
     {

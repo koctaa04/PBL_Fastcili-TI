@@ -7,68 +7,56 @@
     <div class="content">
         <h3>Data Fasilitas</h3>
         <div class="card p-4">
-            <div class="card-header">
-                <div class="row align-items-center justify-content-between">
-                    <div class="col-md-auto">
-                        <button onclick="modalAction('{{ url('/fasilitas/create') }}')"
-                            class="btn btn-sm btn-primary mt-1">Tambah
-                            Data</button>
-                    </div>
-                    <div class="col-md-auto">
-                        <div class="form-group mb-0 d-flex align-items-center">
-                            <label for="id_ruangan" class="mr-2 mb-0">Filter:</label>
-                            <select class="form-control form-control-sm" id="id_ruangan" name="id_ruangan">
-                                <option value="">-- Semua --</option>
-                                @foreach ($ruangan as $item)
-                                    <option value="{{ $item->id_ruangan }}"
-                                        {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
-                                        {{ $item->nama_ruangan }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
+            <div class="card-header d-flex justify-content-center align-items-center mb-5">
+                <div class="card-tools d-flex justify-content-center flex-wrap">
+                    <button onclick="modalAction('{{ url('/fasilitas/import') }}')" 
+                            class="btn btn-lg btn-warning mr-5 mb-2">
+                        Import Data Fasilitas (.xlsx)
+                    </button>
+                    <button onclick="modalAction('{{ url('/fasilitas/create') }}')" 
+                            class="btn btn-lg btn-success mb-2">
+                        Tambah Data Fasilitas
+                    </button>
                 </div>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_fasilitas">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Nama Gedung</th>
-                                <th scope="col">Nama Ruangan</th>
-                                <th scope="col">Nama Fasilitas</th>
-                                <th scope="col">Jumlah</th>
-                                <th scope="col">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($fasilitas as $index => $f)
-                                <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
-                                    <td>{{ $f->ruangan->gedung->nama_gedung }}</td>
-                                    <td>{{ $f->ruangan->nama_ruangan }}</td>
-                                    <td>{{ $f->nama_fasilitas }}</td>
-                                    <td>{{ $f->jumlah }}</td>
-                                    <td>
-                                        <div class="d-flex">
-                                            <button
-                                                onclick="modalAction('{{ url('/fasilitas/edit/' . $f->id_fasilitas . '') }}')"
-                                                class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
-                                            <form class="form-delete"
-                                                action="{{ url('/fasilitas/delete/' . $f->id_fasilitas . '') }}"
-                                                method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                {{-- Filtering --}}
+                <div class="row pr-auto">
+                    <div class="col-md-12">
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Filter:</label>
+                            <div class="col-5">
+                                <select class="form-control" id="id_gedung" name="id_gedung" required>
+                                    <option value="">- Semua Level -</option>
+                                    @foreach($gedung as $item)
+                                        <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Gedung</small>
+                            </div>
+                            <div class="col-5">
+                                <select class="form-control" id="id_ruangan" name="id_ruangan" required>
+                                    <option value="">- Semua Level -</option>
+                                    @foreach($ruangan as $item)
+                                        <option value="{{ $item->id_ruangan }}">{{ $item->nama_ruangan }} </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Ruangan</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card View --}}
+                <div class="row g-3" id="fasilitas-container">
+                    <!-- Fasilitas cards will be loaded here -->
+                </div>
+
+                {{-- Pagination --}}
+                <div class="row mt-4">
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <div id="pagination-links"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -77,19 +65,263 @@
         aria-hidden="true"></div>
 @endsection
 
+@push('styles')
+<style>
+    /* Fasilitas Card Styling */
+    .fasilitas-card {
+        margin-bottom: 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(0,0,0,0.125);
+    }
+    
+    .fasilitas-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .fasilitas-card-body {
+        padding: 15px;
+        flex-grow: 1;
+    }
+    
+    .fasilitas-card-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .fasilitas-card-text {
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+    
+    .fasilitas-card-footer {
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eee;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+    
+    .fasilitas-card-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+    
+    .fasilitas-jumlah {
+        font-weight: bold;
+        color: #28a745;
+    }
+    
+    .fasilitas-ruangan {
+        color: #007bff;
+    }
+    
+    .fasilitas-gedung {
+        color: #6c757d;
+        font-style: italic;
+        font-size: 0.85rem;
+    }
+    
+    /* Responsive grid settings */
+    #fasilitas-container {
+        margin-right: -12px;
+        margin-left: -12px;
+    }
+    
+    #fasilitas-container > [class*="col-"] {
+        padding-right: 12px;
+        padding-left: 12px;
+        margin-bottom: 24px;
+    }
+    
+    /* Button styling */
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* Pagination styling */
+    .pagination {
+        margin-top: 20px;
+    }
+    
+    .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    
+    .page-link {
+        color: #007bff;
+    }
+</style>
+@endpush
+
 @push('scripts')
     <script>
+        var currentPage = 1;
+        var perPage = 15; // 5 cards x 3 rows
+
+        $(document).ready(function() {
+            // Load initial data
+            loadFasilitasCards();
+
+            // Filter change events
+            $('#id_ruangan, #id_gedung').on('change', function() {
+                currentPage = 1; // Reset to first page when filter changes
+                loadFasilitasCards();
+            });
+        });
+
+        function loadFasilitasCards() {
+            const idRuangan = $('#id_ruangan').val();
+            const idGedung = $('#id_gedung').val();
+            
+            $.ajax({
+                url: "{{ url('fasilitas/list') }}",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    id_ruangan: idRuangan,
+                    id_gedung: idGedung,
+                    page: currentPage,
+                    per_page: perPage
+                },
+                success: function(response) {
+                    const container = $('#fasilitas-container');
+                    container.empty();
+                    
+                    if(response.data && response.data.length > 0) {
+                        response.data.forEach((fasilitas) => {
+                            const cardHtml = `
+                                <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 col-12">
+                                    <div class="card fasilitas-card">
+                                        <div class="fasilitas-card-body">
+                                            <h5 class="fasilitas-card-title">${fasilitas.nama_fasilitas}</h5>
+                                            <p class="fasilitas-card-text"><strong>Ruangan:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
+                                            <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
+                                            <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
+                                        </div>
+                                        <div class="fasilitas-card-footer">
+                                            <div class="fasilitas-card-actions">
+                                                <button onclick="modalAction('{{ url('/fasilitas/edit') }}/${fasilitas.id_fasilitas}')" 
+                                                        class="btn btn-sm btn-warning" title="Edit">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                                <form class="form-delete d-inline" action="{{ url('/fasilitas/delete') }}/${fasilitas.id_fasilitas}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            container.append(cardHtml);
+                        });
+                    } else {
+                        container.append('<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data fasilitas</p></div>');
+                    }
+
+                    // Update pagination
+                    updatePagination(response);
+                },
+                error: function(xhr) {
+                    console.error('Error loading fasilitas:', xhr);
+                    alert('Gagal memuat data fasilitas');
+                }
+            });
+        }
+
+        function updatePagination(response) {
+            const paginationContainer = $('#pagination-links');
+            paginationContainer.empty();
+
+            if (response.last_page > 1) {
+                let paginationHtml = '<ul class="pagination">';
+
+                // Previous button
+                if (response.current_page > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="changePage(${response.current_page - 1})" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    `;
+                } else {
+                    paginationHtml += `
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&laquo;</span>
+                        </li>
+                    `;
+                }
+
+                // Page numbers
+                for (let i = 1; i <= response.last_page; i++) {
+                    if (i === response.current_page) {
+                        paginationHtml += `
+                            <li class="page-item active">
+                                <span class="page-link">${i}</span>
+                            </li>
+                        `;
+                    } else {
+                        paginationHtml += `
+                            <li class="page-item">
+                                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                            </li>
+                        `;
+                    }
+                }
+
+                // Next button
+                if (response.current_page < response.last_page) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="changePage(${response.current_page + 1})" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    `;
+                } else {
+                    paginationHtml += `
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&raquo;</span>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += '</ul>';
+                paginationContainer.append(paginationHtml);
+            }
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            loadFasilitasCards();
+            return false;
+        }
+
         function modalAction(url = '') {
             $('#myModal').load(url, function() {
                 $('#myModal').modal('show');
             });
         }
-        var dataruangan;
 
         $(document).on('submit', '.form-delete', function(e) {
-            e.preventDefault(); // Cegah submit form langsung
+            e.preventDefault();
             let form = this;
-            let url = $(this).data('url');
 
             Swal.fire({
                 title: 'Apakah Anda yakin ingin menghapus data ini?',
@@ -104,8 +336,8 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "POST",
-                        url: $(this).attr('action'),
-                        data: $(this).serialize(),
+                        url: $(form).attr('action'),
+                        data: $(form).serialize(),
                         dataType: "json",
                         success: function(response) {
                             if (response.success) {
@@ -113,48 +345,36 @@
                                 Swal.fire({
                                     icon: "success",
                                     title: "Berhasil!",
-                                    text: response.messages,
+                                    text: response.message,
+                                    timer: 3000,
+                                    showConfirmButton: true
                                 });
-                                location.reload();
+                                loadFasilitasCards();
                             } else {
-                                alert('Gagal menghapus data.');
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Gagal!",
+                                    text: response.message,
+                                });
                             }
                         },
                         error: function(xhr) {
                             if (xhr.responseJSON && xhr.responseJSON.msgField) {
                                 let errors = xhr.responseJSON.msgField;
-                                $.each(errors, function(field, messages) {
-                                    $('#error-' + field).text(messages[0]);
+                                $.each(errors, function(field, message) {
+                                    $('#error-' + field).text(message[0]);
                                 });
                             } else {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",
-                                    text: response.messages,
+                                    text: xhr.responseJSON.message || 'Terjadi kesalahan',
                                 });
                             }
                         }
                     });
                 }
             });
-        });
-
-        $(document).ready(function() {
-            $('#id_ruangan').on('change', function() {
-                var selectedRuangan = $(this).val();
-                var currentUrl = window.location.href.split('?')[0];
-                var newUrl = currentUrl;
-
-                if (selectedRuangan !== "") {
-                    newUrl += '?id_ruangan=' + selectedRuangan;
-                } else {
-                    newUrl = currentUrl;
-                }
-
-                window.location.href = newUrl;
-            });
-
-            var datafasilitas = $('#table_fasilitas').DataTable();
         });
     </script>
 @endpush
