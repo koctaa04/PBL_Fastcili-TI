@@ -11,10 +11,11 @@ use App\Models\StatusLaporan;
 use App\Models\PelaporLaporan;
 use App\Models\LaporanKerusakan;
 use App\Models\PenugasanTeknisi;
-use Database\Seeders\pelaporLaporanSeeder;
+use App\Models\KriteriaPenilaian;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Database\Seeders\pelaporLaporanSeeder;
 
 class LaporanKerusakanController extends Controller
 {
@@ -195,7 +196,49 @@ class LaporanKerusakanController extends Controller
     }
 
 
+    public function trending()
+    {
+        $data = LaporanKerusakan::with(['pelaporLaporan.user', 'fasilitas'])
+            ->where('id_status', 1) // hanya laporan dengan status "Diajukan"
+            ->get()
+            ->sortByDesc(function ($laporan) {
+                return $laporan->skor_trending;
+            })
+            ->take(10); // ambil 10 besar trending
 
+        return view('laporan.trending', compact('data'));
+    }
+
+    public function showPenilaian(string $id)
+    {
+        $laporan = LaporanKerusakan::with([
+            'fasilitas',
+            'pelaporLaporan'
+        ])->findOrFail($id);
+
+        return view('laporan.showPenilaian', compact('laporan'));
+    }
+
+
+
+    public function simpanPenilaian(Request $request, $id)
+    {
+        $request->validate([
+            'tingkat_kerusakan' => 'required|numeric',
+            'frekuensi_digunakan' => 'required|numeric',
+            'dampak' => 'required|numeric',
+            'potensi_bahaya' => 'required|numeric',
+            'estimasi_biaya' => 'required|numeric',
+        ]);
+
+        // Simpan ke tabel penilaian atau update laporan
+        KriteriaPenilaian::updateOrCreate(
+            ['id_laporan' => $id],
+            $request->only(['tingkat_kerusakan', 'frekuensi_digunakan', 'dampak', 'potensi_bahaya', 'estimasi_biaya'])
+        );
+
+        return redirect()->back()->with('success', 'Nilai berhasil disimpan.');
+    }
 
 
 

@@ -132,9 +132,12 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
 		Route::get('/create', [LaporanKerusakanController::class, 'create']);
 		Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
-		Route::get('/edit/{id}', [LaporanKerusakanController::class, 'edit']);
-		Route::put('/update/{id}', [LaporanKerusakanController::class, 'update']);
+		// Route::get('/edit/{id}', [LaporanKerusakanController::class, 'edit']);
+		// Route::put('/update/{id}', [LaporanKerusakanController::class, 'update']);
 		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('laporan.destroy');
+		Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
+		Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
+		Route::post('/simpan-penilaian/{id}', [LaporanKerusakanController::class, 'simpanPenilaian'])->name('laporan.simpanPenilaian');
 	});
 
 
@@ -192,5 +195,4 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
 	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
-
 });

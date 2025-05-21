@@ -23,6 +23,7 @@ class PelaporLaporan extends Model
     {
         return $this->belongsTo(LaporanKerusakan::class, 'id_laporan');
     }
+    
 
     public function user()
     {

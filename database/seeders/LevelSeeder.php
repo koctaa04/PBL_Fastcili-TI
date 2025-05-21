@@ -18,7 +18,9 @@ class LevelSeeder extends Seeder
             ['kode_level' => 'ADM', 'nama_level' => 'Admin'],
             ['kode_level' => 'SRP', 'nama_level' => 'Sarana Prasarana'],
             ['kode_level' => 'TKN', 'nama_level' => 'Teknisi'],
-            ['kode_level' => 'PLP', 'nama_level' => 'Mahasiswa/Dosen/Tendik'],
+            ['kode_level' => 'MHS', 'nama_level' => 'Mahasiswa'],
+            ['kode_level' => 'DSN', 'nama_level' => 'Dosen'],
+            ['kode_level' => 'TDK', 'nama_level' => 'Tendik'],
         ]);
         
     }
