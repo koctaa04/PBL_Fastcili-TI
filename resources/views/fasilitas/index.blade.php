@@ -57,6 +57,9 @@
                 </div>
 
                 {{-- Card View --}}
+                <span class="badge badge-info p-2 mb-3">
+                    <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Terbaru Ditambahkan
+                </span>
                 <div class="row g-3" id="fasilitas-container">
                     <!-- Fasilitas cards will be loaded here -->
                 </div>
@@ -76,6 +79,9 @@
 
 @push('styles')
 <style>
+    .badge.badge-info {
+        background-color: #f49a00;
+    }
     /* Fasilitas Card Styling */
     .fasilitas-card {
         margin-bottom: 0;
@@ -113,7 +119,7 @@
     
     .fasilitas-card-footer {
         padding: 10px 15px;
-        background-color: #f8f9fa;
+        background-color: #fef5ed;
         border-top: 1px solid #eee;
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
@@ -131,7 +137,7 @@
     }
     
     .fasilitas-ruangan {
-        color: #007bff;
+        color: #ffa200;
     }
     
     .fasilitas-gedung {
@@ -164,12 +170,12 @@
     }
     
     .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
+        background-color: #ffa200;
+        border-color: #ffa200;
     }
     
     .page-link {
-        color: #007bff;
+        color: #ffa200;
     }
 </style>
 @endpush

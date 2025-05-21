@@ -52,6 +52,9 @@
 
 @push('styles')
 <style>
+    .badge.badge-info {
+        background-color: #f49a00;
+    }
     /* Gedung Card Styling */
     .gedung-card {
         margin-bottom: 0;
@@ -108,7 +111,7 @@
     
     .gedung-card-footer {
         padding: 10px 15px;
-        background-color: #f8f9fa;
+        background-color: #fef5ed;
         border-top: 1px solid #eee;
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
@@ -122,7 +125,7 @@
     
     .gedung-kode {
         font-weight: bold;
-        color: #007bff;
+        color: #ffa200;
     }
     
     .gedung-deskripsi {
@@ -159,12 +162,12 @@
     }
     
     .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
+        background-color: #ffa200;
+        border-color: #ffa200;
     }
     
     .page-link {
-        color: #007bff;
+        color: #ffa200;
     }
 </style>
 @endpush
