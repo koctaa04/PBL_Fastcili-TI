@@ -66,20 +66,36 @@ class LaporanKerusakanController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $laporan = pelaporLaporan::find($id);
+        $pelapor = pelaporLaporan::find($id);
 
-        if ($laporan) {
-            $laporan->delete($request->all());
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Berhasil Dihapus'
-            ]);
-        } else {
+        if (!$pelapor) {
             return response()->json([
                 'success' => false,
                 'message' => 'Data tidak ditemukan'
             ]);
         }
+
+        $laporan_id = $pelapor->id_laporan;
+
+        // Hitung jumlah pelapor untuk laporan ini
+        $jumlahPelapor = pelaporLaporan::where('id_laporan', $laporan_id)->count();
+
+        // Hapus pelapor ini
+        $pelapor->delete();
+
+        // Jika pelapor tinggal 1, hapus juga laporan utama
+        if ($jumlahPelapor == 1) {
+            $laporanUtama = laporanKerusakan::find($laporan_id);
+            if ($laporanUtama) {
+                // Jika ada relasi lain yang perlu dihapus juga, tambahkan di sini
+                $laporanUtama->delete();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil dihapus'
+        ]);
     }
 
 

@@ -106,6 +106,7 @@
                                 <th>Deskripsi</th>
                                 <th>Status</th>
                                 <th>Tanggal Lapor</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -138,6 +139,13 @@
                                             {{ $item->laporan->status->nama_status }}</p>
                                     </td>
                                     <td>{{ $item->laporan->tanggal_lapor }}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $item->id }}"
+                                            data-nama="{{ $item->user->nama }}">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -344,4 +352,47 @@
             $('#table_laporan').DataTable();
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).on('click', '.btn-delete', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+        let nama = $(this).data('nama');
+
+        Swal.fire({
+            title: 'Yakin Hapus Data?',
+            html: `<strong>Data pelapor atas nama <u>${nama}</u></strong> akan dihapus.<br><br>
+                <span class="text-danger">Tindakan ini berdampak besar! Jika ini adalah satu-satunya pelapor untuk laporan terkait, maka laporan utama juga akan ikut terhapus.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ url('lapor_kerusakan/delete') }}/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Berhasil!', response.message, 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Gagal', response.message, 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error', 'Terjadi kesalahan saat menghapus.', 'error');
+                    }
+                });
+            }
+        });
+    });
+</script>
+
 @endpush
