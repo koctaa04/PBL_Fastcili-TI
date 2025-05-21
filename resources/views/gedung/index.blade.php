@@ -8,9 +8,9 @@
         <h3>Data Gedung</h3>
         <div class="card p-4">
             <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex justify-content-center flex-wrap">
+                <div class="card-tools d-flex flex-wrap justify-content-center flex-wrap">
                     <button onclick="modalAction('{{ url('/gedung/create') }}')" 
-                            class="btn btn-lg btn-success mb-2">
+                            class="btn btn-lg btn-success text-truncate">
                         Tambah Data Gedung
                     </button>
                 </div>
@@ -52,6 +52,50 @@
 
 @push('styles')
 <style>
+    /* Container untuk buttons */
+    .card-tools {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    /* Base button style dengan ukuran tetap */
+    .btn-action {
+        width: 240px; /* Ukuran tetap */
+        height: 50px; /* Tinggi tetap */
+        padding: 0.5rem;
+        border-radius: 6px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: clamp(0.8rem, 2vw, 1rem); /* Font size responsive */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.3s ease;
+    }
+
+    /* Untuk layar kecil */
+    @media (max-width: 768px) {
+        .btn-action {
+            width: 200px;
+            height: 45px;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .btn-action {
+            width: 100%;
+            max-width: 220px;
+            height: 42px;
+        }
+    }
+
     .badge.badge-info {
         background-color: #f49a00;
     }
@@ -174,6 +218,30 @@
 
 @push('scripts')
     <script>
+        function adjustButtonText() {
+            const buttons = document.querySelectorAll('.card-tools .btn');
+            
+            buttons.forEach(button => {
+                // Reset font size untuk perhitungan ulang
+                button.style.fontSize = '';
+                
+                // Dapatkan dimensi button dan teks
+                const buttonWidth = button.offsetWidth;
+                const textWidth = button.scrollWidth;
+                
+                // Jika teks melebihi lebar button, kurangi font size
+                if (textWidth > buttonWidth) {
+                    const fontSize = parseFloat(window.getComputedStyle(button).fontSize);
+                    const newFontSize = fontSize * 0.9; // Kurangi 10%
+                    button.style.fontSize = `${newFontSize}px`;
+                }
+            });
+        }
+
+        // Panggil fungsi saat load dan resize
+        window.addEventListener('load', adjustButtonText);
+        window.addEventListener('resize', adjustButtonText);
+
         var currentPage = 1;
         var perPage = 12; // 4 cards x 3 rows
         var searchTimeout;
