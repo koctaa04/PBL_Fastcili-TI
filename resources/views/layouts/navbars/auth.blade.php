@@ -114,7 +114,7 @@
                             <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
                                 <a href="{{ route('perbaikan.index') }}">
                                     <span class="sidebar-mini-icon">{{ __('L') }}</span>
-                                    <span class="sidebar-normal">{{ __(' Lapor Kerusakan ') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Laporan Kerusakan ') }}</span>
                                 </a>
                             </li>
                             <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">

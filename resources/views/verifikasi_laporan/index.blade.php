@@ -24,7 +24,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($laporan as $index => $l)
+                            {{-- @foreach ($laporan as $index => $l)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
                                     <td>{{ $l->deskripsi }}</td>
@@ -41,7 +41,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endforeach --}}
                         </tbody>
                     </table>
                 </div>
