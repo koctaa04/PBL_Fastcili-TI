@@ -51,6 +51,12 @@ class User extends Authenticatable
         return $this->id_level;
     }
 
+    public function laporanDilaporkan()
+{
+    return $this->hasMany(PelaporLaporan::class, 'id_user');
+}
+
+
     /**
      * The attributes that should be hidden for serialization.
      *

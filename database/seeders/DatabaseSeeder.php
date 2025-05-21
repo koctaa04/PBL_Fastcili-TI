@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             LaporanKerusakanSeeder::class,
             KriteriaPenilaianSeeder::class,
             PenugasanTeknisiSeeder::class,
+            pelaporLaporanSeeder::class,
         ]);
     }
 }

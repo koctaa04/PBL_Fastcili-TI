@@ -14,11 +14,10 @@ class StatusLaporanSeeder extends Seeder
     public function run(): void
     {
         StatusLaporan::insert([
-            ['nama_status' => 'Menunggu'],
+            ['nama_status' => 'Diajukan'],
             ['nama_status' => 'Diproses'],
             ['nama_status' => 'Diperbaiki'],
             ['nama_status' => 'Selesai'],
-            ['nama_status' => 'Ditolak'],
         ]);
     }
 }

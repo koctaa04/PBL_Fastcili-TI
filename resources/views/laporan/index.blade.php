@@ -5,80 +5,350 @@
 
 @section('content')
     <div class="content">
-        <h3>Daftar Laporan Kerusakan</h3>
+        <h3>Laporan kerusakan</h3>
         <div class="card p-4">
             <div class="card-header">
-                <button onclick="modalAction('{{ url('/lapor_kerusakan/create') }}')"
-                    class="btn btn-sm btn-primary mt-1">Tambah
-                    Data</button>
+                <h3 class="mb-0">Form Laporan Kerusakan</h3>
+                <div class="card-body">
+                    <form action="{{ route('laporan.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <!-- Kiri: Pilih Gedung & Ruangan -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_gedung">Pilih Gedung</label>
+                                    <select name="id_gedung" id="id_gedung" class="form-control" required>
+                                        <option value="">-- Pilih Gedung --</option>
+                                        @foreach ($gedung as $g)
+                                            <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="ruangan-group" style="display: none;">
+                                    <label for="id_ruangan">Pilih Ruangan</label>
+                                    <select name="id_ruangan" id="id_ruangan" class="form-control" required>
+                                        <option value="">-- Pilih Ruangan --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Form Laporan Baru (muncul saat klik 'Bukan salah satu') -->
+                                <div id="form-laporan-baru" style="display: none;" class="mt-4">
+                                    <div class="form-group">
+                                        <label for="id_fasilitas">Fasilitas</label>
+                                        <select name="id_fasilitas" id="id_fasilitas" class="form-control"
+                                            required></select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="deskripsi">Deskripsi</label>
+                                        <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+                                    </div>
+
+                                    <div class="">
+                                        <label for="foto_kerusakan">Foto Kerusakan</label>
+                                        <input type="file" name="foto_kerusakan" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kanan: Card Laporan Sudah Ada -->
+                            <div class="col-md-8">
+                                <div id="laporan-terlapor-container" style="display: none;" class="mt-2">
+                                    <label>Laporan yang Sudah Ada:</label>
+                                    <div class="mb-3">
+                                        <button type="button" id="bukan-laporan" class="btn btn-warning">
+                                            Bukan salah satu laporan di bawah?
+                                        </button>
+                                    </div>
+                                    <div id="laporan-terlapor-list" class="row"></div>
+
+                                </div>
+
+                                <!-- Jika memilih dukung laporan -->
+                                <div id="form-dukungan" style="display: none;" class="mt-4">
+                                    <input type="hidden" name="dukungan_laporan" id="dukungan_laporan">
+                                    <div class="form-group">
+                                        <label>Tambahkan deskripsi (opsional)</label>
+                                        <textarea name="tambahan_deskripsi" class="form-control" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Submit -->
+                        <div class="row mt-4">
+                            <div class="col-md-12 text-end">
+                                <button type="submit" id="btn-submit" class="btn btn-success" disabled>Kirim
+                                    Laporan</button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card p-4">
+            <div class="card-header">
+                <h3>Daftar Laporan Kerusakan</h3>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover table-sm" id="table_laporan">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Foto Kerusakan</th>
-                                <th scope="col">Nama Fasilitas</th>
-                                <th scope="col">Deskripsi</th>
-                                <th scope="col">Tanggal lapor</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Keterangan</th>
-                                <th scope="col">Aksi</th>
+                                <th>#</th>
+                                <th>Foto Kerusakan</th>
+                                <th>Nama Fasilitas</th>
+                                <th>Deskripsi</th>
+                                <th>Tanggal Lapor</th>
+                                <th>Status</th>
+                                <th>Keterangan</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($laporan_kerusakan as $lapor => $l)
-                                <tr>
-                                    <th scope="row">{{ $lapor + 1 }}</th>
-                                    <td>
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $l->foto_kerusakan) }}"
-                                            alt="Foto Kerusakan" width="200"
-                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
-                                    </td>
-
-                                    <td>{{ $l->fasilitas->nama_fasilitas }}</td>
-                                    <td>{{ $l->deskripsi }}</td>
-                                    <td>{{ $l->tanggal_lapor }}</td>
-                                    <td>{{ $l->status->nama_status }}</td>
-                                    <td>{{ $l->keterangan ?? '-' }}</td>
-                                    <td>
-                                        <div class="d-flex">
-                                            @if ($l->id_status == 5)
-                                                <button
-                                                    onclick="modalAction('{{ url('/lapor_kerusakan/edit/' . $l->id_laporan) }}')"
-                                                    class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
-                                            @else
-                                                <button class="btn btn-sm btn-warning" style="margin-right: 8px"
-                                                    disabled>Edit</button>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            {{-- @foreach ($laporan_kerusakan as $i => $lapor)
+                        <tr>
+                            <td>{{ $i + 1 }}</td>
+                            <td>
+                                <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $lapor->foto_kerusakan) }}"
+                                     alt="Foto Kerusakan"
+                                     width="120"
+                                     onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                            </td>
+                            <td>{{ $lapor->fasilitas->nama_fasilitas ?? '-' }}</td>
+                            <td>{{ $lapor->deskripsi }}</td>
+                            <td>{{ $lapor->tanggal_lapor }}</td>
+                            <td>{{ $lapor->status->nama_status ?? '-' }}</td>
+                            <td>{{ $lapor->keterangan ?? '-' }}</td>
+                            <td>
+                                <div class="d-flex">
+                                    @if ($lapor->id_status == 5)
+                                    <button onclick="modalAction('{{ url('/lapor_kerusakan/edit/' . $lapor->id_laporan) }}')"
+                                            class="btn btn-sm btn-warning me-2">
+                                        Edit
+                                    </button>
+                                    @else
+                                    <button class="btn btn-sm btn-secondary" disabled>Edit</button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach --}}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
-        aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
     <script>
-        function modalAction(url = '') {
-            $('#myModal').load(url, function() {
-                $('#myModal').modal('show');
-            });
-        }
-        var dataLaporan;
+        var currentUserId = {{ auth()->id() }};
+        $(document).ready(function() {
+            // Fungsi: Menampilkan form dukungan laporan
+            function showFormDukungan() {
+                $('#id_fasilitas').prop('required', false).prop('disabled', true).closest('.form-group').hide();
+                $('textarea[name="deskripsi"]').prop('required', false).prop('disabled', true).closest(
+                    '.form-group').hide();
+                $('input[name="foto_kerusakan"]').prop('required', false).prop('disabled', true).closest(
+                    '.form-group').hide();
+            }
 
+            // Fungsi: Menampilkan form laporan baru
+            function showFormBaru() {
+                $('#id_fasilitas').prop('disabled', false).prop('required', true).closest('.form-group').show();
+                $('textarea[name="deskripsi"]').prop('disabled', false).prop('required', true).closest(
+                    '.form-group').show();
+                $('input[name="foto_kerusakan"]').prop('disabled', false).prop('required', true).closest(
+                    '.form-group').show();
+            }
+
+            // Event Submit Form
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+
+                $('#form-laporan-baru input, #form-laporan-baru select, #form-laporan-baru textarea').each(
+                    function() {
+                        if ($(this).is(':hidden')) {
+                            $(this).prop('disabled', true).prop('required', false);
+                        }
+                    });
+
+                const form = this;
+                const formData = new FormData(form);
+
+                $.ajax({
+                    url: $(form).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = "/lapor_kerusakan";
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: response.message,
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        let msg = "Terjadi kesalahan";
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: msg,
+                        });
+                    }
+                });
+            });
+
+            // Dropdown: Gedung → Ruangan
+            $('#id_gedung').on('change', function() {
+                const idGedung = $(this).val();
+                $('#ruangan-group').show();
+                $('#id_ruangan').html('<option value="">Memuat...</option>');
+
+                $.get('/get-ruangan/' + idGedung, function(data) {
+                    let options = '<option value="">-- Pilih Ruangan --</option>';
+                    data.forEach(r => options +=
+                        `<option value="${r.id_ruangan}">${r.nama_ruangan}</option>`);
+                    $('#id_ruangan').html(options);
+                });
+
+                $('#laporan-terlapor-container, #form-dukungan, #form-laporan-baru').hide();
+            });
+
+            // Dropdown: Ruangan → Laporan & Fasilitas
+            $('#id_ruangan').on('change', function() {
+                const idRuangan = $(this).val();
+                $('#laporan-terlapor-list').empty();
+                $('#laporan-terlapor-container, #form-dukungan, #form-laporan-baru').hide();
+
+                $.get('/get-fasilitas-terlapor/' + idRuangan, function(data) {
+                    const filteredData = data.filter(f => f.id_user !== currentUserId);
+
+                    if (filteredData.length > 0) {
+                        let html = '';
+                        filteredData.forEach(f => {
+                            html += `
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <img src="/storage/uploads/laporan_kerusakan/${f.foto_kerusakan}" class="card-img-top" style="height: 180px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title">${f.nama_fasilitas}</h5>
+                                    <p class="card-text">${f.deskripsi}</p>
+                                    <button type="button" class="btn btn-outline-primary pilih-laporan" data-id="${f.id_laporan}">Laporkan Ini</button>
+                                </div>
+                            </div>
+                        </div>`;
+                        });
+                        $('#laporan-terlapor-list').html(html);
+                        $('#laporan-terlapor-container').show();
+                        $('#form-laporan-baru').hide();
+                    } else {
+                        $('#laporan-terlapor-container').hide();
+                        $('#form-laporan-baru').show();
+                    }
+                });
+
+                $.get('/get-fasilitas-belum-lapor/' + idRuangan, function(data) {
+                    let options = '<option value="">-- Pilih Fasilitas --</option>';
+                    data.forEach(f => options +=
+                        `<option value="${f.id_fasilitas}">${f.nama_fasilitas}</option>`);
+                    $('#id_fasilitas').html(options);
+                });
+            });
+
+            // Klik tombol: Dukung laporan sudah ada
+            $(document).on('click', '.pilih-laporan', function() {
+                const selectedId = $(this).data('id');
+                $('.pilih-laporan').removeClass('btn-primary').addClass('btn-outline-primary');
+                $(this).removeClass('btn-outline-primary').addClass('btn-primary');
+
+                $('#dukungan_laporan').val(selectedId);
+                $('#form-dukungan').show();
+                $('#form-laporan-baru').hide();
+
+                showFormDukungan();
+            });
+
+            // Klik tombol: Buat laporan baru
+            $('#bukan-laporan').on('click', function() {
+                $('#dukungan_laporan').val('');
+                $('#form-dukungan').hide();
+                $('#form-laporan-baru').show();
+
+                showFormBaru();
+            });
+
+            // Validasi tombol submit
+            function updateSubmitButtonState() {
+                const isDukung = $('#dukungan_laporan').val() !== '';
+                const isLaporanBaru = $('#form-laporan-baru').is(':visible');
+
+                let enable = false;
+
+                if (isDukung) {
+                    const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
+                    enable = tambahanDeskripsi.length > 0;
+                }
+
+                if (isLaporanBaru) {
+                    const fasilitas = $('#id_fasilitas').val();
+                    const deskripsi = $('textarea[name="deskripsi"]').val().trim();
+                    const foto = $('input[name="foto_kerusakan"]')[0].files.length > 0;
+
+                    enable = fasilitas !== '' && deskripsi.length > 0 && foto;
+                }
+
+                $('#btn-submit').prop('disabled', !enable);
+            }
+
+            // Pantau input
+            $(document).on('input change',
+                '#id_fasilitas, textarea[name="deskripsi"], input[name="foto_kerusakan"], textarea[name="tambahan_deskripsi"]',
+                updateSubmitButtonState);
+
+            // Reset tombol saat pilih gedung/ruangan berubah
+            $('#id_gedung, #id_ruangan').on('change', function() {
+                $('#btn-submit').prop('disabled', true);
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+    <script>
         $(document).on('submit', '.form-delete', function(e) {
-            e.preventDefault(); // Cegah submit form langsung
-            let form = this;
-            let url = $(this).data('url');
+            e.preventDefault();
+            const form = this;
 
             Swal.fire({
                 title: 'Apakah Anda yakin ingin menghapus data ini?',
@@ -93,35 +363,20 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "POST",
-                        url: $(this).attr('action'),
-                        data: $(this).serialize(),
+                        url: $(form).attr('action'),
+                        data: $(form).serialize(),
                         dataType: "json",
                         success: function(response) {
                             if (response.success) {
                                 $('#myModal').modal('hide');
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Berhasil!",
-                                    text: response.messages,
-                                });
+                                Swal.fire("Berhasil!", response.messages, "success");
                                 location.reload();
                             } else {
-                                alert('Gagal menghapus data.');
+                                Swal.fire("Gagal!", response.messages, "error");
                             }
                         },
                         error: function(xhr) {
-                            if (xhr.responseJSON && xhr.responseJSON.msgField) {
-                                let errors = xhr.responseJSON.msgField;
-                                $.each(errors, function(field, messages) {
-                                    $('#error-' + field).text(messages[0]);
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Gagal!",
-                                    text: response.messages,
-                                });
-                            }
+                            Swal.fire("Gagal!", "Terjadi kesalahan sistem.", "error");
                         }
                     });
                 }
@@ -129,7 +384,7 @@
         });
 
         $(document).ready(function() {
-            var datalaporan = $('#table_laporan').DataTable();
+            $('#table_laporan').DataTable();
         });
     </script>
 @endpush

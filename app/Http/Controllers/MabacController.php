@@ -14,6 +14,8 @@ class MabacController extends Controller
     {
         // Mengambil nilai min dan max untuk setiap kriteria
         $minMaxValues = DB::table('kriteria_penilaian')
+            ->join('laporan_kerusakan', 'kriteria_penilaian.id_laporan', '=', 'laporan_kerusakan.id_laporan')
+            ->where('laporan_kerusakan.id_status', 2)
             ->select(
                 DB::raw('MIN(tingkat_kerusakan) as min_tingkat_kerusakan'),
                 DB::raw('MAX(tingkat_kerusakan) as max_tingkat_kerusakan'),
@@ -38,16 +40,24 @@ class MabacController extends Controller
 
         // Melakukan Normalisasi (X)
         foreach ($alternatif as $item) {
-            $normalizedMatrix[] = [
-                'id_laporan' => $item->laporan->id_laporan,
-                'deskripsi' => $item->laporan->deskripsi,
-                'status' => $item->laporan->status->nama_status,
-                'tingkat_kerusakan' => ($item->tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan) / ($minMaxValues->max_tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan),
-                'frekuensi_digunakan' => ($item->frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan) / ($minMaxValues->max_frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan),
-                'dampak' => ($item->dampak - $minMaxValues->min_dampak) / ($minMaxValues->max_dampak - $minMaxValues->min_dampak),
-                'estimasi_biaya' => ($item->estimasi_biaya - $minMaxValues->max_estimasi_biaya) / ($minMaxValues->min_estimasi_biaya - $minMaxValues->max_estimasi_biaya),
-                'potensi_bahaya' => ($item->potensi_bahaya - $minMaxValues->min_potensi_bahaya) / ($minMaxValues->max_potensi_bahaya - $minMaxValues->min_potensi_bahaya),
-            ];
+            if ($item->laporan->id_status == 2) {
+                $tingkat_kerusakan_range = $minMaxValues->max_tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan;
+                $frekuensi_digunakan_range = $minMaxValues->max_frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan;
+                $dampak_range = $minMaxValues->max_dampak - $minMaxValues->min_dampak;
+                $estimasi_biaya_range = $minMaxValues->min_estimasi_biaya - $minMaxValues->max_estimasi_biaya;
+                $potensi_bahaya_range = $minMaxValues->max_potensi_bahaya - $minMaxValues->min_potensi_bahaya;
+
+                $normalizedMatrix[] = [
+                    'id_laporan' => $item->laporan->id_laporan,
+                    'deskripsi' => $item->laporan->deskripsi,
+                    'status' => $item->laporan->status->nama_status,
+                    'tingkat_kerusakan' => $tingkat_kerusakan_range != 0 ? ($item->tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan) / $tingkat_kerusakan_range : 0,
+                    'frekuensi_digunakan' => $frekuensi_digunakan_range != 0 ? ($item->frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan) / $frekuensi_digunakan_range : 0,
+                    'dampak' => $dampak_range != 0 ? ($item->dampak - $minMaxValues->min_dampak) / $dampak_range : 0,
+                    'estimasi_biaya' => $estimasi_biaya_range != 0 ? ($item->estimasi_biaya - $minMaxValues->max_estimasi_biaya) / $estimasi_biaya_range : 0,
+                    'potensi_bahaya' => $potensi_bahaya_range != 0 ? ($item->potensi_bahaya - $minMaxValues->min_potensi_bahaya) / $potensi_bahaya_range : 0,
+                ];
+            }
         }
 
         // Membuat Matriks Berbobot (V)

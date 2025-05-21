@@ -8,17 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class LaporanKerusakan extends Model
 {
     use HasFactory;
+
     protected $table = 'laporan_kerusakan';
     protected $primaryKey = 'id_laporan';
 
     protected $fillable = [
-        'id_user', 'id_fasilitas', 'id_status', 'deskripsi', 'keterangan', 'foto_kerusakan', 'tanggal_lapor'
+        'id_fasilitas',
+        'deskripsi',
+        'foto_kerusakan',
+        'tanggal_lapor',
+        'id_status',
+        'keterangan',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'id_user');
-    }
 
     public function fasilitas()
     {
@@ -30,13 +31,14 @@ class LaporanKerusakan extends Model
         return $this->belongsTo(StatusLaporan::class, 'id_status');
     }
 
+    public function pelapor()
+    {
+        return $this->hasMany(PelaporLaporan::class, 'id_laporan');
+    }
+
+    //Kriteria
     public function kriteria()
     {
         return $this->hasMany(KriteriaPenilaian::class, 'id_laporan');
-    }
-
-    public function penugasan()
-    {
-        return $this->hasOne(PenugasanTeknisi::class, 'id_laporan');
     }
 }
