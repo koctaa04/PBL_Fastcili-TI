@@ -138,6 +138,11 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 	});
 
+	Route::get('/get-ruangan/{idGedung}', [LaporanKerusakanController::class, 'getRuangan']);
+	Route::get('/get-fasilitas-terlapor/{idRuangan}', [LaporanKerusakanController::class, 'getFasilitasTerlapor']);
+	Route::get('/get-fasilitas-belum-lapor/{idRuangan}', [LaporanKerusakanController::class, 'getFasilitasBelumLapor']);
+
+
 	/** -----------------------------
 	 *  Verifikasi Laporan (Untuk Sarpras verifikasi laporan)
 	 *  ---------------------------- */
