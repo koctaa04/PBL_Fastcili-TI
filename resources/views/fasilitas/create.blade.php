@@ -70,7 +70,7 @@
                         timer: 3000,
                         showConfirmButton: true
                     });
-                    dataFasilitas.ajax.reload();
+                    loadFasilitasCards();
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -98,36 +98,39 @@
     });
 
     $(document).ready(function() {
-        // Ketika gedung dipilih
         $('#gedung').change(function() {
             let gedungId = $(this).val();
-            $('#ruangan').html('<option value="">Loading...</option>').prop('disabled', true);
+            $('#ruangan').html('<option value="">Memuat...</option>').prop('disabled', true);
 
             if (gedungId) {
                 $.ajax({
                     url: "{{ route('fasilitas.getRuangan', '') }}/" + gedungId,
                     type: 'GET',
                     dataType: 'json',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
                     success: function(data) {
+                        console.log('Response:', data); // Untuk debugging
                         let options = '<option value="">Pilih Ruangan</option>';
-                        if (data.length > 0) {
+                        
+                        if (data && data.length > 0) {
                             $.each(data, function(i, ruangan) {
                                 options += '<option value="' + ruangan.id_ruangan + '">' + 
-                                        ruangan.nama_ruangan + '</option>';
+                                ruangan.nama_ruangan + '</option>';
                             });
                         } else {
                             options = '<option value="">Tidak ada ruangan</option>';
                         }
+                        
                         $('#ruangan').html(options).prop('disabled', false);
-                    }   
-                    error: function() {
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', status, error); // Untuk debugging
                         $('#ruangan').html('<option value="">Gagal memuat ruangan</option>')
                             .prop('disabled', true);
                     }
                 });
+            } else {
+                $('#ruangan').html('<option value="">Pilih Gedung terlebih dahulu</option>')
+                    .prop('disabled', true);
             }
         });
     });

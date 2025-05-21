@@ -51,7 +51,7 @@
                         timer: 3000,
                         showConfirmButton: true
                     });
-                    dataFasilitas.ajax.reload();
+                    loadFasilitasCards();
                 } else {
                     Swal.fire({
                         icon: "error",

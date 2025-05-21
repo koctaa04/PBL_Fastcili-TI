@@ -20,14 +20,21 @@
                 </div>
             </div>
             <div class="card-body">
-                {{-- Filtering --}}
+                {{-- Search and Filtering --}}
                 <div class="row pr-auto">
                     <div class="col-md-12">
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Cari:</label>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
+                                <small class="form-text text-muted">Masukkan nama fasilitas</small>
+                            </div>
+                        </div>
                         <div class="form-group row mb-5">
                             <label class="col-2 control-label col-form-label">Filter:</label>
                             <div class="col-5">
                                 <select class="form-control" id="id_gedung" name="id_gedung" required>
-                                    <option value="">- Semua Level -</option>
+                                    <option value="">- Semua Gedung -</option>
                                     @foreach($gedung as $item)
                                         <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
                                     @endforeach
@@ -35,11 +42,13 @@
                                 <small class="form-text text-muted">Gedung</small>
                             </div>
                             <div class="col-5">
-                                <select class="form-control" id="id_ruangan" name="id_ruangan" required>
-                                    <option value="">- Semua Level -</option>
-                                    @foreach($ruangan as $item)
-                                        <option value="{{ $item->id_ruangan }}">{{ $item->nama_ruangan }} </option>
-                                    @endforeach
+                                <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled>
+                                    <option value="">- Semua Ruangan -</option>
+                                    @if(isset($ruangan))
+                                        @foreach($ruangan as $item)
+                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">{{ $item->nama_ruangan }} </option>
+                                        @endforeach
+                                    @endif
                                 </select>
                                 <small class="form-text text-muted">Ruangan</small>
                             </div>
@@ -168,22 +177,66 @@
 @push('scripts')
     <script>
         var currentPage = 1;
-        var perPage = 15; // 5 cards x 3 rows
+        var perPage = 16; // 4 cards x 4 rows
+        var searchTimeout;
 
         $(document).ready(function() {
+            // Initialize ruangan dropdown as disabled
+            $('#id_ruangan').prop('disabled', true);
+
             // Load initial data
             loadFasilitasCards();
 
-            // Filter change events
-            $('#id_ruangan, #id_gedung').on('change', function() {
-                currentPage = 1; // Reset to first page when filter changes
+            // Gedung change event
+            $('#id_gedung').on('change', function() {
+                const idGedung = $(this).val();
+                
+                if (idGedung) {
+                    // Enable ruangan dropdown
+                    $('#id_ruangan').prop('disabled', false);
+                    
+                    // Filter ruangan options based on selected gedung
+                    $('#id_ruangan option').each(function() {
+                        const optionGedung = $(this).data('gedung');
+                        if (optionGedung == idGedung || $(this).val() === '') {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                    
+                    // Reset ruangan selection
+                    $('#id_ruangan').val('');
+                } else {
+                    // Disable ruangan dropdown if no gedung selected
+                    $('#id_ruangan').prop('disabled', true);
+                    $('#id_ruangan').val('');
+                }
+                
+                currentPage = 1;
                 loadFasilitasCards();
+            });
+
+            // Filter change events
+            $('#id_ruangan').on('change', function() {
+                currentPage = 1;
+                loadFasilitasCards();
+            });
+
+            // Search input event with debounce
+            $('#search').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    currentPage = 1;
+                    loadFasilitasCards();
+                }, 500);
             });
         });
 
         function loadFasilitasCards() {
             const idRuangan = $('#id_ruangan').val();
             const idGedung = $('#id_gedung').val();
+            const searchTerm = $('#search').val();
             
             $.ajax({
                 url: "{{ url('fasilitas/list') }}",
@@ -192,6 +245,7 @@
                 data: {
                     id_ruangan: idRuangan,
                     id_gedung: idGedung,
+                    search: searchTerm,
                     page: currentPage,
                     per_page: perPage
                 },
@@ -202,7 +256,7 @@
                     if(response.data && response.data.length > 0) {
                         response.data.forEach((fasilitas) => {
                             const cardHtml = `
-                                <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 col-12">
+                                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                                     <div class="card fasilitas-card">
                                         <div class="fasilitas-card-body">
                                             <h5 class="fasilitas-card-title">${fasilitas.nama_fasilitas}</h5>

@@ -68,12 +68,19 @@ class FasilitasController extends Controller
         if ($request->has('id_ruangan') && $request->id_ruangan != '') {
             $fasilitas->where('ruangan.id_ruangan', $request->id_ruangan);
         }
+
         // Add gedung filter if provided
         if ($request->has('id_gedung') && $request->id_gedung != '') {
             $fasilitas->where('ruangan.id_gedung', $request->id_gedung);
         }
 
-        $perPage = $request->has('per_page') ? $request->per_page : 15;
+        // Add search filter if provided
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = '%' . $request->search . '%';
+            $fasilitas->where('fasilitas.nama_fasilitas', 'like', $searchTerm);
+        }
+
+        $perPage = $request->has('per_page') ? $request->per_page : 16;
         $page = $request->has('page') ? $request->page : 1;
 
         return response()->json($fasilitas->paginate($perPage, ['*'], 'page', $page));
