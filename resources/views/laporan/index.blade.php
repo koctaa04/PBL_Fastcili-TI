@@ -116,8 +116,7 @@
                                     <td>
                                         <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
                                             alt="Foto Gedung" class="card-img-top img-fluid"
-                                            style="height: 120px; object-fit: cover;"
-                                            onerror="this.onerror=null;this.src='{{ asset('gedung_default.jpg') }}';">
+                                            style="height: 120px; object-fit: cover;">
                                     </td>
                                     <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
                                     <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
@@ -357,45 +356,44 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    $(document).on('click', '.btn-delete', function(e) {
-        e.preventDefault();
-        let id = $(this).data('id');
-        let nama = $(this).data('nama');
+    <script>
+        $(document).on('click', '.btn-delete', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let nama = $(this).data('nama');
 
-        Swal.fire({
-            title: 'Yakin Hapus Data?',
-            html: `<strong>Data pelapor atas nama <u>${nama}</u></strong> akan dihapus.<br><br>
+            Swal.fire({
+                title: 'Yakin Hapus Data?',
+                html: `<strong>Data pelapor atas nama <u>${nama}</u></strong> akan dihapus.<br><br>
                 <span class="text-danger">Tindakan ini berdampak besar! Jika ini adalah satu-satunya pelapor untuk laporan terkait, maka laporan utama juga akan ikut terhapus.</span>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "{{ url('lapor_kerusakan/delete') }}/" + id,
-                    type: 'DELETE',
-                    data: {
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            Swal.fire('Berhasil!', response.message, 'success')
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire('Gagal', response.message, 'error');
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('lapor_kerusakan/delete') }}/" + id,
+                        type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Berhasil!', response.message, 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Gagal', response.message, 'error');
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghapus.', 'error');
                         }
-                    },
-                    error: function(xhr) {
-                        Swal.fire('Error', 'Terjadi kesalahan saat menghapus.', 'error');
-                    }
-                });
-            }
+                    });
+                }
+            });
         });
-    });
-</script>
-
+    </script>
 @endpush

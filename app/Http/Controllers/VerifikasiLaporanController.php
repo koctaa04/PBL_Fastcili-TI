@@ -11,11 +11,11 @@ class VerifikasiLaporanController extends Controller
 {
     public function     index()
     {
-        $laporan = LaporanKerusakan::with(['user:id_user,nama', 'status:id_status,nama_status'])
-            ->where('id_status', 1)
-            ->get();
+        // $laporan = LaporanKerusakan::with(['user:id_user,nama', 'status:id_status,nama_status'])
+        //     ->where('id_status', 1)
+        //     ->get();
 
-        return view('verifikasi_laporan.index', ['laporan' => $laporan]);
+        return view('verifikasi_laporan.index');
     }
 
     public function verif(string $id)

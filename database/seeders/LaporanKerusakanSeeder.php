@@ -14,8 +14,8 @@ class LaporanKerusakanSeeder extends Seeder
     public function run(): void
     {
         LaporanKerusakan::insert([
-            ['id_fasilitas' => 2, 'deskripsi' => 'PC tidak bisa menyala', 'foto_kerusakan' => 'tes.jpg' , 'tanggal_lapor' => now(), 'id_status' => 1],
-            ['id_fasilitas' => 3, 'deskripsi' => 'Kipas mati total', 'foto_kerusakan' => 'tes.jpg' , 'tanggal_lapor' => now(), 'id_status' => 1],
+            ['id_fasilitas' => 2, 'deskripsi' => 'PC tidak bisa menyala', 'foto_kerusakan' => 'gedung1.jpg' , 'tanggal_lapor' => now(), 'id_status' => 1],
+            ['id_fasilitas' => 3, 'deskripsi' => 'Kipas mati total', 'foto_kerusakan' => 'gedung2.jpg' , 'tanggal_lapor' => now(), 'id_status' => 1],
         ]);
     }
 }
