@@ -105,7 +105,6 @@
                                 <th>Deskripsi Tambahan</th>
                                 <th>Status</th>
                                 <th>Tanggal Lapor</th>
-                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
