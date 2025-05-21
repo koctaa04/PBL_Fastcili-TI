@@ -7,64 +7,57 @@
     <div class="content">
         <h3>Data Ruangan</h3>
         <div class="card p-4">
-            <div class="card-header">
-                <div class="row align-items-center justify-content-between">
-                    <div class="col-md-auto">
-                        <button onclick="modalAction('{{ url('/ruangan/create') }}')" class="btn btn-sm btn-primary">Tambah
-                            Data</button>
-                    </div>
-                    <div class="col-md-auto">
-                        <div class="form-group mb-0 d-flex align-items-center">
-                            <label for="id_gedung" class="mr-2 mb-0">Filter:</label>
-                            <select class="form-control form-control-sm" id="id_gedung" name="id_gedung">
-                                <option value="">-- Semua --</option>
-                                @foreach ($gedung as $item)
-                                    <option value="{{ $item->id_gedung }}"
-                                        {{ request('id_gedung') == $item->id_gedung ? 'selected' : '' }}>
-                                        {{ $item->nama_gedung }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
+            <div class="card-header d-flex justify-content-center align-items-center mb-5">
+                <div class="card-tools d-flex flex-wrap justify-content-center gap-3">
+                    <button onclick="modalAction('{{ url('/ruangan/import') }}')" 
+                            class="btn btn-action btn-warning text-truncate">
+                        Import Data Ruangan (.xlsx)
+                    </button>
+                    <button onclick="modalAction('{{ url('/ruangan/create') }}')" 
+                            class="btn btn-action btn-success text-truncate">
+                        Tambah Data Ruangan
+                    </button>
                 </div>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_ruangan">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Nama Gedung</th>
-                                <th scope="col">Kode Ruangan</th>
-                                <th scope="col">Nama Ruangan</th>
-                                <th scope="col">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($ruangan as $index => $r)
-                                <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
-                                    <td>{{ $r->gedung->nama_gedung }}</td>
-                                    <td>{{ $r->kode_ruangan }}</td>
-                                    <td>{{ $r->nama_ruangan }}</td>
-                                    <td>
-                                        <div class="d-flex">
-                                            <button
-                                                onclick="modalAction('{{ url('/ruangan/edit/' . $r->id_ruangan . '') }}')"
-                                                class="btn btn-sm btn-warning" style="margin-right: 8px">Edit</button>
-                                            <form class="form-delete"
-                                                action="{{ url('/ruangan/delete/' . $r->id_ruangan . '') }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                {{-- Search and Filtering --}}
+                <div class="row pr-auto">
+                    <div class="col-md-12">
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Cari:</label>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="search" placeholder="Cari ruangan...">
+                                <small class="form-text text-muted">Masukkan nama ruangan</small>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Filter:</label>
+                            <div class="col-5">
+                                <select class="form-control" id="id_gedung" name="id_gedung" required>
+                                    <option value="">- Semua Gedung -</option>
+                                    @foreach($gedung as $item)
+                                        <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Gedung</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card View --}}
+                <span class="badge badge-info p-2 mb-3">
+                    <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Terbaru Ditambahkan
+                </span>
+                <div class="row g-3" id="ruangan-container">
+                    <!-- Ruangan cards will be loaded here -->
+                </div>
+
+                {{-- Pagination --}}
+                <div class="row mt-4">
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <div id="pagination-links"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,8 +66,330 @@
         aria-hidden="true"></div>
 @endsection
 
+@push('styles')
+<style>
+    /* Container untuk buttons */
+    .card-tools {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    /* Base button style dengan ukuran tetap */
+    .btn-action {
+        width: 240px; /* Ukuran tetap */
+        height: 50px; /* Tinggi tetap */
+        padding: 0.5rem;
+        border-radius: 6px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: clamp(0.8rem, 2vw, 1rem); /* Font size responsive */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.3s ease;
+    }
+
+    /* Untuk layar kecil */
+    @media (max-width: 768px) {
+        .btn-action {
+            width: 200px;
+            height: 45px;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .btn-action {
+            width: 100%;
+            max-width: 220px;
+            height: 42px;
+        }
+    }
+
+    .badge.badge-info {
+        background-color: #f49a00;
+    }
+    /* Ruangan Card Styling */
+    .ruangan-card {
+        margin-bottom: 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(0,0,0,0.125);
+    }
+    
+    .ruangan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .ruangan-card-body {
+        padding: 15px;
+        flex-grow: 1;
+    }
+    
+    .ruangan-card-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .ruangan-card-text {
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+    
+    .ruangan-card-footer {
+        padding: 10px 15px;
+        background-color: #fef5ed;
+        border-top: 1px solid #eee;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+    
+    .ruangan-card-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+    
+    .ruangan-kode {
+        font-weight: bold;
+        color: #ffa200;
+    }
+    
+    .ruangan-gedung {
+        color: #6c757d;
+        font-style: italic;
+        font-size: 0.85rem;
+    }
+    
+    /* Responsive grid settings */
+    #ruangan-container {
+        margin-right: -12px;
+        margin-left: -12px;
+    }
+    
+    #ruangan-container > [class*="col-"] {
+        padding-right: 12px;
+        padding-left: 12px;
+        margin-bottom: 24px;
+    }
+    
+    /* Button styling */
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* Pagination styling */
+    .pagination {
+        margin-top: 20px;
+    }
+    
+    .page-item.active .page-link {
+        background-color: #ffa200;
+        border-color: #ffa200;
+    }
+    
+    .page-link {
+        color: #ffa200;
+    }
+</style>
+@endpush
+
 @push('scripts')
     <script>
+        function adjustButtonText() {
+            const buttons = document.querySelectorAll('.card-tools .btn');
+            
+            buttons.forEach(button => {
+                // Reset font size untuk perhitungan ulang
+                button.style.fontSize = '';
+                
+                // Dapatkan dimensi button dan teks
+                const buttonWidth = button.offsetWidth;
+                const textWidth = button.scrollWidth;
+                
+                // Jika teks melebihi lebar button, kurangi font size
+                if (textWidth > buttonWidth) {
+                    const fontSize = parseFloat(window.getComputedStyle(button).fontSize);
+                    const newFontSize = fontSize * 0.9; // Kurangi 10%
+                    button.style.fontSize = `${newFontSize}px`;
+                }
+            });
+        }
+
+        // Panggil fungsi saat load dan resize
+        window.addEventListener('load', adjustButtonText);
+        window.addEventListener('resize', adjustButtonText);
+        
+        var currentPage = 1;
+        var perPage = 12; // 4 cards x 3 rows
+        var searchTimeout;
+
+        $(document).ready(function() {
+            // Load initial data
+            loadRuanganCards();
+
+            // Search input event with debounce
+            $('#search').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    currentPage = 1;
+                    loadRuanganCards();
+                }, 500);
+            });
+
+            // Gedung filter change event
+            $('#id_gedung').on('change', function() {
+                currentPage = 1;
+                loadRuanganCards();
+            });
+        });
+
+        function loadRuanganCards() {
+            const searchTerm = $('#search').val();
+            const idGedung = $('#id_gedung').val();
+            
+            $.ajax({
+                url: "{{ url('ruangan') }}",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    search: searchTerm,
+                    id_gedung: idGedung,
+                    page: currentPage,
+                    per_page: perPage
+                },
+                success: function(response) {
+                    const container = $('#ruangan-container');
+                    container.empty();
+                    
+                    if(response.data && response.data.length > 0) {
+                        response.data.forEach((ruangan) => {
+                            const cardHtml = `
+                                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
+                                    <div class="card ruangan-card">
+                                        <div class="ruangan-card-body">
+                                            <h5 class="ruangan-card-title">${ruangan.nama_ruangan}</h5>
+                                            <p class="ruangan-card-text"><strong>Kode:</strong> <span class="ruangan-kode">${ruangan.kode_ruangan || '-'}</span></p>
+                                            <p class="ruangan-card-text"><strong>Gedung:</strong> <span class="ruangan-gedung">${ruangan.gedung?.nama_gedung || 'Tidak ada gedung'}</span></p>
+                                        </div>
+                                        <div class="ruangan-card-footer">
+                                            <div class="ruangan-card-actions">
+                                                <button onclick="modalAction('{{ url('/ruangan/edit') }}/${ruangan.id_ruangan}')" 
+                                                        class="btn btn-sm btn-warning" title="Edit">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                                <form class="form-delete d-inline" action="{{ url('/ruangan/delete') }}/${ruangan.id_ruangan}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            container.append(cardHtml);
+                        });
+                    } else {
+                        container.append('<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data ruangan</p></div>');
+                    }
+
+                    // Update pagination
+                    updatePagination(response);
+                },
+                error: function(xhr) {
+                    console.error('Error loading ruangan:', xhr);
+                    alert('Gagal memuat data ruangan');
+                }
+            });
+        }
+
+        function updatePagination(response) {
+            const paginationContainer = $('#pagination-links');
+            paginationContainer.empty();
+
+            if (response.last_page > 1) {
+                let paginationHtml = '<ul class="pagination">';
+
+                // Previous button
+                if (response.current_page > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="changePage(${response.current_page - 1})" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    `;
+                } else {
+                    paginationHtml += `
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&laquo;</span>
+                        </li>
+                    `;
+                }
+
+                // Page numbers
+                for (let i = 1; i <= response.last_page; i++) {
+                    if (i === response.current_page) {
+                        paginationHtml += `
+                            <li class="page-item active">
+                                <span class="page-link">${i}</span>
+                            </li>
+                        `;
+                    } else {
+                        paginationHtml += `
+                            <li class="page-item">
+                                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                            </li>
+                        `;
+                    }
+                }
+
+                // Next button
+                if (response.current_page < response.last_page) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="changePage(${response.current_page + 1})" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    `;
+                } else {
+                    paginationHtml += `
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&raquo;</span>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += '</ul>';
+                paginationContainer.append(paginationHtml);
+            }
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            loadRuanganCards();
+            return false;
+        }
+
         function modalAction(url = '') {
             $('#myModal').load(url, function() {
                 $('#myModal').modal('show');
@@ -98,8 +413,8 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "POST",
-                        url: $(this).attr('action'),
-                        data: $(this).serialize(),
+                        url: $(form).attr('action'),
+                        data: $(form).serialize(),
                         dataType: "json",
                         success: function(response) {
                             if (response.success) {
@@ -107,48 +422,36 @@
                                 Swal.fire({
                                     icon: "success",
                                     title: "Berhasil!",
-                                    text: response.messages,
+                                    text: response.message,
+                                    timer: 3000,
+                                    showConfirmButton: true
                                 });
-                                location.reload();
+                                loadRuanganCards();
                             } else {
-                                alert('Gagal menghapus data.');
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Gagal!",
+                                    text: response.message,
+                                });
                             }
                         },
                         error: function(xhr) {
                             if (xhr.responseJSON && xhr.responseJSON.msgField) {
                                 let errors = xhr.responseJSON.msgField;
-                                $.each(errors, function(field, messages) {
-                                    $('#error-' + field).text(messages[0]);
+                                $.each(errors, function(field, message) {
+                                    $('#error-' + field).text(message[0]);
                                 });
                             } else {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",
-                                    text: response.messages,
+                                    text: xhr.responseJSON.message || 'Terjadi kesalahan',
                                 });
                             }
                         }
                     });
                 }
             });
-        });
-
-        $(document).ready(function() {
-            $('#id_gedung').on('change', function() {
-                var selectedGedung = $(this).val();
-                var currentUrl = window.location.href.split('?')[0];
-                var newUrl = currentUrl;
-
-                if (selectedGedung !== "") {
-                    newUrl += '?id_gedung=' + selectedGedung;
-                } else {
-                    newUrl = currentUrl;
-                }
-
-                window.location.href = newUrl;
-            });
-
-            var dataruangan = $('#table_ruangan').DataTable();
         });
     </script>
 @endpush

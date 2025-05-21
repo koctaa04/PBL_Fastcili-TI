@@ -1,31 +1,37 @@
-<div class="modal-dialog" role="document">
+<div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-        <form method="POST" action="{{ url('/ruangan/update/' . $ruangan->id_ruangan) }}" id="form_edit">
+        <div class="modal-header">
+            <h5 class="modal-title">Edit Data Ruangan</h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <form method="POST" action="{{ url('/ruangan/update/' . $ruangan->id_ruangan) }}" id="form_edit" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Data Ruangan</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nama Gedung</label>
+                    <label for="id_gedung">Nama Gedung</label>
                     <select class="form-control" name="id_gedung" id="id_gedung" required>
                         @foreach ($gedung as $g)
                             <option value="{{ $g->id_gedung }}" @if ($g->id_gedung == $ruangan->id_gedung) selected @endif>
-                                {{ $g->nama_gedung }}</option>
+                                {{ $g->nama_gedung }}
+                            </option>
                         @endforeach
                     </select>
+                    <small class="text-danger" id="error-id_gedung"></small>
                 </div>
-                <div class="form-group">
-                    <label>Kode ruangan</label>
-                    <input type="text" class="form-control" name="kode_ruangan" value="{{ $ruangan->kode_ruangan }}"
-                        required>
+                <div class="form-group mt-3">
+                    <label for="kode_ruangan">Kode Ruangan</label>
+                    <input type="text" class="form-control" name="kode_ruangan" id="kode_ruangan" 
+                           value="{{ $ruangan->kode_ruangan }}" required>
+                    <small class="text-danger" id="error-kode_ruangan"></small>
                 </div>
-                <div class="form-group">
-                    <label>Nama ruangan</label>
-                    <input type="text" class="form-control" name="nama_ruangan" value="{{ $ruangan->nama_ruangan }}"
-                        required>
+                <div class="form-group mt-3">
+                    <label for="nama_ruangan">Nama Ruangan</label>
+                    <input type="text" class="form-control" name="nama_ruangan" id="nama_ruangan" 
+                           value="{{ $ruangan->nama_ruangan }}" required>
+                    <small class="text-danger" id="error-nama_ruangan"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -35,38 +41,50 @@
         </form>
     </div>
 </div>
+
 <script>
+$(document).ready(function() {
+    // Reset form when modal is closed
+    $('#myModal').on('hidden.bs.modal', function() {
+        $('.text-danger').text('');
+    });
+
     $(document).on('submit', '#form_edit', function(e) {
         e.preventDefault();
+        $('.text-danger').text(''); // Clear previous errors
 
-        $('.error-text').text('');
+        var form = $(this);
+        var formData = new FormData(this);
 
         $.ajax({
             type: "POST",
-            url: $(this).attr('action'),
-            data: $(this).serialize(),
+            url: form.attr('action'),
+            data: formData,
             dataType: "json",
+            contentType: false,
+            processData: false,
             beforeSend: function() {
-                $('#form_edit button[type=submit]').prop('disabled', true).text('Menyimpan...');
+                form.find('button[type=submit]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
             },
             success: function(response) {
-                $('#form_edit button[type=submit]').prop('disabled', false).text('Simpan');
+                form.find('button[type=submit]').prop('disabled', false).html('Simpan');
                 if (response.success) {
                     $('#myModal').modal('hide');
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
-                        text: response.messages,
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        loadRuanganCards();
                     });
-                    location.reload();
-                } else {
-                    alert('Gagal menyimpan data.');
                 }
             },
             error: function(xhr) {
-                $('#form_edit button[type=submit]').prop('disabled', false).text('Simpan');
-                if (xhr.responseJSON && xhr.responseJSON.msgField) {
-                    let errors = xhr.responseJSON.msgField;
+                form.find('button[type=submit]').prop('disabled', false).html('Simpan');
+                if (xhr.status === 422) { // Validation error
+                    let errors = xhr.responseJSON.errors;
                     $.each(errors, function(field, messages) {
                         $('#error-' + field).text(messages[0]);
                     });
@@ -74,10 +92,11 @@
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.messages,
+                        text: xhr.responseJSON.message || 'Terjadi kesalahan saat menyimpan data',
                     });
                 }
             }
         });
     });
+});
 </script>

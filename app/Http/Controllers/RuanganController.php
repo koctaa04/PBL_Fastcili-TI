@@ -12,17 +12,37 @@ class RuanganController extends Controller
 {
     public function index(Request $request)
     {
-        $id_gedung = $request->query('id_gedung');
-
-        if (!empty($id_gedung)) {
-            $ruangan = Ruangan::where('id_gedung', $id_gedung)->get();
-        } else {
-            $ruangan = Ruangan::all(); // tampilkan semua
+        if ($request->ajax()) {
+            return $this->getRuanganData($request);
         }
 
         $gedung = Gedung::all();
+        return view('ruangan.index', compact('gedung'));
+    }
 
-        return view('ruangan.index', ['ruangan' => $ruangan, 'gedung' => $gedung]);
+    private function getRuanganData(Request $request)
+    {
+        $ruangan = Ruangan::with('gedung');
+
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $ruangan->where(function ($query) use ($search) {
+                $query->where('nama_ruangan', 'like', '%' . $search . '%')
+                    ->orWhere('kode_ruangan', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter by gedung
+        if ($request->has('id_gedung') && !empty($request->id_gedung)) {
+            $ruangan->where('id_gedung', $request->id_gedung);
+        }
+
+        // Order by newest first
+        $ruangan->orderBy('created_at', 'desc');
+
+        // Pagination - 12 items per page (4x3)
+        return $ruangan->paginate(12);
     }
 
     public function create()
@@ -36,28 +56,38 @@ class RuanganController extends Controller
     {
         $rules = [
             'id_gedung' => 'required|exists:gedung,id_gedung',
-            'kode_ruangan' => 'required|string|max:20',
+            'kode_ruangan' => 'required|string|max:20|unique:ruangan,kode_ruangan',
             'nama_ruangan' => 'required|string|max:50'
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $customMessages = [
+            'kode_ruangan.unique' => 'Kode ruangan sudah digunakan. Silakan gunakan kode yang lain.'
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $customMessages);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Validasi',
+                'message' => 'Validasi gagal',
                 'msgField' => $validator->errors()
-            ]);
+            ], 422); // Tambahkan status code 422 untuk validation error
         }
 
-        Ruangan::create($request->all());
+        try {
+            Ruangan::create($request->all());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Berhasil menambahkan data!'
-        ]);
-
-        redirect('/');
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menambahkan data ruangan!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function edit(string $id)
@@ -70,38 +100,42 @@ class RuanganController extends Controller
 
     public function update(Request $request, $id)
     {
+        $ruangan = Ruangan::findOrFail($id);
+
         $rules = [
             'id_gedung' => 'required|exists:gedung,id_gedung',
-            'kode_ruangan' => 'required|string|max:20',
+            'kode_ruangan' => 'required|string|max:20|unique:ruangan,kode_ruangan,' . $ruangan->id_ruangan . ',id_ruangan',
             'nama_ruangan' => 'required|string|max:50'
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $customMessages = [
+            'kode_ruangan.unique' => 'Kode ruangan sudah digunakan. Silakan gunakan kode yang lain.'
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $customMessages);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Validasi',
-                'msgField' => $validator->errors()
-            ]);
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $data = Ruangan::find($id);
+        try {
+            $ruangan->update($request->all());
 
-        if ($data) {
-            $data->update($request->all());
             return response()->json([
                 'success' => true,
-                'message' => 'Berhasil mengubah data!'
+                'message' => 'Data ruangan berhasil diperbarui!'
             ]);
-        } else {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data tidak ditemukan!'
-            ]);
+                'message' => 'Gagal memperbarui data',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        redirect('/');
     }
 
     public function destroy(Request $request, $id)
