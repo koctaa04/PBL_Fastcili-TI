@@ -98,29 +98,54 @@
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>Foto Kerusakan</th>
                                 <th>Fasilitas</th>
-                                <th>Gedung - Ruangan</th>
+                                <th>Gedung</th>
+                                <th>Ruangan</th>
+                                <th>Pelapor</th>
                                 <th>Deskripsi</th>
-                                <th>Pelapor / Pendukung</th>
-                                <th>Deskripsi Tambahan</th>
                                 <th>Status</th>
                                 <th>Tanggal Lapor</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($laporan as $i => $item)
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
-                                    <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
                                     <td>
-                                        {{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}
-                                        - {{ $item->laporan->fasilitas->ruangan->nama_ruangan }}
+                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
+                                            alt="Foto Gedung" class="card-img-top img-fluid"
+                                            style="height: 120px; object-fit: cover;"
+                                            onerror="this.onerror=null;this.src='{{ asset('gedung_default.jpg') }}';">
                                     </td>
-                                    <td>{{ $item->laporan->deskripsi }}</td>
+                                    <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
+                                    <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
+                                    <td>{{ $item->laporan->fasilitas->ruangan->nama_ruangan }}</td>
                                     <td>{{ $item->user->nama }}</td>
                                     <td>{{ $item->deskripsi_tambahan ?? '-' }}</td>
-                                    <td>{{ $item->laporan->status->nama_status }}</td>
+                                    <td>
+
+                                        @php
+                                            $statusColor = match ($item->laporan->status->id_status) {
+                                                1 => 'bg-warning',
+                                                2 => 'bg-primary',
+                                                3 => 'bg-secondary text-white',
+                                                4 => 'bg-success text-white',
+                                                default => 'bg-dark',
+                                            };
+                                        @endphp
+                                        <p class=" p-2 badge {{ $statusColor }}">
+                                            {{ $item->laporan->status->nama_status }}</p>
+                                    </td>
                                     <td>{{ $item->laporan->tanggal_lapor }}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $item->id }}"
+                                            data-nama="{{ $item->user->nama }}">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -322,56 +347,52 @@
             });
         });
     </script>
-
-
-
-
-
-
-
-
-
-
     <script>
-        $(document).on('submit', '.form-delete', function(e) {
-            e.preventDefault();
-            const form = this;
-
-            Swal.fire({
-                title: 'Apakah Anda yakin ingin menghapus data ini?',
-                text: "Data yang dihapus tidak dapat dikembalikan!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "POST",
-                        url: $(form).attr('action'),
-                        data: $(form).serialize(),
-                        dataType: "json",
-                        success: function(response) {
-                            if (response.success) {
-                                $('#myModal').modal('hide');
-                                Swal.fire("Berhasil!", response.messages, "success");
-                                location.reload();
-                            } else {
-                                Swal.fire("Gagal!", response.messages, "error");
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire("Gagal!", "Terjadi kesalahan sistem.", "error");
-                        }
-                    });
-                }
-            });
-        });
-
         $(document).ready(function() {
             $('#table_laporan').DataTable();
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).on('click', '.btn-delete', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+        let nama = $(this).data('nama');
+
+        Swal.fire({
+            title: 'Yakin Hapus Data?',
+            html: `<strong>Data pelapor atas nama <u>${nama}</u></strong> akan dihapus.<br><br>
+                <span class="text-danger">Tindakan ini berdampak besar! Jika ini adalah satu-satunya pelapor untuk laporan terkait, maka laporan utama juga akan ikut terhapus.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ url('lapor_kerusakan/delete') }}/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Berhasil!', response.message, 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Gagal', response.message, 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error', 'Terjadi kesalahan saat menghapus.', 'error');
+                    }
+                });
+            }
+        });
+    });
+</script>
+
 @endpush

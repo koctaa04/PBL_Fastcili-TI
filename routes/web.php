@@ -134,9 +134,9 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
 		Route::get('/edit/{id}', [LaporanKerusakanController::class, 'edit']);
 		Route::put('/update/{id}', [LaporanKerusakanController::class, 'update']);
-		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy']);
-		Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
-		Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
+		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('laporan.destroy');
+		// Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
+		// Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 	});
 
 	Route::get('/get-ruangan/{idGedung}', [LaporanKerusakanController::class, 'getRuangan']);
