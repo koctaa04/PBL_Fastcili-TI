@@ -149,8 +149,14 @@ class LaporanKerusakanController extends Controller
 
     public function index()
     {
+        // Ambil semua laporan + pelapor
+        $laporan = PelaporLaporan::with([
+            'laporan.fasilitas.ruangan.gedung',
+            'laporan.status',
+            'user'
+        ])->get();
         $gedung = Gedung::all();
-        return view('laporan.index', compact('gedung'));
+        return view('laporan.index', compact('gedung', 'laporan'));
     }
 
     public function store(Request $request)
