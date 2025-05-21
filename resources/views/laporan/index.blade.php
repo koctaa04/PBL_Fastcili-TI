@@ -210,7 +210,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                window.location.href = "/lapor_kerusakan";
+                                window.location.href = "{{ url("/lapor_kerusakan") }}";
                             });
                         } else {
                             Swal.fire({
@@ -240,7 +240,8 @@
                 $('#ruangan-group').show();
                 $('#id_ruangan').html('<option value="">Memuat...</option>');
 
-                $.get('/get-ruangan/' + idGedung, function(data) {
+                var url = '{{ url("/get-ruangan") }}/' + idGedung;
+                $.get(url, function(data) {
                     let options = '<option value="">-- Pilih Ruangan --</option>';
                     data.forEach(r => options +=
                         `<option value="${r.id_ruangan}">${r.nama_ruangan}</option>`);
@@ -256,7 +257,8 @@
                 $('#laporan-terlapor-list').empty();
                 $('#laporan-terlapor-container, #form-dukungan, #form-laporan-baru').hide();
 
-                $.get('/get-fasilitas-terlapor/' + idRuangan, function(data) {
+                var url = '{{ url("/get-fasilitas-terlapor") }}/' + idRuangan;
+                $.get(url, function(data) {
                     const filteredData = data.filter(f => f.id_user !== currentUserId);
 
                     if (filteredData.length > 0) {
@@ -265,7 +267,7 @@
                             html += `
                         <div class="col-md-6">
                             <div class="card mb-3">
-                                <img src="/storage/uploads/laporan_kerusakan/${f.foto_kerusakan}" class="card-img-top" style="height: 180px; object-fit: cover;">
+                                <img src="{{ url('/storage/uploads/laporan_kerusakan/${f.foto_kerusakan}') }}" class="card-img-top" style="height: 180px; object-fit: cover;">
                                 <div class="card-body">
                                     <h5 class="card-title">${f.nama_fasilitas}</h5>
                                     <p class="card-text">${f.deskripsi}</p>
@@ -283,7 +285,8 @@
                     }
                 });
 
-                $.get('/get-fasilitas-belum-lapor/' + idRuangan, function(data) {
+                var url = '{{ url("/get-fasilitas-belum-lapor") }}/' + idRuangan;
+                $.get(url, function(data) {
                     let options = '<option value="">-- Pilih Fasilitas --</option>';
                     data.forEach(f => options +=
                         `<option value="${f.id_fasilitas}">${f.nama_fasilitas}</option>`);
