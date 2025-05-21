@@ -1,3 +1,31 @@
+<style>
+    .rating {
+        direction: rtl;
+        unicode-bidi: bidi-override;
+        display: inline-flex;
+    }
+
+    .rating input[type="radio"] {
+        display: none;
+    }
+
+    .rating label {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+    }
+
+    .rating input[type="radio"]:checked~label {
+        color: gold;
+    }
+
+    .rating label:hover,
+    .rating label:hover~label {
+        color: orange;
+    }
+</style>
+
+
 <div id="modal-master" class="modal-dialog" role="document">
     <div class="modal-content">
         <form method="POST" action="{{ route('pelapor.rating', ['id' => $laporan->id_laporan]) }}" id="form_create">
@@ -9,26 +37,60 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="mt-2 text-center">
-                </div><label for="rating_pengguna">Berikan Rating:</label>
-                <div class="rating">
-                    @for ($i = 5; $i >= 1; $i--)
-                        <input type="radio" id="star{{ $i }}" name="rating_pengguna"
-                            value="{{ $i }}" {{ old('rating_pengguna') == $i ? 'checked' : '' }} />
-                        <label for="star{{ $i }}" title="{{ $i }} stars"></label>
-                    @endfor
+
+            <style>
+                .rating {
+                    direction: rtl;
+                    unicode-bidi: bidi-override;
+                    display: inline-flex;
+                    font-size: 1.8rem;
+                }
+
+                .rating input[type="radio"] {
+                    display: none;
+                }
+
+                .rating label {
+                    color: #ccc;
+                    cursor: pointer;
+                    padding: 0 4px;
+                    transition: color 0.2s;
+                }
+
+                .rating input[type="radio"]:checked~label {
+                    color: gold;
+                }
+
+                .rating label:hover,
+                .rating label:hover~label {
+                    color: orange;
+                }
+            </style>
+
+<div class="modal-body">
+    <label for="rating_pengguna">Berikan Rating:</label>
+    <div class="form-group">
+                    <div class="rating">
+                        @for ($i = 5; $i >= 1; $i--)
+                            <input type="radio" id="star{{ $i }}" name="rating_pengguna"
+                                value="{{ $i }}" {{ old('rating_pengguna') == $i ? 'checked' : '' }} />
+                            <label for="star{{ $i }}" title="{{ $i }} stars">★</label>
+                        @endfor
+                    </div>
+                    @error('rating_pengguna')
+                        <div class="text-danger mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
-                @error('rating_pengguna')
-                    <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
 
                 <div class="form-group mt-3">
                     <label for="feedback_pengguna">Ulasan</label>
-                    <textarea class="form-control" name="feedback_pengguna" id="feedback_pengguna" rows="3" required></textarea>
-                    <small class="text-danger error-text" id="error-feedback_pengguna"></small>
+                    <textarea class="form-control" name="feedback_pengguna" id="feedback_pengguna" rows="3" required>{{ old('feedback_pengguna') }}</textarea>
+                    @error('feedback_pengguna')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
                 </div>
             </div>
+
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>

@@ -97,45 +97,33 @@
                     <table class="table table-bordered table-striped table-hover table-sm" id="table_laporan">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Foto Kerusakan</th>
-                                <th>Nama Fasilitas</th>
+                                <th>No</th>
+                                <th>Fasilitas</th>
+                                <th>Gedung - Ruangan</th>
                                 <th>Deskripsi</th>
-                                <th>Tanggal Lapor</th>
+                                <th>Pelapor / Pendukung</th>
+                                <th>Deskripsi Tambahan</th>
                                 <th>Status</th>
-                                <th>Keterangan</th>
+                                <th>Tanggal Lapor</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- @foreach ($laporan_kerusakan as $i => $lapor)
-                        <tr>
-                            <td>{{ $i + 1 }}</td>
-                            <td>
-                                <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $lapor->foto_kerusakan) }}"
-                                     alt="Foto Kerusakan"
-                                     width="120"
-                                     onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
-                            </td>
-                            <td>{{ $lapor->fasilitas->nama_fasilitas ?? '-' }}</td>
-                            <td>{{ $lapor->deskripsi }}</td>
-                            <td>{{ $lapor->tanggal_lapor }}</td>
-                            <td>{{ $lapor->status->nama_status ?? '-' }}</td>
-                            <td>{{ $lapor->keterangan ?? '-' }}</td>
-                            <td>
-                                <div class="d-flex">
-                                    @if ($lapor->id_status == 5)
-                                    <button onclick="modalAction('{{ url('/lapor_kerusakan/edit/' . $lapor->id_laporan) }}')"
-                                            class="btn btn-sm btn-warning me-2">
-                                        Edit
-                                    </button>
-                                    @else
-                                    <button class="btn btn-sm btn-secondary" disabled>Edit</button>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach --}}
+                            @foreach ($laporan as $i => $item)
+                                <tr>
+                                    <td>{{ $i + 1 }}</td>
+                                    <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
+                                    <td>
+                                        {{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}
+                                        - {{ $item->laporan->fasilitas->ruangan->nama_ruangan }}
+                                    </td>
+                                    <td>{{ $item->laporan->deskripsi }}</td>
+                                    <td>{{ $item->user->nama }}</td>
+                                    <td>{{ $item->deskripsi_tambahan ?? '-' }}</td>
+                                    <td>{{ $item->laporan->status->nama_status }}</td>
+                                    <td>{{ $item->laporan->tanggal_lapor }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
