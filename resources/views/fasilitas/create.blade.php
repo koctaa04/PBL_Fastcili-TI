@@ -66,25 +66,31 @@
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
-                        text: response.messages,
+                        text: response.message,
+                        timer: 3000,
+                        showConfirmButton: true
                     });
-                    location.reload();
+                    dataFasilitas.ajax.reload();
                 } else {
-                    alert('Gagal menyimpan data.');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text: response.message,
+                    });
                 }
             },
             error: function(xhr) {
                 $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
                 if (xhr.responseJSON && xhr.responseJSON.msgField) {
                     let errors = xhr.responseJSON.msgField;
-                    $.each(errors, function(field, messages) {
-                        $('#error-' + field).text(messages[0]);
+                    $.each(errors, function(field, message) {
+                        $('#error-' + field).text(message[0]);
                     });
                 } else {
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.messages,
+                        text: response.message,
                     });
                 }
             }
@@ -99,16 +105,24 @@
 
             if (gedungId) {
                 $.ajax({
-                    url: '/get-ruangan/' + gedungId,
+                    url: "{{ route('fasilitas.getRuangan', '') }}/" + gedungId,
                     type: 'GET',
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     success: function(data) {
                         let options = '<option value="">Pilih Ruangan</option>';
-                        $.each(data, function(i, ruangan) {
-                            options += '<option value="' + ruangan.id_ruangan +
-                                '">' + ruangan.nama_ruangan + '</option>';
-                        });
+                        if (data.length > 0) {
+                            $.each(data, function(i, ruangan) {
+                                options += '<option value="' + ruangan.id_ruangan + '">' + 
+                                        ruangan.nama_ruangan + '</option>';
+                            });
+                        } else {
+                            options = '<option value="">Tidak ada ruangan</option>';
+                        }
                         $('#ruangan').html(options).prop('disabled', false);
-                    },
+                    }   
                     error: function() {
                         $('#ruangan').html('<option value="">Gagal memuat ruangan</option>')
                             .prop('disabled', true);

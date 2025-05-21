@@ -120,7 +120,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/edit/{id}', [FasilitasController::class, 'edit']);
 		Route::put('/update/{id}', [FasilitasController::class, 'update']);
 		Route::delete('/delete/{id}', [FasilitasController::class, 'destroy']);
-		Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan']);
+		Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan'])->name('fasilitas.getRuangan');
+		Route::get('/list', [FasilitasController::class, 'list'])->name('fasilitas.list');
 	});
 
 
