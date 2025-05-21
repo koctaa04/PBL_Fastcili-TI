@@ -50,6 +50,8 @@ The above copyright notice and this permission notice shall be included in all c
     <link href="{{ asset('paper') }}/css/paper-dashboard.css?v=2.0.0" rel="stylesheet" />
     <!-- CSS DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    @stack('styles')
 </head>
 
 <body class="{{ $class }}">
@@ -87,7 +89,7 @@ The above copyright notice and this permission notice shall be included in all c
     $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
     </script>
 
-    <script src="{{ asset('script/script.js') }}"></script>r
+    <script src="{{ asset('script/script.js') }}"></script>
 
     @stack('scripts')
 </body>

@@ -78,7 +78,7 @@
     background: white;
     border: 1px solid #ddd;
     border-radius: 4px;
-    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
     z-index: 1000;
     max-height: 300px;
     overflow-y: auto;
@@ -115,18 +115,18 @@
     .navbar-brand {
         max-width: calc(100% - 80px);
     }
-    
+
     .navbar-search-form.d-none.d-lg-flex {
         display: none !important;
     }
-    
+
     .navbar-content {
         position: absolute;
         top: 100%;
         right: 0;
         background: white;
         padding: 15px;
-        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
         z-index: 1000;
         min-width: 250px;
     }
