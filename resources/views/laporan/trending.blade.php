@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="content">
-        <h3>Data Laporan Masuk</h3>
+        <h3>VerifikasiLaporan Trending</h3>
         <div class="card p-4">
             <div class="card-header">
 
