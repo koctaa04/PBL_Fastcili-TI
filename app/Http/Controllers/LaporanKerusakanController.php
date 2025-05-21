@@ -185,7 +185,7 @@ class LaporanKerusakanController extends Controller
             PelaporLaporan::create([
                 'id_laporan' => $laporan->id_laporan,
                 'id_user' => $userId,
-                'deskripsi' => $request->deskripsi,
+                'deskripsi_tambahan' => $request->deskripsi,
             ]);
 
             return response()->json([
