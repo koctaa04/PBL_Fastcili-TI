@@ -75,7 +75,7 @@ class RuanganController extends Controller
         }
 
         try {
-            Ruangan::create($request->all());
+            Ruangan::create([$request->all(), 'created_at' => now()]);
 
             return response()->json([
                 'success' => true,

@@ -118,7 +118,7 @@ class FasilitasController extends Controller
             ]);
         }
 
-        Fasilitas::create($request->all());
+        Fasilitas::create([$request->all(), 'created_at' => now()]);
 
         return response()->json([
             'success' => true,
