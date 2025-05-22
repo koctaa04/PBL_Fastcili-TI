@@ -12,6 +12,7 @@ use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\VerifikasiLaporanController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\WaspasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -163,7 +164,7 @@ Route::group(['middleware' => 'auth'], function () {
 	/** -----------------------------
 	 *  MABAC
 	 *  ---------------------------- */
-	Route::get('/mabac', [MabacController::class, 'index'])->name('mabac.index');
+	Route::get('/waspas', [WaspasController::class, 'index'])->name('waspas.index');
 
 	/** -----------------------------
 	 *  Perbaikan (Untuk Teknisi)
