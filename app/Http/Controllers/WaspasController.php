@@ -2,112 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\LaporanKerusakan;
-use Illuminate\Support\Facades\Auth;
-
-use App\Models\Gedung;
-use App\Models\StatusLaporan;
 use App\Models\PenugasanTeknisi;
 use App\Models\KriteriaPenilaian;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
 
-class HomeController extends Controller
+class WaspasController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\View\View
-     */
     public function index()
-    {
-        $jmlLaporan = LaporanKerusakan::count();
-        $laporanAktif = LaporanKerusakan::whereIn('id_status', [1, 2, 3])->count();
-        $laporanTerverifikasi = LaporanKerusakan::whereIn('id_status', [2])->count();
-        $laporanSelesai = LaporanKerusakan::whereIn('id_status', [4])->count();
-
-        //grafik laporan perbulan
-        $tahun = now()->year;
-
-        $bulanLengkap = collect([
-            'Jan' => 0,
-            'Feb' => 0,
-            'Mar' => 0,
-            'Apr' => 0,
-            'May' => 0,
-            'Jun' => 0,
-            'Jul' => 0,
-            'Aug' => 0,
-            'Sep' => 0,
-            'Oct' => 0,
-            'Nov' => 0,
-            'Dec' => 0
-        ]);
-
-        $dataLaporan = LaporanKerusakan::selectRaw('MONTH(tanggal_lapor) as bulan, COUNT(*) as jumlah')
-            ->whereYear('tanggal_lapor', $tahun)
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get()
-            ->pluck('jumlah', 'bulan')
-            ->mapWithKeys(function ($jumlah, $bulanAngka) {
-                $namaBulan = Carbon::create()->month($bulanAngka)->format('M');
-                return [$namaBulan => $jumlah];
-            });
-
-        $laporanPerBulan = $bulanLengkap->merge($dataLaporan);
-
-        //pie chart status laporan
-        $statusLaporan = LaporanKerusakan::select('id_status', DB::raw('COUNT(*) as jumlah'))
-            ->groupBy('id_status')
-            ->pluck('jumlah', 'id_status');
-
-        $statusLabel = StatusLaporan::pluck('nama_status', 'id_status');
-
-        $statusLaporan = $statusLabel->mapWithKeys(function ($statusLabel, $id) use ($statusLaporan) {
-            return [$statusLabel => $statusLaporan[$id] ?? 0];
-        });
-
-        //grafik laproan pergedung
-        $laporanPerGedung = DB::table('laporan_kerusakan')
-            ->join('fasilitas', 'laporan_kerusakan.id_fasilitas', '=', 'fasilitas.id_fasilitas')
-            ->join('ruangan', 'fasilitas.id_ruangan', '=', 'ruangan.id_ruangan')
-            ->join('gedung', 'ruangan.id_gedung', '=', 'gedung.id_gedung')
-            ->select('gedung.id_gedung', DB::raw('COUNT(*) as jumlah'))
-            ->groupBy('gedung.id_gedung')
-            ->pluck('jumlah', 'gedung.id_gedung');
-
-        $gedungLabels = Gedung::pluck('kode_gedung', 'id_gedung');
-
-        $laporanPerGedung = $gedungLabels->mapWithKeys(function ($kode, $id) use ($laporanPerGedung) {
-            return [$kode => $laporanPerGedung[$id] ?? 0];
-        });
-
-        $spkRank = $this->getRanked();
-
-        return view('pages.dashboard', [
-            'jmlLaporan' => $jmlLaporan,
-            'laporanAktif' => $laporanAktif,
-            'laporanTerverifikasi' => $laporanTerverifikasi,
-            'laporanSelesai' => $laporanSelesai,
-            'laporanPerBulan' => $laporanPerBulan,
-            'statusLaporan' => $statusLaporan,
-            'laporanPerGedung' => $laporanPerGedung,
-            'spkRank' => $spkRank,
-        ]);
-    }
-
-    public function getRanked()
     {
         // Mengambil nilai min dan max untuk setiap kriteria
         $minMaxValues = DB::table('kriteria_penilaian')
@@ -225,16 +128,6 @@ class HomeController extends Controller
         }
 
         // Kirim data ke views
-        return $ranked;
-    }
-
-
-    public function pelapor()
-    {
-        $laporan = LaporanKerusakan::where('id_user', Auth::id())->get();
-        $status = LaporanKerusakan::where('id_user', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->first();
-        return view('pages.pelapor.index', compact('laporan', 'status'));
+        return view('laporan_prioritas.index', ['ranked' => $ranked]);
     }
 }

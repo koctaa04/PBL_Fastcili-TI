@@ -10,7 +10,7 @@
             <div class="card-header d-flex justify-content-center align-items-center mb-5">
                 <div class="card-tools d-flex flex-wrap justify-content-center flex-wrap">
                     <button onclick="modalAction('{{ url('/gedung/create') }}')" 
-                            class="btn btn-lg btn-success text-truncate">
+                            class="btn btn-action btn-success text-truncate">
                         Tambah Data Gedung
                     </button>
                 </div>

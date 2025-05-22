@@ -123,8 +123,8 @@
                                     <span class="sidebar-normal">{{ __(' Verifikasi Laporan ') }}</span>
                                 </a>
                             </li>
-                            <li class="{{ $elementActive == 'mabac' ? 'active' : '' }}">
-                                <a href="{{ route('mabac.index') }}">
+                            <li class="{{ $elementActive == 'waspas' ? 'active' : '' }}">
+                                <a href="{{ route('waspas.index') }}">
                                     <span class="sidebar-mini-icon">{{ __('P') }}</span>
                                     <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
                                 </a>
