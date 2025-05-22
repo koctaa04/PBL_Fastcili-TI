@@ -29,13 +29,13 @@
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
                                     <td>
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan) }}"
+                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
                                             alt="Foto Gedung" class="card-img-top img-fluid"
                                             style="height: 120px; object-fit: cover;">
                                     </td>
-                                    <td>{{ $laporan->fasilitas->nama_fasilitas ?? '-' }}</td>
-                                    <td>{{ $laporan->deskripsi ?? '-' }}</td>
-                                    <td>{{ $laporan->pelaporLaporan->count() }}</td>
+                                    <td>{{ $laporan->laporan->fasilitas->nama_fasilitas ?? '-' }}</td>
+                                    <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
+                                    <td>{{ $laporan->total }}</td>
                                     <td>{{ $laporan->skor_trending }}</td>
                                     <td>
                                         <!-- Tombol untuk memunculkan modal -->
@@ -54,7 +54,6 @@
     </div>
     <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
         aria-hidden="true"></div>
-        
 @endsection
 
 @push('scripts')

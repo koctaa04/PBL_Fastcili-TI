@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Database\Seeders\pelaporLaporanSeeder;
+use Illuminate\Support\Facades\DB;
 
 class LaporanKerusakanController extends Controller
 {
@@ -198,25 +199,48 @@ class LaporanKerusakanController extends Controller
 
     public function trending()
     {
-        $data = LaporanKerusakan::with(['pelaporLaporan.user', 'fasilitas'])
-            ->where('id_status', 1) // hanya laporan dengan status "Diajukan"
-            ->get()
-            ->sortByDesc(function ($laporan) {
-                return $laporan->skor_trending;
+        // $data = LaporanKerusakan::with(['pelaporLaporan.user', 'fasilitas'])
+        //     ->where('id_status', 1)
+        //     ->get()
+        //     ->sortByDesc(function ($laporan) {
+        //         return $laporan->skor_trending;
+        //     })
+        //     ->take(10); // ambil 10 besar trending
+
+        $data = PelaporLaporan::select('id_laporan', DB::raw('count(*) as total'))
+            ->groupBy('id_laporan')
+            ->orderByDesc('total')
+            ->whereHas('laporan', function ($laporan) {
+                $laporan->where('id_status', 1);
             })
-            ->take(10); // ambil 10 besar trending
+            ->get();
 
         return view('laporan.trending', compact('data'));
     }
 
     public function showPenilaian(string $id)
     {
+        $data = PelaporLaporan::select('id_laporan', DB::raw('count(*) as total'))
+            ->groupBy('id_laporan')
+            ->orderByDesc('total')
+            ->whereHas('laporan', function ($laporan) {
+                $laporan->where('id_status', 1);
+            })
+            ->get();
+
+        $trendingRanks = [];
+        foreach ($data as $index => $item) {
+            $trendingRanks[$item->id_laporan] = $index + 1;
+        }
+
         $laporan = LaporanKerusakan::with([
             'fasilitas',
             'pelaporLaporan'
         ])->findOrFail($id);
 
-        return view('laporan.showPenilaian', compact('laporan'));
+        $trendingNo = $trendingRanks[$laporan->id_laporan] ?? '-';
+
+        return view('laporan.showPenilaian', compact('laporan', 'trendingNo'));
     }
 
 
@@ -239,15 +263,6 @@ class LaporanKerusakanController extends Controller
 
         return redirect()->back()->with('success', 'Nilai berhasil disimpan.');
     }
-
-
-
-
-
-
-
-
-
 
     public function tugaskanTeknisi($id)
     {
