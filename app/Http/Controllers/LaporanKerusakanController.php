@@ -170,14 +170,16 @@ class LaporanKerusakanController extends Controller
             }
 
             // Upload foto
-            $fotoFullPath = $request->file('foto_kerusakan')->store('uploads/laporan_kerusakan', 'public');
-            $fotoName = basename($fotoFullPath);
+            $filename = null;
+            $file = $request->file('foto_kerusakan');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/uploads/laporan_kerusakan'), $filename);
 
             // Simpan laporan baru
             $laporan = LaporanKerusakan::create([
                 'id_fasilitas' => $request->id_fasilitas,
                 'deskripsi' => $request->deskripsi,
-                'foto_kerusakan' => $fotoName,
+                'foto_kerusakan' => $filename,
                 'tanggal_lapor' => now(),
                 'id_status' => 1,
             ]);
@@ -247,21 +249,40 @@ class LaporanKerusakanController extends Controller
 
     public function simpanPenilaian(Request $request, $id)
     {
+        $findLaporan = LaporanKerusakan::find($id);
+        $findLaporan->id_status = 2;
+        $findLaporan->save();
+
         $request->validate([
             'tingkat_kerusakan' => 'required|numeric',
             'frekuensi_digunakan' => 'required|numeric',
             'dampak' => 'required|numeric',
-            'potensi_bahaya' => 'required|numeric',
             'estimasi_biaya' => 'required|numeric',
+            'potensi_bahaya' => 'required|numeric',
         ]);
 
-        // Simpan ke tabel penilaian atau update laporan
-        KriteriaPenilaian::updateOrCreate(
-            ['id_laporan' => $id],
-            $request->only(['tingkat_kerusakan', 'frekuensi_digunakan', 'dampak', 'potensi_bahaya', 'estimasi_biaya'])
-        );
+        $kriteria = KriteriaPenilaian::create([
+            'id_laporan' => $id,
+            'tingkat_kerusakan' => $request->tingkat_kerusakan,
+            'frekuensi_digunakan' => $request->frekuensi_digunakan,
+            'dampak' => $request->dampak,
+            'estimasi_biaya' => $request->estimasi_biaya,
+            'potensi_bahaya' => $request->potensi_bahaya
+        ]);
 
-        return redirect()->back()->with('success', 'Nilai berhasil disimpan.');
+        if ($kriteria) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil diverifikasi'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Diverifikasi'
+            ]);
+        }
+
+        redirect('/');
     }
 
     public function tugaskanTeknisi($id)

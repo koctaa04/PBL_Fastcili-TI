@@ -30,6 +30,7 @@ class LaporanKerusakan extends Model
     public function getSkorTrendingAttribute()
     {
         $bobot = [
+            'ADM' => 0,
             'MHS' => 1,
             'DSN' => 3,
             'TDK' => 2
