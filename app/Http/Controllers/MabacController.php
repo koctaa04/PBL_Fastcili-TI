@@ -91,6 +91,13 @@ class MabacController extends Controller
             $G['potensi_bahaya'] *= $item['potensi_bahaya'];
         }
 
+        if (count($weightedMatrix) === 0) {
+            return view('laporan_prioritas.index', [
+                'ranked' => [],
+                'message' => 'Tidak ada data laporan yang terverifikasi.'
+            ]);
+        }
+
         $pangkat = 1 / count($weightedMatrix);
 
         foreach ($G as $key => $value) {

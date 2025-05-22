@@ -20,7 +20,7 @@
                                     class="img-fluid rounded shadow-sm" alt="Foto Kerusakan" style="max-height: 250px;">
                             </div>
                             <div class="col-md-8">
-                                <p><strong>Trending No:</strong> {{ $laporan->trending_no ?? '-' }}</p>
+                                <p><strong>Trending No:</strong> {{ $trendingNo }}</p>
                                 <p><strong>Gedung:</strong> {{ $laporan->fasilitas->ruangan->gedung->nama_gedung }}</p>
                                 <p><strong>Ruangan:</strong> {{ $laporan->fasilitas->ruangan->nama_ruangan }}</p>
                                 <p><strong>Fasilitas:</strong> {{ $laporan->fasilitas->nama_fasilitas }}</p>
