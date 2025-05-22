@@ -40,9 +40,18 @@ class HomeController extends Controller
         $tahun = now()->year;
 
         $bulanLengkap = collect([
-            'Jan' => 0, 'Feb' => 0, 'Mar' => 0, 'Apr' => 0,
-            'May' => 0, 'Jun' => 0, 'Jul' => 0, 'Aug' => 0,
-            'Sep' => 0, 'Oct' => 0, 'Nov' => 0, 'Dec' => 0
+            'Jan' => 0,
+            'Feb' => 0,
+            'Mar' => 0,
+            'Apr' => 0,
+            'May' => 0,
+            'Jun' => 0,
+            'Jul' => 0,
+            'Aug' => 0,
+            'Sep' => 0,
+            'Oct' => 0,
+            'Nov' => 0,
+            'Dec' => 0
         ]);
 
         $dataLaporan = LaporanKerusakan::selectRaw('MONTH(tanggal_lapor) as bulan, COUNT(*) as jumlah')
@@ -167,6 +176,13 @@ class HomeController extends Controller
             $G['dampak'] *= $item['dampak'];
             $G['estimasi_biaya'] *= $item['estimasi_biaya'];
             $G['potensi_bahaya'] *= $item['potensi_bahaya'];
+        }
+
+        if (count($weightedMatrix) === 0) {
+            return view('pages.dashboard', [
+                'ranked' => [],
+                'message' => 'Tidak ada data laporan dengan status yang sesuai.'
+            ]);
         }
 
         $pangkat = 1 / count($weightedMatrix);

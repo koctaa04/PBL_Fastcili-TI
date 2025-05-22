@@ -1,6 +1,6 @@
 @extends('layouts.app', [
     'class' => '',
-    'elementActive' => 'dashboard'
+    'elementActive' => 'dashboard',
 ])
 
 @section('content')
@@ -18,7 +18,7 @@
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
                                     <p class="card-category">Total Laporan Masuk</p>
-                                    <p class="card-title">{{$jmlLaporan}}<p>
+                                    <p class="card-title">{{ $jmlLaporan }}</p>
                                 </div>
                             </div>
                         </div>
@@ -37,7 +37,8 @@
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
                                     <p class="card-category">Laporan Terverifikasi</p>
-                                    <p class="card-title">{{$laporanTerverifikasi}}<p>
+                                    <p class="card-title">{{ $laporanTerverifikasi }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
@@ -56,7 +57,8 @@
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
                                     <p class="card-category">Laporan Aktif</p>
-                                    <p class="card-title">{{$laporanAktif}}<p>
+                                    <p class="card-title">{{ $laporanAktif }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +77,8 @@
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
                                     <p class="card-category">Laporan Selesai</p>
-                                    <p class="card-title">{{$laporanSelesai}}<p>
+                                    <p class="card-title">{{ $laporanSelesai }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
@@ -116,7 +119,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach(collect($spkRank)->take(5) as $item)
+                                @foreach (collect($spkRank)->take(5) as $item)
                                     <tr>
                                         <td>{{ $item['rank'] }}</td>
                                         <td>{{ $item['id_laporan'] }}</td>
