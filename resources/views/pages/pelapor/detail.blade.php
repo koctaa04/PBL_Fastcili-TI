@@ -7,26 +7,26 @@
             </button>
         </div>
         <div class="modal-body text-center">
-            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan) }}"
+            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
                 onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';" alt="Foto Kerusakan"
                 style="max-width: 300px; height: auto;" class="img-fluid rounded mb-3">
 
             <table class="table table-sm table-bordered table-striped text-left">
                 <tr>
                     <th class="text-right col-3">Fasilitas :</th>
-                    <td class="col-9">{{ $laporan->fasilitas->nama_fasilitas }}</td>
+                    <td class="col-9">{{ $laporan->laporan->fasilitas->nama_fasilitas }}</td>
                 </tr>
                 <tr>
                     <th class="text-right col-3">Deskripsi :</th>
-                    <td class="col-9">{{ $laporan->deskripsi }}</td>
+                    <td class="col-9">{{ $laporan->deskripsi_tambahan }}</td>
                 </tr>
                 <tr>
                     <th class="text-right col-3">Tanggal Lapor :</th>
-                    <td class="col-9">{{ \Carbon\Carbon::parse($laporan->tanggal_lapor)->format('d M Y') }}</td>
+                    <td class="col-9">{{ \Carbon\Carbon::parse($laporan->created_at)->format('d M Y') }}</td>
                 </tr>
                 <tr>
                     @php
-                        $statusColor = match ($laporan->id_status) {
+                        $statusColor = match ($laporan->laporan->id_status) {
                             1 => 'bg-secondary',
                             2 => 'bg-primary',
                             3 => 'bg-info',
@@ -37,12 +37,12 @@
                     @endphp
                     <th class="text-right col-3">Status :</th>
                     <td class="col-9">
-                        <span class="badge {{ $statusColor }}">{{ $laporan->status->nama_status }}</span>
+                        <span class="badge {{ $statusColor }}">{{ $laporan->laporan->status->nama_status }}</span>
                     </td>
                 </tr>
                 <tr>
                     <th class="text-right col-3">Teknisi :</th>
-                    <td class="col-9">{{ $laporan->penugasan->user->nama ?? '-' }}</td>
+                    <td class="col-9">{{ $laporan->laporan->penugasan->user->nama ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th class="text-right col-3">Keterangan :</th>

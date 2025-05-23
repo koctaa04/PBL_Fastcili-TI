@@ -28,7 +28,7 @@
 
 <div id="modal-master" class="modal-dialog" role="document">
     <div class="modal-content">
-        <form method="POST" action="{{ route('pelapor.rating', ['id' => $laporan->id_laporan]) }}" id="form_create">
+        <form method="POST" action="{{ route('pelapor.rating', ['id' => $laporan->id_user]) }}" id="form_create">
             @csrf
             @method('PUT')
             <div class="modal-header">
@@ -67,9 +67,9 @@
                 }
             </style>
 
-<div class="modal-body">
-    <label for="rating_pengguna">Berikan Rating:</label>
-    <div class="form-group">
+            <div class="modal-body">
+                <label for="rating_pengguna">Berikan Rating:</label>
+                <div class="form-group">
                     <div class="rating">
                         @for ($i = 5; $i >= 1; $i--)
                             <input type="radio" id="star{{ $i }}" name="rating_pengguna"
@@ -143,7 +143,7 @@
             console.log("Data yang dikirim:", $(this).serialize());
 
             $.ajax({
-                type: "POST",
+                type: "PUT",
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
                 dataType: "json",

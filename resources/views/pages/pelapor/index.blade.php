@@ -6,12 +6,12 @@
 @section('content')
     <div class="content">
         <div class="container">
-            @if ($status->rating_pengguna == null)
+            @if ($status && $status->rating_pengguna == null)
                 <div class="card shadow rounded p-4">
                     <h3 class="mb-4 fw-bold">Status Laporan Anda</h3>
                     <div class="row g-0">
                         <div class="col-md-4 d-flex align-items-center justify-content-center p-3 rounded-start">
-                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $status->foto_kerusakan) }}"
+                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $status->laporan->foto_kerusakan) }}"
                                 onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
                                 alt="Foto Kerusakan" class="img-fluid rounded">
                         </div>
@@ -19,13 +19,14 @@
                             <div class="card-body p-4">
                                 <h5 class="card-title mb-4">Laporan Kerusakan Fasilitas</h5>
 
-                                <p class="mb-2"><strong>Fasilitas:</strong> {{ $status->fasilitas->nama_fasilitas }}</p>
+                                <p class="mb-2"><strong>Fasilitas:</strong>
+                                    {{ $status->laporan->fasilitas->nama_fasilitas }}</p>
                                 <p class="mb-2"><strong>Tanggal Lapor:</strong>
-                                    {{ \Carbon\Carbon::parse($status->tanggal_lapor)->format('d M Y') }}</p>
+                                    {{ \Carbon\Carbon::parse($status->created_at)->format('d M Y') }}</p>
                                 <p class="mb-2">
                                     <strong>Status:</strong>
                                     @php
-                                        $statusColor = match ($status->id_status) {
+                                        $statusColor = match ($status->laporan->id_status) {
                                             1 => 'bg-secondary',
                                             2 => 'bg-primary',
                                             3 => 'bg-info',
@@ -34,29 +35,30 @@
                                             default => 'bg-dark',
                                         };
                                     @endphp
-                                    <span class="badge {{ $statusColor }}">{{ $status->status->nama_status }}</span>
+                                    <span
+                                        class="badge {{ $statusColor }}">{{ $status->laporan->status->nama_status }}</span>
                                 </p>
-                                <p class="mb-0"><strong>Deskripsi:</strong> {{ $status->deskripsi }}</p>
-                                @if ($status->id_status == 3 || $status->id_status == 4)
-                                    <p class="mb-0"><strong>Teknisi:</strong> {{ $status->penugasan->user->nama ?? '-' }}
+                                <p class="mb-0"><strong>Deskripsi:</strong> {{ $status->deskripsi_tambahan }}</p>
+                                @if ($status->laporan->id_status == 3 || $status->laporan->id_status == 4)
+                                    <p class="mb-0"><strong>Teknisi:</strong>
+                                        {{ $status->laporan->penugasan->user->nama ?? '-' }}
                                     </p>
                                 @endif
                                 <div class="d-flex justify-content-end mt-4">
-                                    @if ($status->id_status == 5)
-                                        <a href="{{ route('pelapor.edit', ['id' => $status->id_laporan]) }}"
+                                    @if ($status->laporan->id_status == 5)
+                                        <a href="{{ route('pelapor.edit', ['id' => $status->id]) }}"
                                             class="btn btn-warning btn-sm me-2">
                                             Edit
                                         </a>
-                                    @elseif ($status->id_status == 4)
+                                    @elseif ($status->laporan->id_status == 4)
                                         <button
-                                            onclick="modalAction('{{ route('pelapor.rate', ['id' => $status->id_laporan]) }}')"
+                                            onclick="modalAction('{{ route('pelapor.rate', ['id' => $status->id_user]) }}')"
                                             class="btn btn-primary btn-sm me-2">
                                             Beri Nilai
                                         </button>
-                                    @elseif ($status->id_status == 1 || $status->id_status == 5)
+                                    @elseif ($status->laporan->id_status == 1 || $status->laporan->id_status == 5)
                                         <form class="form-delete"
-                                            action="{{ url('/lapor_kerusakan/delete/' . $status->id_laporan) }}"
-                                            method="POST">
+                                            action="{{ route('pelapor.delete', ['id' => $status->id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm">
@@ -78,7 +80,7 @@
                     <p>Pastikan laporan berisi informasi yang jelas dan disertai foto kerusakan agar proses perbaikan
                         dapat
                         segera dilakukan.</p>
-                    <a class="btn btn-primary mt-3" href="{{ url('lapor_kerusakan/mhs/create') }}">
+                    <a class="btn btn-primary mt-3" href="{{ route('pelapor.create') }}">
                         <i class="bi bi-plus-circle me-2"></i> Laporkan Kerusakan Fasilitas
                     </a>
                 </div>
@@ -98,7 +100,6 @@
                                         <th scope="col">Deskripsi</th>
                                         <th scope="col">Tanggal lapor</th>
                                         <th scope="col">Status</th>
-                                        <th scope="col">Keterangan</th>
                                         <th scope="col">Aksi</th>
                                     </tr>
                                 </thead>
@@ -106,14 +107,13 @@
                                     @foreach ($laporan as $lapor => $l)
                                         <tr>
                                             <th scope="row">{{ $lapor + 1 }}</th>
-                                            <td>{{ $l->fasilitas->nama_fasilitas }}</td>
-                                            <td>{{ $l->deskripsi }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($l->tanggal_lapor)->format('d M Y') }}</td>
-                                            <td>{{ $l->status->nama_status }}</td>
-                                            <td>{{ $l->keterangan ?? '-' }}</td>
+                                            <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
+                                            <td>{{ $l->deskripsi_tambahan }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($l->created_at)->format('d M Y') }}</td>
+                                            <td>{{ $l->laporan->status->nama_status }}</td>
                                             <td>
                                                 <button
-                                                    onclick="modalAction('{{ route('pelapor.detail', ['id' => $l->id_laporan]) }}')"
+                                                    onclick="modalAction('{{ route('pelapor.detail', ['id' => $l->id]) }}')"
                                                     class="btn btn-sm btn-warning" style="margin-right: 8px">detail</button>
                                             </td>
                                         </tr>

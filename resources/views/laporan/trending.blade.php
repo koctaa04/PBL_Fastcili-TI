@@ -36,7 +36,7 @@
                                     <td>{{ $laporan->laporan->fasilitas->nama_fasilitas ?? '-' }}</td>
                                     <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
                                     <td>{{ $laporan->total }}</td>
-                                    <td>{{ $laporan->skor_trending }}</td>
+                                    <td>{{ $laporan->laporan->skor_trending }}</td>
                                     <td>
                                         <!-- Tombol untuk memunculkan modal -->
                                         <button class="btn btn-primary btn-sm"

@@ -11,6 +11,7 @@ use App\Models\PenugasanTeknisi;
 use App\Models\KriteriaPenilaian;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use App\Models\PelaporLaporan;
 
 class HomeController extends Controller
 {
@@ -298,8 +299,8 @@ class HomeController extends Controller
 
     public function pelapor()
     {
-        $laporan = LaporanKerusakan::where('id_user', Auth::id())->get();
-        $status = LaporanKerusakan::where('id_user', Auth::id())
+        $laporan = PelaporLaporan::where('id_user', Auth::id())->get();
+        $status = PelaporLaporan::where('id_user', Auth::id())
             ->orderBy('created_at', 'desc')
             ->first();
         return view('pages.pelapor.index', compact('laporan', 'status'));
