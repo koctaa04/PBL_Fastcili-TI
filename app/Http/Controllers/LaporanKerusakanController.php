@@ -579,7 +579,7 @@ class LaporanKerusakanController extends Controller
 
     public function rate(string $id)
     {
-        $laporan = LaporanKerusakan::find($id);
+        $laporan =  PelaporLaporan::where('id_user', $id)->first();
 
         return view('pages.pelapor.rating', ['laporan' => $laporan]);
     }
@@ -591,7 +591,7 @@ class LaporanKerusakanController extends Controller
             'feedback_pengguna' => 'required|string|max:500',
         ]);
 
-        $laporan = LaporanKerusakan::find($id);
+        $laporan = PelaporLaporan::where('id_user', $id)->first();
         if (!$laporan) {
             return response()->json(['success' => false, 'message' => 'Laporan tidak ditemukan.']);
         }
@@ -608,7 +608,7 @@ class LaporanKerusakanController extends Controller
 
     public function detail(string $id)
     {
-        $laporan = LaporanKerusakan::find($id);
+        $laporan = PelaporLaporan::find($id);
 
         return view('pages.pelapor.detail', ['laporan' => $laporan]);
     }
