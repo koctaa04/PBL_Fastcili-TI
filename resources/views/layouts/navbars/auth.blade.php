@@ -21,7 +21,7 @@
             </style>
             <li class="{{ $elementActive == 'dashboard' ? 'active' : '' }}">
                 @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
-                    <a href="{{ route('home', 'dashboard') }}">
+                    <a href="{{ route('home') }}">
                         <i class="nc-icon nc-sun-fog-29"></i>
                         <p>{{ __('Dashboard') }}</p>
                     </a>

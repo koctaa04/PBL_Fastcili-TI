@@ -30,16 +30,47 @@ class HomeController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+
+
+    public function index(WaspasController $waspasController)
     {
+        // Hitung jumlah laporan
         $jmlLaporan = LaporanKerusakan::count();
         $laporanAktif = LaporanKerusakan::whereIn('id_status', [1, 2, 3])->count();
         $laporanTerverifikasi = LaporanKerusakan::whereIn('id_status', [2])->count();
         $laporanSelesai = LaporanKerusakan::whereIn('id_status', [4])->count();
 
-        //grafik laporan perbulan
+        // Data grafik laporan perbulan
         $tahun = now()->year;
+        $laporanPerBulan = $this->getLaporanPerBulan($tahun);
 
+        // Data pie chart status laporan
+        $statusLaporan = $this->getStatusLaporan();
+
+        // Data grafik laporan per gedung
+        $laporanPerGedung = $this->getLaporanPerGedung();
+
+        // Data ranking SPK
+        $spkRank = $waspasController->getPrioritas();
+
+        // Debug data yang dikirim ke view
+        $debugData = [
+            'jmlLaporan' => $jmlLaporan,
+            'laporanAktif' => $laporanAktif,
+            'laporanTerverifikasi' => $laporanTerverifikasi,
+            'laporanSelesai' => $laporanSelesai,
+            'laporanPerBulan' => $laporanPerBulan,
+            'statusLaporan' => $statusLaporan,
+            'laporanPerGedung' => $laporanPerGedung,
+            'spkRank' => $spkRank,
+        ];
+
+        return view('pages.dashboard', $debugData);
+    }
+
+    // Helper method untuk data laporan perbulan
+    protected function getLaporanPerBulan($tahun)
+    {
         $bulanLengkap = collect([
             'Jan' => 0,
             'Feb' => 0,
@@ -66,21 +97,27 @@ class HomeController extends Controller
                 return [$namaBulan => $jumlah];
             });
 
-        $laporanPerBulan = $bulanLengkap->merge($dataLaporan);
+        return $bulanLengkap->merge($dataLaporan);
+    }
 
-        //pie chart status laporan
-        $statusLaporan = LaporanKerusakan::select('id_status', DB::raw('COUNT(*) as jumlah'))
+    // Helper method untuk data status laporan
+    protected function getStatusLaporan()
+    {
+        $statusCount = LaporanKerusakan::select('id_status', DB::raw('COUNT(*) as jumlah'))
             ->groupBy('id_status')
             ->pluck('jumlah', 'id_status');
 
         $statusLabel = StatusLaporan::pluck('nama_status', 'id_status');
 
-        $statusLaporan = $statusLabel->mapWithKeys(function ($statusLabel, $id) use ($statusLaporan) {
-            return [$statusLabel => $statusLaporan[$id] ?? 0];
+        return $statusLabel->mapWithKeys(function ($namaStatus, $id) use ($statusCount) {
+            return [$namaStatus => $statusCount[$id] ?? 0];
         });
+    }
 
-        //grafik laproan pergedung
-        $laporanPerGedung = DB::table('laporan_kerusakan')
+    // Helper method untuk data laporan per gedung
+    protected function getLaporanPerGedung()
+    {
+        $countPerGedung = DB::table('laporan_kerusakan')
             ->join('fasilitas', 'laporan_kerusakan.id_fasilitas', '=', 'fasilitas.id_fasilitas')
             ->join('ruangan', 'fasilitas.id_ruangan', '=', 'ruangan.id_ruangan')
             ->join('gedung', 'ruangan.id_gedung', '=', 'gedung.id_gedung')
@@ -90,212 +127,10 @@ class HomeController extends Controller
 
         $gedungLabels = Gedung::pluck('kode_gedung', 'id_gedung');
 
-        $laporanPerGedung = $gedungLabels->mapWithKeys(function ($kode, $id) use ($laporanPerGedung) {
-            return [$kode => $laporanPerGedung[$id] ?? 0];
+        return $gedungLabels->mapWithKeys(function ($kodeGedung, $id) use ($countPerGedung) {
+            return [$kodeGedung => $countPerGedung[$id] ?? 0];
         });
-
-        $spkRank = $this->getRanked();
-
-        return view('pages.dashboard', [
-            'jmlLaporan' => $jmlLaporan,
-            'laporanAktif' => $laporanAktif,
-            'laporanTerverifikasi' => $laporanTerverifikasi,
-            'laporanSelesai' => $laporanSelesai,
-            'laporanPerBulan' => $laporanPerBulan,
-            'statusLaporan' => $statusLaporan,
-            'laporanPerGedung' => $laporanPerGedung,
-            'spkRank' => $spkRank,
-        ]);
     }
-
-    public function getRanked()
-    {
-        // Mengambil nilai min dan max untuk setiap kriteria
-        $minMaxValues = DB::table('kriteria_penilaian')
-            ->join('laporan_kerusakan', 'kriteria_penilaian.id_laporan', '=', 'laporan_kerusakan.id_laporan')
-            ->where('laporan_kerusakan.id_status', 2)
-            ->select(
-                DB::raw('MIN(tingkat_kerusakan) as min_tingkat_kerusakan'),
-                DB::raw('MAX(tingkat_kerusakan) as max_tingkat_kerusakan'),
-                DB::raw('MIN(frekuensi_digunakan) as min_frekuensi_digunakan'),
-                DB::raw('MAX(frekuensi_digunakan) as max_frekuensi_digunakan'),
-                DB::raw('MIN(dampak) as min_dampak'),
-                DB::raw('MAX(dampak) as max_dampak'),
-                DB::raw('MIN(estimasi_biaya) as min_estimasi_biaya'),
-                DB::raw('MAX(estimasi_biaya) as max_estimasi_biaya'),
-                DB::raw('MIN(potensi_bahaya) as min_potensi_bahaya'),
-                DB::raw('MAX(potensi_bahaya) as max_potensi_bahaya')
-            )
-            ->first();
-
-        // Mengambil data alternatif
-        $alternatif = KriteriaPenilaian::with('laporan')->get();
-        $laporan = LaporanKerusakan::with('status')->get();
-
-        $normalizedMatrix = [];
-        $weight = [0.35, 0.3, 0.1, 0.05, 0.2]; // Bobot kriteria
-
-        // Step 1: Normalisasi matriks keputusan
-        foreach ($alternatif as $item) {
-            if ($item->laporan->id_status == 2) {
-                // Kriteria benefit (semakin besar semakin baik)
-                $tingkat_kerusakan_norm = ($minMaxValues->max_tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan) != 0
-                    ? ($item->tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan) / ($minMaxValues->max_tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan)
-                    : 0;
-
-                $frekuensi_digunakan_norm = ($minMaxValues->max_frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan) != 0
-                    ? ($item->frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan) / ($minMaxValues->max_frekuensi_digunakan - $minMaxValues->min_frekuensi_digunakan)
-                    : 0;
-
-                $dampak_norm = ($minMaxValues->max_dampak - $minMaxValues->min_dampak) != 0
-                    ? ($item->dampak - $minMaxValues->min_dampak) / ($minMaxValues->max_dampak - $minMaxValues->min_dampak)
-                    : 0;
-
-                $potensi_bahaya_norm = ($minMaxValues->max_potensi_bahaya - $minMaxValues->min_potensi_bahaya) != 0
-                    ? ($item->potensi_bahaya - $minMaxValues->min_potensi_bahaya) / ($minMaxValues->max_potensi_bahaya - $minMaxValues->min_potensi_bahaya)
-                    : 0;
-
-                // Kriteria cost (semakin kecil semakin baik)
-                $estimasi_biaya_norm = ($minMaxValues->max_estimasi_biaya - $minMaxValues->min_estimasi_biaya) != 0
-                    ? ($minMaxValues->max_estimasi_biaya - $item->estimasi_biaya) / ($minMaxValues->max_estimasi_biaya - $minMaxValues->min_estimasi_biaya)
-                    : 0;
-
-                $normalizedMatrix[] = [
-                    'id_laporan' => $item->laporan->id_laporan,
-                    'deskripsi' => $item->laporan->deskripsi,
-                    'status' => $item->laporan->status->nama_status,
-                    'tingkat_kerusakan' => $tingkat_kerusakan_norm,
-                    'frekuensi_digunakan' => $frekuensi_digunakan_norm,
-                    'dampak' => $dampak_norm,
-                    'estimasi_biaya' => $estimasi_biaya_norm,
-                    'potensi_bahaya' => $potensi_bahaya_norm,
-                ];
-            }
-        }
-
-        // Step 2: Hitung Weighted Sum Model (WSM) dan Weighted Product Model (WPM)
-        $results = [];
-        foreach ($normalizedMatrix as $item) {
-            // WSM Calculation
-            $WSM = ($item['tingkat_kerusakan'] * $weight[0])
-                + ($item['frekuensi_digunakan'] * $weight[1])
-                + ($item['dampak'] * $weight[2])
-                + ($item['estimasi_biaya'] * $weight[3])
-                + ($item['potensi_bahaya'] * $weight[4]);
-
-            // WPM Calculation (using logarithmic to avoid very small numbers)
-            $WPM = pow($item['tingkat_kerusakan'], $weight[0])
-                * pow($item['frekuensi_digunakan'], $weight[1])
-                * pow($item['dampak'], $weight[2])
-                * pow($item['estimasi_biaya'], $weight[3])
-                * pow($item['potensi_bahaya'], $weight[4]);
-
-            // Combine WSM and WPM (λ = 0.5 for equal importance)
-            $lambda = 0.5;
-            $Q = ($lambda * $WSM) + ((1 - $lambda) * $WPM);
-
-            $results[] = [
-                'id_laporan' => $item['id_laporan'],
-                'deskripsi' => $item['deskripsi'],
-                'status' => $item['status'],
-                'WSM' => $WSM,
-                'WPM' => $WPM,
-                'Q' => $Q
-            ];
-        }
-
-        // Membuat Matriks Berbobot (V)
-        foreach ($normalizedMatrix as $i) {
-            $weightedMatrix[] = [
-                'id_laporan' => $i['id_laporan'],
-                'deskripsi' => $i['deskripsi'],
-                'status' => $i['status'],
-                'tingkat_kerusakan' => ($i['tingkat_kerusakan'] * $weight[0]) + $weight[0],
-                'frekuensi_digunakan' => ($i['frekuensi_digunakan'] * $weight[1]) + $weight[1],
-                'dampak' => ($i['dampak'] * $weight[2]) + $weight[2],
-                'estimasi_biaya' => ($i['estimasi_biaya'] * $weight[3]) + $weight[3],
-                'potensi_bahaya' => ($i['potensi_bahaya'] * $weight[4]) + $weight[4]
-            ];
-        }
-
-        $G = [
-            'tingkat_kerusakan' => 1,
-            'frekuensi_digunakan' => 1,
-            'dampak' => 1,
-            'estimasi_biaya' => 1,
-            'potensi_bahaya' => 1,
-        ];
-
-        // Membuat matriks area perkiraan batas (G)
-        foreach ($weightedMatrix as $item) {
-            $G['tingkat_kerusakan'] *= $item['tingkat_kerusakan'];
-            $G['frekuensi_digunakan'] *= $item['frekuensi_digunakan'];
-            $G['dampak'] *= $item['dampak'];
-            $G['estimasi_biaya'] *= $item['estimasi_biaya'];
-            $G['potensi_bahaya'] *= $item['potensi_bahaya'];
-        }
-
-        if (count($weightedMatrix) === 0) {
-            return view('pages.dashboard', [
-                'ranked' => [],
-                'message' => 'Tidak ada data laporan dengan status yang sesuai.'
-            ]);
-        }
-
-        $pangkat = 1 / count($weightedMatrix);
-
-        foreach ($G as $key => $value) {
-            $G[$key] = pow($value, $pangkat);
-        }
-
-        foreach ($weightedMatrix as $i) {
-            $perkiraanBatas[] = [
-                'id_laporan' => $i['id_laporan'],
-                'deskripsi' => $i['deskripsi'],
-                'status' => $i['status'],
-                'tingkat_kerusakan' => $i['tingkat_kerusakan'] - $G['tingkat_kerusakan'],
-                'frekuensi_digunakan' => $i['frekuensi_digunakan'] - $G['frekuensi_digunakan'],
-                'dampak' => $i['dampak'] - $G['dampak'],
-                'estimasi_biaya' => $i['estimasi_biaya'] - $G['estimasi_biaya'],
-                'potensi_bahaya' => $i['potensi_bahaya'] - $G['potensi_bahaya']
-            ];
-        }
-
-        foreach ($perkiraanBatas as $k) {
-            $totalPerkiraan = $k['tingkat_kerusakan'] + $k['frekuensi_digunakan'] + $k['dampak'] + $k['estimasi_biaya'] + $k['potensi_bahaya'];
-
-            $S[] = [
-                'id_laporan' => $k['id_laporan'],
-                'deskripsi' => $k['deskripsi'],
-                'status' => $k['status'],
-                'S' => $totalPerkiraan
-            ];
-        }
-
-        usort($S, function ($a, $b) {
-            return $b['S'] <=> $a['S'];
-        });
-
-        // Tambahkan ranking
-        $ranked = [];
-        $rank = 1;
-        foreach ($results as $item) {
-            $item['rank'] = $rank++;
-            $ranked[] = $item;
-        }
-
-        foreach ($ranked as &$item) {
-            // Ambil data penugasan teknisi berdasarkan id_laporan
-            $penugasan = PenugasanTeknisi::where('id_laporan', $item['id_laporan'])->first();
-
-            // Tambahkan data penugasan ke masing-masing item hasil ranking
-            $item['penugasan'] = $penugasan;
-        }
-
-        // Kirim data ke views
-        return $ranked;
-    }
-
 
     public function pelapor()
     {
