@@ -297,7 +297,8 @@ class LaporanKerusakanController extends Controller
     public function verifikasiPerbaikan($id)
     {
         $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
-
+        // dd($laporan);
+        
         return view('laporan_prioritas.verifikasi', compact('laporan'));
     }
     // public function verifikasiPerbaikan($id)
@@ -361,7 +362,8 @@ class LaporanKerusakanController extends Controller
             ]);
         } else {
             $laporan->update([
-                'id_status' => 5, // Ditolak
+                // id status berubah menjadi diperbaiki lagi ketika Ditolak
+                'id_status' => 3, 
             ]);
 
             $penugasan->update([

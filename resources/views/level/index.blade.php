@@ -5,8 +5,29 @@
 
 @section('content')
     <div class="content">
-        <h3>Data Level</h3>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Kelola Data Level</h3>
+            <div class="card-tools">
+                <button onclick="modalAction('{{ url('/level/create') }}')" class="btn btn-success">
+                    Tambah Data Level
+                </button>
+            </div>
+        </div>
         <div class="card p-4">
+            {{-- <h3>Kelola Data Level</h3>
+        <div class="card px-2">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Data Level</h3>
+                <div class="card-tools">
+                    <button onclick="modalAction('{{ url('/level/create') }}')" class="btn btn-success ">
+                        Tambah Data Level
+                    </button>
+                </div>
+            </div> --}}
+
+            {{-- <h3>Data Level</h3>
+        <div class="card px-2">
             <div class="card-header d-flex justify-content-center align-items-center mb-5">
                 <div class="card-tools d-flex justify-content-center flex-wrap">
                     <button onclick="modalAction('{{ url('/level/create') }}')" 
@@ -14,7 +35,7 @@
                         Tambah Data Level
                     </button>
                 </div>
-            </div>
+            </div> --}}
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-row-bordered" id="table_level">
@@ -45,22 +66,32 @@
                 ajax: {
                     url: window.location.href,
                     data: function(d) {
-                        
+
                     }
                 },
-                columns: [
-                    { data: 'DT_RowIndex', className: 'text-center'},
-                    { data: 'kode_level', className: 'text-center'},
-                    { data: 'nama_level', className: 'text-center' },
-                    { data: 'aksi', name: 'aksi', className: 'text-center'}
-                ],
-                columnDefs: [
-                    { 
-                        targets: [0, 1],
-                        orderable: false,
-                        searchable: true
+                columns: [{
+                        data: 'DT_RowIndex',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'kode_level',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'nama_level',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'aksi',
+                        name: 'aksi',
+                        className: 'text-center'
                     }
-                ]
+                ],
+                columnDefs: [{
+                    targets: [0, 1],
+                    orderable: false,
+                    searchable: true
+                }]
             });
 
             $("#form-delete").validate({
@@ -163,9 +194,9 @@
                                     $('#error-' + field).text(message[0]);
                                 });
                             } else {
-                                let errorMsg = response && response.message 
-                                    ? response.message 
-                                    : 'Terjadi kesalahan saat menghapus data';
+                                let errorMsg = response && response.message ?
+                                    response.message :
+                                    'Terjadi kesalahan saat menghapus data';
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",

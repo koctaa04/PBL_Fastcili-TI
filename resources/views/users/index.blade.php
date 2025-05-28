@@ -5,7 +5,21 @@
 
 @section('content')
     <div class="content">
-        <h3>Data User</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Kelola Data User</h3>
+            <div class="card-tools">
+                <div class="card-tools d-flex justify-content-center flex-wrap">
+                    <button onclick="modalAction('{{ url('/users/import') }}')" class="btn btn-warning mr-2">
+                        Import Data User (.xlsx)
+                    </button>
+                    <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-success">
+                        Tambah Data User
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card p-4">
+            {{-- <h3>Data User</h3>
         <div class="card p-4">
             <div class="card-header d-flex justify-content-center align-items-center mb-5">
                 <div class="card-tools d-flex justify-content-center flex-wrap">
@@ -18,21 +32,21 @@
                         Tambah Data User
                     </button>
                 </div>
-            </div>
+            </div> --}}
             <div class="card-body">
                 {{-- Filtering --}}
                 <div class="row pr-auto">
                     <div class="col-md-12">
                         <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Filter:</label>
-                            <div class="col-8">
+                            <label class="col-2 control-label col-form-label">Filter Level :</label>
+                            <div class="col-4">
                                 <select class="form-control" id="id_level" name="id_level" required>
                                     <option value="">- Semua Level -</option>
-                                    @foreach($level as $item)
+                                    @foreach ($level as $item)
                                         <option value="{{ $item->id_level }}">{{ $item->nama_level }} </option>
                                     @endforeach
                                 </select>
-                                <small class="form-text text-muted">Level User</small>
+                                {{-- <small class="form-text text-muted">Level User</small> --}}
                             </div>
                         </div>
                     </div>
@@ -91,21 +105,42 @@
                         d.id_level = $('#id_level').val();
                     }
                 },
-                columns: [
-                    { data: 'profil', name: 'profil', className: 'text-center'},
-                    { data: 'nama', name: 'nama', className: 'text-center' },
-                    { data: 'email', name: 'email', className: 'text-center' },
-                    { data: 'level.nama_level', name: 'level.nama_level', className: 'text-center' },
-                    { data: 'akses', name: 'akses', className: 'text-center'},
-                    { data: 'aksi', name: 'aksi', className: 'text-center'}
-                ],
-                columnDefs: [
-                    { 
-                        targets: [0, 3, 4, 5],
-                        orderable: false,
-                        searchable: false
+                columns: [{
+                        data: 'profil',
+                        name: 'profil',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'nama',
+                        name: 'nama',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'level.nama_level',
+                        name: 'level.nama_level',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'akses',
+                        name: 'akses',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'aksi',
+                        name: 'aksi',
+                        className: 'text-center'
                     }
-                ]
+                ],
+                columnDefs: [{
+                    targets: [0, 3, 4, 5],
+                    orderable: false,
+                    searchable: false
+                }]
             });
 
             // Ubah event change filter
@@ -119,12 +154,12 @@
                 $('#myModal').modal('show');
             });
         }
-        
+
         function toggleAccess(url) {
             // Extract ID from URL
             const id = url.split('/').pop();
             const currentAccess = $(`button[onclick*="${id}"]`).hasClass('btn-success') ? 0 : 1;
-            
+
             Swal.fire({
                 title: 'Konfirmasi',
                 text: `Anda yakin ingin ${currentAccess ? 'menonaktifkan' : 'mengaktifkan'} akses ini?`,
@@ -224,9 +259,9 @@
                                     $('#error-' + field).text(message[0]);
                                 });
                             } else {
-                                let errorMsg = response && response.message 
-                                    ? response.message 
-                                    : 'Terjadi kesalahan saat menghapus data';
+                                let errorMsg = response && response.message ?
+                                    response.message :
+                                    'Terjadi kesalahan saat menghapus data';
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",

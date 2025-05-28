@@ -62,4 +62,9 @@ class LaporanKerusakan extends Model
     {
         return $this->hasMany(KriteriaPenilaian::class, 'id_laporan');
     }
+
+    public function penugasan()
+    {
+        return $this->hasOne(PenugasanTeknisi::class, 'id_laporan');
+    }
 }

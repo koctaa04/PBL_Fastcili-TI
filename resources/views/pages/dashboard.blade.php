@@ -125,9 +125,9 @@
                                         <td>{{ $item['id_laporan'] ?? '-' }}</td>
                                         <td>{{ $item['deskripsi'] ?? 'Tidak ada deskripsi' }}</td>
                                         <td>{{ $item['status'] ?? 'Status tidak tersedia' }}</td>
-                                        <td>{{ isset($item['Q']) ? number_format($item['Q'], 4) : '0.0000' }}</td>
+                                        <td>{{ isset($item['Q']) ? number_format($item['Q'], 4) : '890' }}</td>
                                         <td>
-                                            {{ $item['penugasan']['nama_teknisi'] ?? 'Belum Ditugaskan' }}
+                                            {{ $item['penugasan']['user']['nama'] ?? 'Belum Ditugaskan' }}
                                         </td>
                                     </tr>
                                 @empty

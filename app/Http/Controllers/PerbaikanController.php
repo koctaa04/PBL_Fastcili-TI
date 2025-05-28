@@ -32,7 +32,7 @@ class PerbaikanController extends Controller
 
         $rules = [
             'catatan_teknisi' => 'nullable|string|max:500',
-            'dokumentasi' => 'required|image|mimes:jpeg,png,jpg|max:2048', // max 2MB
+            'dokumentasi' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // max 2MB
         ];
 
         $validator = Validator::make($request->all(), $rules);
