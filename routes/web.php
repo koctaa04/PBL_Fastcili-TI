@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LevelController;
-use App\Http\Controllers\MabacController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RuanganController;
@@ -162,7 +161,7 @@ Route::group(['middleware' => 'auth'], function () {
 	});
 
 	/** -----------------------------
-	 *  MABAC
+	 *  WASPAS
 	 *  ---------------------------- */
 	Route::get('/waspas', [WaspasController::class, 'index'])->name('waspas.index');
 

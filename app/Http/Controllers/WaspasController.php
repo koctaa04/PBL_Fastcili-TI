@@ -12,6 +12,13 @@ class WaspasController extends Controller
 {
     public function index()
     {
+        $ranked = $this->getPrioritas();
+        
+        // Kirim data ke views
+        return view('laporan_prioritas.index', ['ranked' => $ranked]);
+    }
+
+    public function getPrioritas(){
         // Mengambil nilai min dan max untuk setiap kriteria
         $minMaxValues = DB::table('kriteria_penilaian')
             ->join('laporan_kerusakan', 'kriteria_penilaian.id_laporan', '=', 'laporan_kerusakan.id_laporan')
@@ -126,8 +133,6 @@ class WaspasController extends Controller
             // Tambahkan data penugasan ke masing-masing item hasil ranking
             $item['penugasan'] = $penugasan;
         }
-
-        // Kirim data ke views
-        return view('laporan_prioritas.index', ['ranked' => $ranked]);
+        return $ranked;
     }
 }
