@@ -107,10 +107,10 @@
                         <p class="card-category">Berdasarkan hasil perhitungan SPK</p>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-striped table-hover table-row-bordered">
                             <thead>
                                 <tr>
-                                    <th>Peringkat</th>
+                                    <th>Rank</th>
                                     <th>ID Laporan</th>
                                     <th>Deskripsi</th>
                                     <th>Status</th>
@@ -119,18 +119,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (collect($spkRank)->take(5) as $item)
+                                @forelse (collect($spkRank)->take(5) as $item)
                                     <tr>
-                                        <td>{{ $item['rank'] }}</td>
-                                        <td>{{ $item['id_laporan'] }}</td>
-                                        <td>{{ $item['deskripsi'] }}</td>
-                                        <td>{{ $item['status'] }}</td>
-                                        <td>{{ number_format($item['S'], 4) }}</td>
+                                        <td>{{ $item['rank'] ?? '-' }}</td>
+                                        <td>{{ $item['id_laporan'] ?? '-' }}</td>
+                                        <td>{{ $item['deskripsi'] ?? 'Tidak ada deskripsi' }}</td>
+                                        <td>{{ $item['status'] ?? 'Status tidak tersedia' }}</td>
+                                        <td>{{ isset($item['Q']) ? number_format($item['Q'], 4) : '890' }}</td>
                                         <td>
-                                            {{ $item['penugasan']->nama_teknisi ?? 'Belum Ditugaskan' }}
+                                            {{ $item['penugasan']['user']['nama'] ?? 'Belum Ditugaskan' }}
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            <i class="fas fa-info-circle"></i> Tidak ada data prioritas perbaikan yang tersedia
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

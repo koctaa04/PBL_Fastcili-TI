@@ -67,7 +67,7 @@
                         title: "Berhasil!",
                         text: response.messages,
                     }).then(() => {
-                        window.location.href = '/mabac';
+                        location.reload();
                     });
                 } else {
                     Swal.fire({

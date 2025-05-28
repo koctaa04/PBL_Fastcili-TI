@@ -5,7 +5,20 @@
 
 @section('content')
     <div class="content">
-        <h3>Data Fasilitas</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Kelola Data User</h3>
+            <div class="d-flex justify-content-center flex-wrap">
+                <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
+                    Import Data Fasilitas (.xlsx)
+                </button>
+                <button onclick="modalAction('{{ url('/fasilitas/create') }}')" class="btn btn-success">
+                    Tambah Data Fasilitas
+                </button>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            {{-- <h3>Data Fasilitas</h3>
         <div class="card p-4">
             <div class="card-header d-flex justify-content-center align-items-center mb-5">
                 <div class="card-tools d-flex flex-wrap justify-content-center gap-3">
@@ -18,13 +31,13 @@
                         Tambah Data Fasilitas
                     </button>
                 </div>
-            </div>
+            </div> --}}
             <div class="card-body">
                 {{-- Search and Filtering --}}
                 <div class="row pr-auto">
                     <div class="col-md-12">
                         <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Cari:</label>
+                            <label class="col-2 control-label col-form-label">Cari Data Fasilitas:</label>
                             <div class="col-10">
                                 <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
                                 <small class="form-text text-muted">Masukkan nama fasilitas</small>
@@ -35,7 +48,7 @@
                             <div class="col-5">
                                 <select class="form-control" id="id_gedung" name="id_gedung" required>
                                     <option value="">- Semua Gedung -</option>
-                                    @foreach($gedung as $item)
+                                    @foreach ($gedung as $item)
                                         <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
                                     @endforeach
                                 </select>
@@ -44,9 +57,10 @@
                             <div class="col-5">
                                 <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled>
                                     <option value="">- Semua Ruangan -</option>
-                                    @if(isset($ruangan))
-                                        @foreach($ruangan as $item)
-                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">{{ $item->nama_ruangan }} </option>
+                                    @if (isset($ruangan))
+                                        @foreach ($ruangan as $item)
+                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">
+                                                {{ $item->nama_ruangan }} </option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -78,165 +92,169 @@
 @endsection
 
 @push('styles')
-<style>
-    /* Container untuk buttons */
-    .card-tools {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-        width: 100%;
-    }
-
-    /* Base button style dengan ukuran tetap */
-    .btn-action {
-        width: 240px; /* Ukuran tetap */
-        height: 50px; /* Tinggi tetap */
-        padding: 0.5rem;
-        border-radius: 6px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-size: clamp(0.8rem, 2vw, 1rem); /* Font size responsive */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: all 0.3s ease;
-    }
-
-    /* Untuk layar kecil */
-    @media (max-width: 768px) {
-        .btn-action {
-            width: 200px;
-            height: 45px;
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
-        }
-    }
-
-    @media (max-width: 576px) {
-        .btn-action {
+    <style>
+        /* Container untuk buttons */
+        .card-tools {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
             width: 100%;
-            max-width: 220px;
-            height: 42px;
         }
-    }
 
-    .badge.badge-info {
-        background-color: #f49a00;
-    }
-    /* Fasilitas Card Styling */
-    .fasilitas-card {
-        margin-bottom: 0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        border: 1px solid rgba(0,0,0,0.125);
-    }
-    
-    .fasilitas-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-    
-    .fasilitas-card-body {
-        padding: 15px;
-        flex-grow: 1;
-    }
-    
-    .fasilitas-card-title {
-        font-size: 1.1rem;
-        font-weight: bold;
-        margin-bottom: 10px;
-        color: #333;
-    }
-    
-    .fasilitas-card-text {
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-        color: #555;
-    }
-    
-    .fasilitas-card-footer {
-        padding: 10px 15px;
-        background-color: #fef5ed;
-        border-top: 1px solid #eee;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-    
-    .fasilitas-card-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-    }
-    
-    .fasilitas-jumlah {
-        font-weight: bold;
-        color: #28a745;
-    }
-    
-    .fasilitas-ruangan {
-        color: #ffa200;
-    }
-    
-    .fasilitas-gedung {
-        color: #6c757d;
-        font-style: italic;
-        font-size: 0.85rem;
-    }
-    
-    /* Responsive grid settings */
-    #fasilitas-container {
-        margin-right: -12px;
-        margin-left: -12px;
-    }
-    
-    #fasilitas-container > [class*="col-"] {
-        padding-right: 12px;
-        padding-left: 12px;
-        margin-bottom: 24px;
-    }
-    
-    /* Button styling */
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
+        /* Base button style dengan ukuran tetap */
+        .btn-action {
+            width: 240px;
+            /* Ukuran tetap */
+            height: 50px;
+            /* Tinggi tetap */
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            /* Font size responsive */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+        }
 
-    /* Pagination styling */
-    .pagination {
-        margin-top: 20px;
-    }
-    
-    .page-item.active .page-link {
-        background-color: #ffa200;
-        border-color: #ffa200;
-    }
-    
-    .page-link {
-        color: #ffa200;
-    }
-</style>
+        /* Untuk layar kecil */
+        @media (max-width: 768px) {
+            .btn-action {
+                width: 200px;
+                height: 45px;
+                font-size: clamp(0.7rem, 2vw, 0.9rem);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn-action {
+                width: 100%;
+                max-width: 220px;
+                height: 42px;
+            }
+        }
+
+        .badge.badge-info {
+            background-color: #f49a00;
+        }
+
+        /* Fasilitas Card Styling */
+        .fasilitas-card {
+            margin-bottom: 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .fasilitas-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .fasilitas-card-body {
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .fasilitas-card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .fasilitas-card-text {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .fasilitas-card-footer {
+            padding: 10px 15px;
+            background-color: #fef5ed;
+            border-top: 1px solid #eee;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .fasilitas-card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .fasilitas-jumlah {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .fasilitas-ruangan {
+            color: #ffa200;
+        }
+
+        .fasilitas-gedung {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive grid settings */
+        #fasilitas-container {
+            margin-right: -12px;
+            margin-left: -12px;
+        }
+
+        #fasilitas-container>[class*="col-"] {
+            padding-right: 12px;
+            padding-left: 12px;
+            margin-bottom: 24px;
+        }
+
+        /* Button styling */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Pagination styling */
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .page-item.active .page-link {
+            background-color: #ffa200;
+            border-color: #ffa200;
+        }
+
+        .page-link {
+            color: #ffa200;
+        }
+    </style>
 @endpush
 
 @push('scripts')
     <script>
         function adjustButtonText() {
             const buttons = document.querySelectorAll('.card-tools .btn');
-            
+
             buttons.forEach(button => {
                 // Reset font size untuk perhitungan ulang
                 button.style.fontSize = '';
-                
+
                 // Dapatkan dimensi button dan teks
                 const buttonWidth = button.offsetWidth;
                 const textWidth = button.scrollWidth;
-                
+
                 // Jika teks melebihi lebar button, kurangi font size
                 if (textWidth > buttonWidth) {
                     const fontSize = parseFloat(window.getComputedStyle(button).fontSize);
@@ -264,11 +282,11 @@
             // Gedung change event
             $('#id_gedung').on('change', function() {
                 const idGedung = $(this).val();
-                
+
                 if (idGedung) {
                     // Enable ruangan dropdown
                     $('#id_ruangan').prop('disabled', false);
-                    
+
                     // Filter ruangan options based on selected gedung
                     $('#id_ruangan option').each(function() {
                         const optionGedung = $(this).data('gedung');
@@ -278,7 +296,7 @@
                             $(this).hide();
                         }
                     });
-                    
+
                     // Reset ruangan selection
                     $('#id_ruangan').val('');
                 } else {
@@ -286,7 +304,7 @@
                     $('#id_ruangan').prop('disabled', true);
                     $('#id_ruangan').val('');
                 }
-                
+
                 currentPage = 1;
                 loadFasilitasCards();
             });
@@ -311,7 +329,7 @@
             const idRuangan = $('#id_ruangan').val();
             const idGedung = $('#id_gedung').val();
             const searchTerm = $('#search').val();
-            
+
             $.ajax({
                 url: "{{ url('fasilitas/list') }}",
                 type: "GET",
@@ -326,8 +344,8 @@
                 success: function(response) {
                     const container = $('#fasilitas-container');
                     container.empty();
-                    
-                    if(response.data && response.data.length > 0) {
+
+                    if (response.data && response.data.length > 0) {
                         response.data.forEach((fasilitas) => {
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
@@ -359,7 +377,9 @@
                             container.append(cardHtml);
                         });
                     } else {
-                        container.append('<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data fasilitas</p></div>');
+                        container.append(
+                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data fasilitas</p></div>'
+                        );
                     }
 
                     // Update pagination
@@ -496,7 +516,8 @@
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",
-                                    text: xhr.responseJSON.message || 'Terjadi kesalahan',
+                                    text: xhr.responseJSON.message ||
+                                        'Terjadi kesalahan',
                                 });
                             }
                         }

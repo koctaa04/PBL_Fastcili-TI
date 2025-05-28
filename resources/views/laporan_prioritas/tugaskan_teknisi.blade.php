@@ -61,7 +61,8 @@
                         text: response.messages,
                     }).then(() => {
                         // Redirect kembali ke halaman MABAC atau reload halaman
-                        window.location.href = '/mabac';
+                        // window.location.href = '/mabac';
+                        location.reload();
                     });
                 } else {
                     alert('Gagal menyimpan data.');

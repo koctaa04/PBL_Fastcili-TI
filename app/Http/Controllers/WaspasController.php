@@ -12,10 +12,17 @@ class WaspasController extends Controller
 {
     public function index()
     {
+        $ranked = $this->getPrioritas();
+        dd($ranked);
+        // Kirim data ke views
+        return view('laporan_prioritas.index', ['ranked' => $ranked]);
+    }
+
+    public function getPrioritas(){
         // Mengambil nilai min dan max untuk setiap kriteria
         $minMaxValues = DB::table('kriteria_penilaian')
             ->join('laporan_kerusakan', 'kriteria_penilaian.id_laporan', '=', 'laporan_kerusakan.id_laporan')
-            ->where('laporan_kerusakan.id_status', 2)
+            ->where('laporan_kerusakan.id_status', [2,3])
             ->select(
                 DB::raw('MIN(tingkat_kerusakan) as min_tingkat_kerusakan'),
                 DB::raw('MAX(tingkat_kerusakan) as max_tingkat_kerusakan'),
@@ -39,7 +46,7 @@ class WaspasController extends Controller
 
         // Step 1: Normalisasi matriks keputusan
         foreach ($alternatif as $item) {
-            if ($item->laporan->id_status == 2) {
+            if ($item->laporan->id_status == 2 || $item->laporan->id_status == 3) {
                 // Kriteria benefit (semakin besar semakin baik)
                 $tingkat_kerusakan_norm = ($minMaxValues->max_tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan) != 0
                     ? ($item->tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan) / ($minMaxValues->max_tingkat_kerusakan - $minMaxValues->min_tingkat_kerusakan)
@@ -126,8 +133,6 @@ class WaspasController extends Controller
             // Tambahkan data penugasan ke masing-masing item hasil ranking
             $item['penugasan'] = $penugasan;
         }
-
-        // Kirim data ke views
-        return view('laporan_prioritas.index', ['ranked' => $ranked]);
+        return $ranked;
     }
 }

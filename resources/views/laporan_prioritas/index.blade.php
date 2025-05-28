@@ -30,7 +30,7 @@
                                 <tr>
                                     <th scope="row">{{ $r['rank'] }}</th>
                                     <td>{{ $r['deskripsi'] }}</td>
-                                    <td>{{ number_format($r['S'], 4) }}</td>
+                                    <td>{{ number_format($r['Q'], 4) }}</td>
                                     <td>{{ $statusPerbaikan ?? 'Belum Dikerjakan' }}</td>
                                     <td>{{ $penugasan->komentar_sarpras ?? '-' }}</td>
                                     <td>

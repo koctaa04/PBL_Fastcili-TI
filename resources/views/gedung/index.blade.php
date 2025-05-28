@@ -5,7 +5,15 @@
 
 @section('content')
     <div class="content">
-        <h3>Data Gedung</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Kelola Data Gedung</h3>
+            <button onclick="modalAction('{{ url('/gedung/create') }}')" class="btn btn-success text-truncate">
+                Tambah Data Gedung
+            </button>
+        </div>
+
+        <div class="card p-4">
+            {{-- <h3>Data Gedung</h3>
         <div class="card p-4">
             <div class="card-header d-flex justify-content-center align-items-center mb-5">
                 <div class="card-tools d-flex flex-wrap justify-content-center flex-wrap">
@@ -14,16 +22,16 @@
                         Tambah Data Gedung
                     </button>
                 </div>
-            </div>
+            </div> --}}
             <div class="card-body">
                 {{-- Search --}}
                 <div class="row pr-auto">
                     <div class="col-md-12">
                         <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Cari:</label>
+                            <label class="col-2 control-label col-form-label">Cari Data Gedung:</label>
                             <div class="col-10">
                                 <input type="text" class="form-control" id="search" placeholder="Cari gedung...">
-                                <small class="form-text text-muted">Masukkan nama, kode, atau deskripsi gedung</small>
+                                <small class="form-text text-muted text-small">Cari berdasarkan nama, kode, atau deskripsi gedung</small>
                             </div>
                         </div>
                     </div>
@@ -51,184 +59,189 @@
 @endsection
 
 @push('styles')
-<style>
-    /* Container untuk buttons */
-    .card-tools {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-        width: 100%;
-    }
-
-    /* Base button style dengan ukuran tetap */
-    .btn-action {
-        width: 240px; /* Ukuran tetap */
-        height: 50px; /* Tinggi tetap */
-        padding: 0.5rem;
-        border-radius: 6px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-size: clamp(0.8rem, 2vw, 1rem); /* Font size responsive */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: all 0.3s ease;
-    }
-
-    /* Untuk layar kecil */
-    @media (max-width: 768px) {
-        .btn-action {
-            width: 200px;
-            height: 45px;
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
-        }
-    }
-
-    @media (max-width: 576px) {
-        .btn-action {
+    <style>
+        /* Container untuk buttons */
+        .card-tools {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
             width: 100%;
-            max-width: 220px;
-            height: 42px;
         }
-    }
 
-    .badge.badge-info {
-        background-color: #f49a00;
-    }
-    /* Gedung Card Styling */
-    .gedung-card {
-        margin-bottom: 0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        border: 1px solid rgba(0,0,0,0.125);
-    }
-    
-    .gedung-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-    
-    .gedung-card-img-container {
-        width: 100%;
-        padding-top: 75%; /* 4:3 Aspect Ratio */
-        position: relative;
-        overflow: hidden;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        background-color: #f8f9fa;
-    }
-    
-    .gedung-card-img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .gedung-card-body {
-        padding: 15px;
-        flex-grow: 1;
-    }
-    
-    .gedung-card-title {
-        font-size: 1.1rem;
-        font-weight: bold;
-        margin-bottom: 10px;
-        color: #333;
-    }
-    
-    .gedung-card-text {
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-        color: #555;
-    }
-    
-    .gedung-card-footer {
-        padding: 10px 15px;
-        background-color: #fef5ed;
-        border-top: 1px solid #eee;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-    
-    .gedung-card-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-    }
-    
-    .gedung-kode {
-        font-weight: bold;
-        color: #ffa200;
-    }
-    
-    .gedung-deskripsi {
-        color: #6c757d;
-        font-size: 0.85rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    /* Responsive grid settings */
-    #gedung-container {
-        margin-right: -12px;
-        margin-left: -12px;
-    }
-    
-    #gedung-container > [class*="col-"] {
-        padding-right: 12px;
-        padding-left: 12px;
-        margin-bottom: 24px;
-    }
-    
-    /* Button styling */
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
+        /* Base button style dengan ukuran tetap */
+        .btn-action {
+            width: 240px;
+            /* Ukuran tetap */
+            height: 50px;
+            /* Tinggi tetap */
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            /* Font size responsive */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+        }
 
-    /* Pagination styling */
-    .pagination {
-        margin-top: 20px;
-    }
-    
-    .page-item.active .page-link {
-        background-color: #ffa200;
-        border-color: #ffa200;
-    }
-    
-    .page-link {
-        color: #ffa200;
-    }
-</style>
+        /* Untuk layar kecil */
+        @media (max-width: 768px) {
+            .btn-action {
+                width: 200px;
+                height: 45px;
+                font-size: clamp(0.7rem, 2vw, 0.9rem);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn-action {
+                width: 100%;
+                max-width: 220px;
+                height: 42px;
+            }
+        }
+
+        .badge.badge-info {
+            background-color: #f49a00;
+        }
+
+        /* Gedung Card Styling */
+        .gedung-card {
+            margin-bottom: 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .gedung-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .gedung-card-img-container {
+            width: 100%;
+            padding-top: 75%;
+            /* 4:3 Aspect Ratio */
+            position: relative;
+            overflow: hidden;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .gedung-card-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gedung-card-body {
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .gedung-card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .gedung-card-text {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .gedung-card-footer {
+            padding: 10px 15px;
+            background-color: #fef5ed;
+            border-top: 1px solid #eee;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .gedung-card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .gedung-kode {
+            font-weight: bold;
+            color: #ffa200;
+        }
+
+        .gedung-deskripsi {
+            color: #6c757d;
+            font-size: 0.85rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Responsive grid settings */
+        #gedung-container {
+            margin-right: -12px;
+            margin-left: -12px;
+        }
+
+        #gedung-container>[class*="col-"] {
+            padding-right: 12px;
+            padding-left: 12px;
+            margin-bottom: 24px;
+        }
+
+        /* Button styling */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Pagination styling */
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .page-item.active .page-link {
+            background-color: #ffa200;
+            border-color: #ffa200;
+        }
+
+        .page-link {
+            color: #ffa200;
+        }
+    </style>
 @endpush
 
 @push('scripts')
     <script>
         function adjustButtonText() {
             const buttons = document.querySelectorAll('.card-tools .btn');
-            
+
             buttons.forEach(button => {
                 // Reset font size untuk perhitungan ulang
                 button.style.fontSize = '';
-                
+
                 // Dapatkan dimensi button dan teks
                 const buttonWidth = button.offsetWidth;
                 const textWidth = button.scrollWidth;
-                
+
                 // Jika teks melebihi lebar button, kurangi font size
                 if (textWidth > buttonWidth) {
                     const fontSize = parseFloat(window.getComputedStyle(button).fontSize);
@@ -262,7 +275,7 @@
 
         function loadGedungCards() {
             const searchTerm = $('#search').val();
-            
+
             $.ajax({
                 url: "{{ url('gedung') }}",
                 type: "GET",
@@ -275,14 +288,14 @@
                 success: function(response) {
                     const container = $('#gedung-container');
                     container.empty();
-                    
-                    if(response.data && response.data.length > 0) {
+
+                    if (response.data && response.data.length > 0) {
                         response.data.forEach((gedung) => {
                             // Determine image source
-                            const fotoGedung = gedung.foto_gedung 
-                                ? "{{ asset('storage/uploads/foto_gedung') }}/" + gedung.foto_gedung 
-                                : "{{ asset('gedung_default.jpg') }}";
-                            
+                            const fotoGedung = gedung.foto_gedung ?
+                                "{{ asset('storage/uploads/foto_gedung') }}/" + gedung.foto_gedung :
+                                "{{ asset('gedung_default.jpg') }}";
+
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                                     <div class="card gedung-card">
@@ -315,7 +328,9 @@
                             container.append(cardHtml);
                         });
                     } else {
-                        container.append('<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data gedung</p></div>');
+                        container.append(
+                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data gedung</p></div>'
+                            );
                     }
 
                     // Update pagination
@@ -452,7 +467,8 @@
                                 Swal.fire({
                                     icon: "error",
                                     title: "Gagal!",
-                                    text: xhr.responseJSON.message || 'Terjadi kesalahan',
+                                    text: xhr.responseJSON.message ||
+                                        'Terjadi kesalahan',
                                 });
                             }
                         }
