@@ -128,7 +128,7 @@
                                         @php
                                             $statusColor = match ($item->laporan->status->id_status) {
                                                 1 => 'bg-warning',
-                                                2 => 'bg-primary',
+                                                2 => 'bg-primary text-white',
                                                 3 => 'bg-secondary text-white',
                                                 4 => 'bg-success text-white',
                                                 default => 'bg-dark',

@@ -124,16 +124,32 @@
                                         <td>{{ $item['rank'] ?? '-' }}</td>
                                         <td>{{ $item['id_laporan'] ?? '-' }}</td>
                                         <td>{{ $item['deskripsi'] ?? 'Tidak ada deskripsi' }}</td>
-                                        <td>{{ $item['status'] ?? 'Status tidak tersedia' }}</td>
+                                        <td>
+                                            @php
+                                                $status = $item['status'] ?? 'Tidak diketahui';
+
+                                                $statusColor = match ($status) {
+                                                    'Diproses' => 'bg-primary text-white',
+                                                    'Diperbaiki' => 'bg-secondary text-white',
+                                                    default => 'bg-primary text-white',
+                                                };
+                                            @endphp
+                                            <span class="badge p-2 {{ $statusColor }}">
+                                                {{ $status }}
+                                            </span>
+                                        </td>
+
                                         <td>{{ isset($item['Q']) ? number_format($item['Q'], 4) : '890' }}</td>
                                         <td>
-                                            {{ $item['penugasan']['user']['nama'] ?? 'Belum Ditugaskan' }}
+                                            {{-- {{ laporan->penugasan->user->nama }} --}}
+                                            {{ $item['penugasan']['nama_teknisi'] ?? 'Belum Ditugaskan' }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="6" class="text-center text-muted">
-                                            <i class="fas fa-info-circle"></i> Tidak ada data prioritas perbaikan yang tersedia
+                                            <i class="fas fa-info-circle"></i> Tidak ada data prioritas perbaikan yang
+                                            tersedia
                                         </td>
                                     </tr>
                                 @endforelse
