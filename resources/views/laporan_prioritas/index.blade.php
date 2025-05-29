@@ -1,6 +1,6 @@
 @extends('layouts.app', [
     'class' => '',
-    'elementActive' => 'waspas',
+    'elementActive' => 'prioritas',
 ])
 
 @section('content')
@@ -23,13 +23,12 @@
                         <tbody>
                             @foreach ($ranked as $r)
                                 @php
-                                    // dd($r);
                                     $penugasan = $r['penugasan'];
                                     $statusPerbaikan = $penugasan->status_perbaikan ?? null;
                                 @endphp
                                 <tr>
-                                    <th scope="row">{{ $r['rank'] }}</th>
-                                    <td>{{ $r['deskripsi'] }}</td>
+                                    <td>{{ $r['rank'] }}</td>
+                                    <td>{{ $r['deskripsi'] ?? '-' }}</td>
                                     <td>{{ number_format($r['Q'], 4) }}</td>
                                     <td>{{ $statusPerbaikan ?? 'Belum Dikerjakan' }}</td>
                                     <td>{{ $penugasan->komentar_sarpras ?? '-' }}</td>
@@ -73,7 +72,11 @@
         }
 
         $(document).ready(function() {
-            var datalaporan = $('#table_prioritas').DataTable();
+            var datalaporan = $('#table_prioritas').DataTable({
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas perbaikan yang tersedia"
+                }
+            });
         });
     </script>
 @endpush
