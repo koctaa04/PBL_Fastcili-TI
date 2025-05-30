@@ -170,10 +170,8 @@ class LaporanKerusakanController extends Controller
             }
 
             // Upload foto
-            $filename = null;
-            $file = $request->file('foto_kerusakan');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('storage/uploads/laporan_kerusakan'), $filename);
+            $fotoFullPath = $request->file('foto_kerusakan')->store('uploads/laporan_kerusakan', 'public');
+            $filename = basename($fotoFullPath);
 
             // Simpan laporan baru
             $laporan = LaporanKerusakan::create([

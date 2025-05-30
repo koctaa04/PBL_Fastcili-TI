@@ -115,7 +115,7 @@
                                     <td>{{ $i + 1 }}</td>
                                     <td>
                                         <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
-                                            alt="Foto Gedung" class="card-img-top img-fluid"
+                                            alt="Foto Kerusakan" class="card-img-top img-fluid"
                                             style="height: 120px; object-fit: cover;">
                                     </td>
                                     <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
