@@ -111,7 +111,7 @@
                                 <fieldset class="rounded p-3">
                                     <legend class="w-auto px-2 mb-2 font-weight-bold">Potensi Bahaya</legend>
                                     <strong>
-                                        @foreach (['Tidak Berbahaya' => 0, 'Kurang Berbahaya' => 1, 'Berbahaya' => 3, 'Sangat Berbahaya' => 5] as $label => $val)
+                                        @foreach (['Tidak Berbahaya' => 1, 'Cukup Berbahaya' => 3, 'Berbahaya' => 5] as $label => $val)
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="potensi_bahaya"
                                                     id="bahaya_{{ $val }}" value="{{ $val }}"
@@ -131,12 +131,12 @@
                                     <legend class="w-auto px-2 mb-2 font-weight-bold">Estimasi Biaya</legend>
                                     <strong>
                                         @foreach ([
-        '< 250k' => 1,
-        '250k ≤ biaya < 500k' => 2,
-        '500k ≤ biaya < 750k' => 3,
-        '750k ≤ biaya < 1500k' => 4,
-        '≥ 1500k' => 5,
-    ] as $label => $val)
+                                                    '< 250k' => 1,
+                                                    '250k ≤ biaya < 500k' => 2,
+                                                    '500k ≤ biaya < 750k' => 3,
+                                                    '750k ≤ biaya < 1500k' => 4,
+                                                    '≥ 1500k' => 5,
+                                                ] as $label => $val)
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="estimasi_biaya"
                                                     id="biaya_{{ $val }}" value="{{ $val }}"

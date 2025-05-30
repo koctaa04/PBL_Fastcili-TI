@@ -103,23 +103,18 @@
                             <label>Potensi Bahaya</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="potensi_bahaya"
-                                    id="potensi_bahaya" value="0">
+                                    id="potensi_bahaya" value="1">
                                 <label class="form-check-label" for="bahaya1">Tidak Berbahaya</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="potensi_bahaya"
-                                    id="potensi_bahaya" value="1">
-                                <label class="form-check-label" for="bahaya1">Kurang Berbahaya</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="potensi_bahaya"
                                     id="potensi_bahaya" value="3">
-                                <label class="form-check-label" for="bahaya2">Berbahaya</label>
+                                <label class="form-check-label" for="bahaya2">Cukup Berbahaya</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="potensi_bahaya"
                                     id="potensi_bahaya" value="5">
-                                <label class="form-check-label" for="bahaya3">Sangat Berbahaya</label>
+                                <label class="form-check-label" for="bahaya3">Berbahaya</label>
                             </div>
                         </div>
                     </div>

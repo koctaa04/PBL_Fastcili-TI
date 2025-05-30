@@ -100,7 +100,7 @@
             {{-- Laporan --}}
             @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
                 <li
-                    class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'mabac' ? 'active' : '' }}">
+                    class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'prioritas' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#laporan">
                         <i class="nc-icon nc-single-copy-04"></i>
                         <p>
@@ -108,7 +108,7 @@
                             <b class="caret"></b>
                         </p>
                     </a>
-                    <div class="collapse {{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'mabac' ? 'show' : '' }}"
+                    <div class="collapse {{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'prioritas' ? 'show' : '' }}"
                         id="laporan">
                         <ul class="nav">
                             <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
@@ -123,8 +123,8 @@
                                     <span class="sidebar-normal">{{ __(' Verifikasi Laporan ') }}</span>
                                 </a>
                             </li>
-                            <li class="{{ $elementActive == 'waspas' ? 'active' : '' }}">
-                                <a href="{{ route('waspas.index') }}">
+                            <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">
+                                <a href="{{ route('prioritas.index') }}">
                                     <span class="sidebar-mini-icon">{{ __('P') }}</span>
                                     <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
                                 </a>

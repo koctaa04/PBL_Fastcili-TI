@@ -153,7 +153,7 @@ Route::group(['middleware' => 'auth'], function () {
 	 *  Verifikasi Laporan (Untuk Sarpras verifikasi laporan)
 	 *  ---------------------------- */
 	Route::prefix('verifikasi')->group(function () {
-		Route::get('/', [VerifikasiLaporanController::class, 'index'])->name('prioritas.index');
+		Route::get('/', [VerifikasiLaporanController::class, 'index']);
 		Route::get('/true/{id}', [VerifikasiLaporanController::class, 'verif']);
 		Route::post('/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
 		Route::get('/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
@@ -163,7 +163,7 @@ Route::group(['middleware' => 'auth'], function () {
 	/** -----------------------------
 	 *  WASPAS
 	 *  ---------------------------- */
-	Route::get('/waspas', [WaspasController::class, 'index'])->name('waspas.index');
+	Route::get('/prioritas', [WaspasController::class, 'index'])->name('prioritas.index');
 
 	/** -----------------------------
 	 *  Perbaikan (Untuk Teknisi)
