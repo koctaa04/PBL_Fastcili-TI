@@ -286,8 +286,7 @@ class LaporanKerusakanController extends Controller
     public function tugaskanTeknisi($id)
     {
         $laporan = LaporanKerusakan::with('fasilitas')->findOrFail($id);
-        // $teknisi = User::where('id_level', '3')->get(); // Sesuaikan dengan role teknisi
-        $teknisi = User::all(); // Sesuaikan dengan role teknisi
+        $teknisi = User::where('id_level', '3')->get();
 
         return view('laporan_prioritas.tugaskan_teknisi', compact('laporan', 'teknisi'));
     }
@@ -296,7 +295,7 @@ class LaporanKerusakanController extends Controller
     {
         $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
         // dd($laporan);
-        
+
         return view('laporan_prioritas.verifikasi', compact('laporan'));
     }
     // public function verifikasiPerbaikan($id)
@@ -361,7 +360,7 @@ class LaporanKerusakanController extends Controller
         } else {
             $laporan->update([
                 // id status berubah menjadi diperbaiki lagi ketika Ditolak
-                'id_status' => 3, 
+                'id_status' => 3,
             ]);
 
             $penugasan->update([
