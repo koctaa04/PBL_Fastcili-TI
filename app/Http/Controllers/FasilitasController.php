@@ -131,9 +131,7 @@ class FasilitasController extends Controller
     public function edit(string $id)
     {
         $fasilitas = Fasilitas::find($id);
-        $ruangan = Ruangan::all();
-
-        return view('fasilitas.edit', ['fasilitas' => $fasilitas, 'ruangan' => $ruangan]);
+        return view('fasilitas.edit', compact('fasilitas'));
     }
 
     public function update(Request $request, $id)

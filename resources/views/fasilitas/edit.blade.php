@@ -9,8 +9,16 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
+                    <label>Nama Gedung</label>
+                    <input type="text" disabled class="form-control" value="{{ $fasilitas->ruangan->gedung->nama_gedung }}">
+                </div>
+                <div class="form-group">
+                    <label>Nama Ruangan</label>
+                    <input type="text" disabled class="form-control" name="jumlah" value="{{ $fasilitas->ruangan->nama_ruangan }}">
+                </div>
+                <div class="form-group">
                     <label>Nama Fasilitas</label>
-                    <input type="text" class="form-control" name="nama_fasilitas" value="{{ $fasilitas->nama_fasilitas }}"
+                    <input type="text" class="form-control" value="{{ $fasilitas->nama_fasilitas }}"
                         required>
                 </div>
                 <div class="form-group">
