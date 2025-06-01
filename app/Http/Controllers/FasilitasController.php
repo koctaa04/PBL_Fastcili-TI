@@ -52,10 +52,8 @@ class FasilitasController extends Controller
         $gedung = Gedung::all();
         $ruangan = Ruangan::all();
 
-        return view('fasilitas.index', [
-            'gedung' => $gedung,
-            'ruangan' => $ruangan
-        ]);
+        return view('fasilitas.index', compact('gedung', 'ruangan'));
+
     }
 
     public function list(Request $request)
@@ -96,8 +94,7 @@ class FasilitasController extends Controller
     {
         $ruangan = Ruangan::all();
         $gedung = Gedung::all();
-
-        return view('fasilitas.create', ['ruangan' => $ruangan, 'gedung' => $gedung]);
+        return view('fasilitas.create', compact('ruangan', 'gedung'));
     }
 
     public function store(Request $request)
