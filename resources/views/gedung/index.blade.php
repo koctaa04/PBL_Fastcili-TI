@@ -13,16 +13,6 @@
         </div>
 
         <div class="card p-4">
-            {{-- <h3>Data Gedung</h3>
-        <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex flex-wrap justify-content-center flex-wrap">
-                    <button onclick="modalAction('{{ url('/gedung/create') }}')" 
-                            class="btn btn-action btn-success text-truncate">
-                        Tambah Data Gedung
-                    </button>
-                </div>
-            </div> --}}
             <div class="card-body">
                 {{-- Search --}}
                 <div class="row pr-auto">

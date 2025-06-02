@@ -17,7 +17,7 @@
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Total Laporan Masuk</p>
+                                    <p class="card-category">Total Laporan</p>
                                     <p class="card-title">{{ $jmlLaporan }}</p>
                                 </div>
                             </div>
