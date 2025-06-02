@@ -140,4 +140,14 @@ class HomeController extends Controller
             ->first();
         return view('pages.pelapor.index', compact('laporan', 'status'));
     }
+
+    public function teknisi()
+    {
+        $riwayat = PenugasanTeknisi::where('id_user', Auth::id())->get();
+        $penugasan = PenugasanTeknisi::with('laporan')
+            ->where('id_user', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->first();
+        return view('pages.teknisi.index', compact('riwayat', 'penugasan'));
+    }
 }
