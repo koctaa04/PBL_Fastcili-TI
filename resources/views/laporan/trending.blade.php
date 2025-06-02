@@ -5,8 +5,8 @@
 
 @section('content')
     <div class="content">
-        <h3>VerifikasiLaporan Trending</h3>
-        <div class="card p-4">
+        <h3>Laporan Kerusakan Trending</h3>
+        <div class="card px-4">
             <div class="card-header">
 
             </div>
@@ -29,18 +29,17 @@
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
                                     <td>
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan['laporan']->foto_kerusakan) }}"
                                             alt="Foto Gedung" class="card-img-top img-fluid"
                                             style="height: 120px; object-fit: cover;">
                                     </td>
-                                    <td>{{ $laporan->laporan->fasilitas->nama_fasilitas ?? '-' }}</td>
-                                    <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
-                                    <td>{{ $laporan->total }}</td>
-                                    <td>{{ $laporan->laporan->skor_trending }}</td>
+                                    <td>{{ $laporan['laporan']->fasilitas->nama_fasilitas ?? '-' }}</td>
+                                    <td>{{ $laporan['laporan']->deskripsi ?? '-' }}</td>
+                                    <td>{{ $laporan['laporan']->pelaporLaporan->count() }}</td>
+                                    <td>{{ $laporan['skor'] }}</td>
                                     <td>
-                                        <!-- Tombol untuk memunculkan modal -->
                                         <button class="btn btn-primary btn-sm"
-                                            onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan->id_laporan) }}')">
+                                            onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan['laporan']->id_laporan) }}')">
                                             <i class="fas fa-star"></i> Beri Nilai
                                         </button>
                                     </td>

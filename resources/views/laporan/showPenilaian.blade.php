@@ -27,7 +27,6 @@
                                 <p><strong>Fasilitas:</strong> {{ $laporan->fasilitas->nama_fasilitas }}</p>
                                 <p><strong>Tanggal Lapor:</strong> {{ $laporan->tanggal_lapor }}</p>
                                 <p><strong>Total Pelapor:</strong> {{ $laporan->pelaporLaporan->count() }}</p>
-                                <p><strong>Skor Trending:</strong> {{ $laporan->skor_trending ?? '-' }}</p>
                                 <div class="mb-2">
                                     <strong>Deskripsi Pelapor:</strong>
                                     <ul class="pl-3 mb-0">

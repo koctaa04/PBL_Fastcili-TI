@@ -27,19 +27,19 @@ class LaporanKerusakan extends Model
     }
 
 
-    public function getSkorTrendingAttribute()
-    {
-        $bobot = [
-            'ADM' => 0,
-            'MHS' => 1,
-            'DSN' => 3,
-            'TDK' => 2
-        ];
+    // public function getSkorTrendingAttribute()
+    // {
+    //     $bobot = [
+    //         'ADM' => 0,
+    //         'MHS' => 1,
+    //         'DSN' => 3,
+    //         'TDK' => 2
+    //     ];
 
-        return $this->pelaporLaporan->sum(function ($pelapor) use ($bobot) {
-            return $bobot[$pelapor->user->level->kode_level];
-        });
-    }
+    //     return $this->pelaporLaporan->sum(function ($pelapor) use ($bobot) {
+    //         return $bobot[$pelapor->user->level->kode_level];
+    //     });
+    // }
 
     public function ruangan()
     {

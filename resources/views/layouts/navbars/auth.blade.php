@@ -120,7 +120,7 @@
                             <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
                                 <a href="{{ route('trending.index') }}">
                                     <span class="sidebar-mini-icon">{{ __('V') }}</span>
-                                    <span class="sidebar-normal">{{ __(' Verifikasi Laporan ') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Laporan Trending ') }}</span>
                                 </a>
                             </li>
                             <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">

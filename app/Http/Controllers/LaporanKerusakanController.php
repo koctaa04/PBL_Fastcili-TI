@@ -196,27 +196,52 @@ class LaporanKerusakanController extends Controller
         }
     }
 
-
     public function trending()
     {
-        // $data = LaporanKerusakan::with(['pelaporLaporan.user', 'fasilitas'])
-        //     ->where('id_status', 1)
-        //     ->get()
-        //     ->sortByDesc(function ($laporan) {
-        //         return $laporan->skor_trending;
-        //     })
-        //     ->take(10); // ambil 10 besar trending
+        $bobot = [
+            'MHS' => 1,
+            'TDK' => 2,
+            'DSN' => 3,
+            'ADM' => 3
+        ];
 
-        $data = PelaporLaporan::select('id_laporan', DB::raw('count(*) as total'))
-            ->groupBy('id_laporan')
-            ->orderByDesc('total')
-            ->whereHas('laporan', function ($laporan) {
-                $laporan->where('id_status', 1);
+        // Ambil semua pelapor dengan relasi user dan level, serta laporan yang statusnya 1 (aktif)
+        $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
+            ->whereHas('laporan', function ($query) {
+                $query->where('id_status', 1);
             })
             ->get();
 
+        // Hitung skor per id_laporan
+        $skorPerLaporan = [];
+
+        foreach ($pelapor as $item) {
+            $idLaporan = $item->id_laporan;
+            $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
+            $skor = $bobot[$kodeLevel] ?? 0;
+
+            if (!isset($skorPerLaporan[$idLaporan])) {
+                $skorPerLaporan[$idLaporan] = 0;
+            }
+
+            $skorPerLaporan[$idLaporan] += $skor;
+        }
+
+        // Ubah jadi koleksi dengan laporan
+        $data = collect($skorPerLaporan)
+            ->map(function ($skor, $idLaporan) {
+                return [
+                    'laporan' => LaporanKerusakan::with(['fasilitas', 'pelaporLaporan.user.level'])
+                        ->find($idLaporan),
+                    'skor' => $skor
+                ];
+            })
+            ->sortByDesc('skor')
+            ->values(); // reset index
+
         return view('laporan.trending', compact('data'));
     }
+
 
     public function showPenilaian(string $id)
     {
