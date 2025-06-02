@@ -199,8 +199,7 @@
                                         <input class="form-check-input" name="agree_terms_and_conditions" type="checkbox">
                                         <span class="form-check-sign"></span>
                                         {{ __('Saya setuju dengan') }}
-                                        <a href="#" class="text-info" data-toggle="collapse"
-                                            data-target="#termsCollapse">{{ __('syarat dan ketentuan') }}</a>.
+                                        <a href="#" class="text-info" >{{ __('syarat dan ketentuan') }}</a>.
                                     </label>
                                     @if ($errors->has('agree_terms_and_conditions'))
                                         <span class="invalid-feedback" style="display: block;" role="alert">
