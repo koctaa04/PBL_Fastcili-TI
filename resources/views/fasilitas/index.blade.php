@@ -41,12 +41,20 @@
                                 <small class="form-text text-muted">Gedung</small>
                             </div>
                             <div class="col-5">
-                                <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled>
+                                {{-- <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled> --}}
+                                <select class="form-control" id="id_ruangan" name="id_ruangan"
+                                    {{ request('id_ruangan') ? '' : 'disabled' }}>
+
                                     <option value="">- Semua Ruangan -</option>
                                     @if (isset($ruangan))
                                         @foreach ($ruangan as $item)
-                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">
-                                                {{ $item->nama_ruangan }} </option>
+                                            {{-- <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">
+                                                {{ $item->nama_ruangan }} </option> --}}
+
+                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
+                                                {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
+                                                {{ $item->nama_ruangan }}
+                                            </option>
                                         @endforeach
                                     @endif
                                 </select>

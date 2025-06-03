@@ -17,7 +17,8 @@ class RuanganController extends Controller
         }
 
         $gedung = Gedung::all();
-        return view('ruangan.index', compact('gedung'));
+        $ruangan = Ruangan::all();
+        return view('ruangan.index', compact('gedung', 'ruangan'));
     }
 
     private function getRuanganData(Request $request)

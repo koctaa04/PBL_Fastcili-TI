@@ -26,10 +26,11 @@
                     </tr>
                 </tbody>
             </table>
-                {{-- Tombol menuju halaman ruangan dengan filter --}}
-    <a href="{{ route('ruangan.index', ['id_gedung' => $gedung->id_gedung]) }}" class="btn btn-info btn-block mt-3">
-        <i class="fas fa-door-open mr-1"></i> Lihat ruangan di gedung {{ $gedung->nama_gedung }}
-    </a>
+            {{-- Tombol menuju halaman ruangan dengan filter --}}
+            <a href="{{ route('ruangan.index', ['id_gedung' => $gedung->id_gedung]) }}"
+                class="btn btn-info btn-block mt-3">
+                <i class="fas fa-door-open mr-1"></i> Lihat ruangan di gedung {{ $gedung->nama_gedung }}
+            </a>
         </div>
         <div class="modal-footer mt-4">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>

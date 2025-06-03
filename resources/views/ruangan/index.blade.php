@@ -301,21 +301,31 @@
                                             <p class="ruangan-card-text"><strong>Kode:</strong> <span class="ruangan-kode">${ruangan.kode_ruangan || '-'}</span></p>
                                             <p class="ruangan-card-text"><strong>Gedung:</strong> <span class="ruangan-gedung">${ruangan.gedung?.nama_gedung || 'Tidak ada gedung'}</span></p>
                                         </div>
-                                        <div class="ruangan-card-footer">
-                                            <div class="ruangan-card-actions">
-                                                <button onclick="modalAction('{{ url('/ruangan/edit') }}/${ruangan.id_ruangan}')" 
-                                                        class="btn btn-sm btn-warning" title="Edit">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <form class="form-delete d-inline" action="{{ url('/ruangan/delete') }}/${ruangan.id_ruangan}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="fa fa-trash"></i>
+                                        <div class="ruangan-card-footer p-3 border-top bg-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                
+                                                {{-- Tombol menuju halaman Fasilitas dengan filter --}}
+                                                <a href="/fasilitas?id_ruangan=${ruangan.id_ruangan}" class="btn btn-sm btn-info d-flex align-items-center">
+                                                    <i class="fas fa-door-open me-1"></i> Lihat Fasilitas
+                                                </a>
+
+                                                <div class="d-flex ">
+                                                    <button onclick="modalAction('{{ url('/ruangan/edit') }}/${ruangan.id_ruangan}')" 
+                                                            class="btn btn-sm btn-warning mr-2" title="Edit">
+                                                        <i class="fa fa-edit"></i>
                                                     </button>
-                                                </form>
+
+                                                    <form class="form-delete d-inline" action="{{ url('/ruangan/delete') }}/${ruangan.id_ruangan}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('Yakin ingin menghapus ruangan ini?')">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             `;
