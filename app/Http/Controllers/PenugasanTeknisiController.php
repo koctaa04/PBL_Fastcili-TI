@@ -32,6 +32,7 @@ class PenugasanTeknisiController extends Controller
             $penugasan->catatan_teknisi = $request->catatan_teknisi;
             $penugasan->dokumentasi = $filename;
             $penugasan->tanggal_selesai = Carbon::now();
+            $penugasan->status_perbaikan = 'Selesai Dikerjakan';
             $penugasan->save();
 
             return response()->json(['success' => true, 'message' => 'Berhasil menambahkan feedback!']);

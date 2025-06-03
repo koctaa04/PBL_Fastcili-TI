@@ -22,7 +22,7 @@
                                 <p class="mb-2"><strong>Fasilitas:</strong>
                                     {{ $penugasan->laporan->fasilitas->nama_fasilitas }}</p>
                                 <p class="mb-2"><strong>Tanggal Lapor:</strong>
-                                    {{ \Carbon\Carbon::parse($penugasan->created_at)->format('d M Y') }}</p>
+                                    {{ \Carbon\Carbon::parse($penugasan->laporan->tanggal_lapor)->format('d M Y') }}</p>
                                 <p class="mb-2"><strong>Deskripsi:</strong>
                                     {{ $penugasan->laporan->pelaporLaporan->first()->deskripsi_tambahan ?? '-' }}
                                 </p>
