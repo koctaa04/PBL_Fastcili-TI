@@ -15,7 +15,11 @@
             <div class="modal-body">
                 <div>
                     <strong>Status Perbaikan:</strong> {{ $laporan->penugasan->status_perbaikan ?? '-' }}<br>
-                    <strong>Teknisi:</strong> {{ $laporan->penugasan->user->nama ?? '-' }}
+                    <strong>Teknisi:</strong> {{ $laporan->penugasan->user->nama ?? '-' }}<br>
+                    <strong>Dokumentasi:</strong><br><img
+                        src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->dokumentasi) }}"
+                        onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
+                        alt="Foto Kerusakan" class="img-fluid rounded" style="height: 180px; width: 240px;">
                 </div>
                 <div class="mt-3">
                     <label for="keterangan">Keterangan (jika menolak):</label>
@@ -56,7 +60,7 @@
             dataType: "json",
             beforeSend: function() {
                 $('#formVerifikasi button[type=submit]').prop('disabled', true).text(
-                'Menyimpan...');
+                    'Menyimpan...');
             },
             success: function(response) {
                 $('#formVerifikasi button[type=submit]').prop('disabled', false).text('Okay');
