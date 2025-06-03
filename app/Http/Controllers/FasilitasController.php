@@ -14,42 +14,6 @@ class FasilitasController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $fasilitas = Fasilitas::with(['ruangan', 'ruangan.gedung'])
-                ->select('fasilitas.id_fasilitas', 'fasilitas.id_ruangan', 'fasilitas.nama_fasilitas', 'fasilitas.jumlah')
-                ->join('ruangan', 'ruangan.id_ruangan', '=', 'fasilitas.id_ruangan');
-
-            // Add ruangan filter if provided
-            if ($request->has('id_ruangan') && $request->id_ruangan != '') {
-                $fasilitas->where('ruangan.id_ruangan', $request->id_ruangan);
-            }
-            // Add gedung filter if provided
-            if ($request->has('id_gedung') && $request->id_gedung != '') {
-                $fasilitas->where('ruangan.id_gedung', $request->id_gedung);
-            }
-
-            // For card view
-            if ($request->has('per_page')) {
-                return $fasilitas->paginate($request->per_page);
-            }
-
-            return DataTables::of($fasilitas)
-                ->addIndexColumn()
-                ->addColumn('aksi', function ($fasilitas) {
-                    return '
-                <div class="d-flex">
-                    <button onclick="modalAction(\'' . url('/fasilitas/edit/' . $fasilitas->id_fasilitas) . '\')" class="btn btn-sm btn-info mr-2">Edit</button>
-                    <form class="form-delete" action="' . url('/fasilitas/delete/' . $fasilitas->id_fasilitas) . '" method="POST">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                    </form>
-                </div>
-            ';
-                })
-                ->rawColumns(['aksi'])
-                ->toJson();
-        }
-
         $gedung = Gedung::all();
         $ruangan = Ruangan::all();
 
@@ -103,16 +67,19 @@ class FasilitasController extends Controller
         $rules = [
             'id_ruangan' => 'required|exists:ruangan,id_ruangan',
             'nama_fasilitas' => 'required|string|max:50',
-            'jumlah' => 'required|integer'
+            'jumlah' => 'required|integer|min:1'
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules, [
+            'jumlah' => 'Jumlah harus merupakan angka dan lebih dari 0'
+        ]);
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal Validasi',
                 'msgField' => $validator->errors()
-            ]);
+            ], 422);
         }
 
 
@@ -310,7 +277,7 @@ class FasilitasController extends Controller
 
 
 
-    protected function convertErrorsToFields($errors)
+    protected function convertErrorsToFields(array $errors)
     {
         $result = [];
         foreach ($errors as $error) {
