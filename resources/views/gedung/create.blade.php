@@ -48,7 +48,7 @@
 <script>
     $(document).ready(function() {
         // Handle file input change
-        $('#foto_gedung').on('change', function() {
+        $('#foto_gedung').on('change', function () {
             var fileName = $(this).val().split('\\').pop();
             if (fileName) {
                 $('#file-label').html('<i class="fas fa-file-image mr-2"></i>' + fileName);
@@ -58,30 +58,32 @@
         });
 
         // Reset form when modal is closed
-        $('#myModal').on('hidden.bs.modal', function() {
+        $('#myModal').on('hidden.bs.modal', function () {
             $('#form_create')[0].reset();
-            $('.error-text').text('');
+            $('.text-danger').text('');
             $('#file-label').html('<i class="fas fa-upload mr-2"></i>Pilih File Gedung');
         });
 
-        // Form submission handler (same as previous)
-        $(document).on('submit', '#form_create', function(e) {
+        // Form submission
+        $(document).on('submit', '#form_create', function (e) {
             e.preventDefault();
             $('.text-danger').text('');
-            const formData = new FormData(this);
+            var form = $(this);
+            var formData = new FormData(this);
 
-            $.ajax({
+
+             $.ajax({
                 type: "POST",
-                url: $(this).attr('action'),
+                url: form.attr('action'),
                 data: formData,
                 contentType: false,
                 processData: false,
                 dataType: "json",
-                beforeSend: function() {
-                    $('#form_create button[type=submit]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+                beforeSend: function () {
+                    form.find('button[type=submit]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
                 },
-                success: function(response) {
-                    $('#form_create button[type=submit]').prop('disabled', false).html('Simpan');
+                success: function (response) {
+                    form.find('button[type=submit]').prop('disabled', false).html('Simpan');
                     if (response.success) {
                         $('#myModal').modal('hide');
                         Swal.fire({
@@ -95,20 +97,17 @@
                         });
                     }
                 },
-                error: function(xhr) {
-                    $('#form_create button[type=submit]').prop('disabled', false).html('Simpan');
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        let errors = xhr.responseJSON.errors;
-                        $.each(errors, function(field, messages) {
-                            $('#error-' + field).text(messages[0]);
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Gagal!",
-                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat menyimpan data',
-                        });
-                    }
+                error: function (xhr) {
+                    form.find('button[type=submit]').prop('disabled', false).html('Simpan');
+                    let errors = xhr.responseJSON.errors;
+                    $.each(errors, function (field, messages) {
+                        $('#error-' + field).text(messages[0]);
+                    });
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text: xhr.responseJSON.message || 'Terjadi kesalahan saat memproses data.',
+                    });
                 }
             });
         });

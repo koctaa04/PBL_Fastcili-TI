@@ -58,9 +58,9 @@ class GedungController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi inputan gagal',
-                'msgField' => $validator->errors()
-            ]);
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
 
