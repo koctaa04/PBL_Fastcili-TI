@@ -34,7 +34,10 @@
                                 <select class="form-control" id="id_gedung" name="id_gedung" required>
                                     <option value="">- Semua Gedung -</option>
                                     @foreach ($gedung as $item)
-                                        <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
+                                        <option value="{{ $item->id_gedung }}"
+                                            {{ request('id_gedung') == $item->id_gedung ? 'selected' : '' }}>
+                                            {{ $item->nama_gedung }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 <small class="form-text text-muted">Gedung</small>
@@ -212,6 +215,15 @@
 @endpush
 
 @push('scripts')
+    <script>
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const gedungId = urlParams.get('id_gedung');
+            if (gedungId) {
+                $('#id_gedung').val(gedungId).trigger('change');
+            }
+        });
+    </script>
     <script>
         function adjustButtonText() {
             const buttons = document.querySelectorAll('.card-tools .btn');

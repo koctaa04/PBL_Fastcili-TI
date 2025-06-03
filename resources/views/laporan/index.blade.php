@@ -45,9 +45,19 @@
                                         <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
                                     </div>
 
-                                    <div class="">
-                                        <label for="foto_kerusakan">Foto Kerusakan</label>
-                                        <input type="file" name="foto_kerusakan" class="form-control" required>
+                                    <div class="form-group">
+                                        <!-- Custom File Input -->
+                                        <label for="foto_kerusakan" class="d-block mb-2">Foto Kerusakan</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" name="foto_kerusakan"
+                                                id="foto_kerusakan" accept="image/*" required>
+                                            <label class="custom-file-label bg-warning text-dark text-center w-100"
+                                                for="foto_kerusakan" id="file-label">
+                                                <i class="fas fa-upload mr-2"></i>Pilih foto kerusakan
+                                            </label>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">Format: JPG, PNG, JPEG (Maks. 2MB)</small>
+                                        <small class="text-danger" id="error-foto_kerusakan"></small>
                                     </div>
                                 </div>
                             </div>
@@ -209,7 +219,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                window.location.href = "{{ url("/lapor_kerusakan") }}";
+                                window.location.href = "{{ url('/lapor_kerusakan') }}";
                             });
                         } else {
                             Swal.fire({
@@ -239,7 +249,7 @@
                 $('#ruangan-group').show();
                 $('#id_ruangan').html('<option value="">Memuat...</option>');
 
-                var url = '{{ url("/get-ruangan") }}/' + idGedung;
+                var url = '{{ url('/get-ruangan') }}/' + idGedung;
                 $.get(url, function(data) {
                     let options = '<option value="">-- Pilih Ruangan --</option>';
                     data.forEach(r => options +=
@@ -256,7 +266,7 @@
                 $('#laporan-terlapor-list').empty();
                 $('#laporan-terlapor-container, #form-dukungan, #form-laporan-baru').hide();
 
-                var url = '{{ url("/get-fasilitas-terlapor") }}/' + idRuangan;
+                var url = '{{ url('/get-fasilitas-terlapor') }}/' + idRuangan;
                 $.get(url, function(data) {
                     const filteredData = data.filter(f => f.id_user !== currentUserId);
 
@@ -284,7 +294,7 @@
                     }
                 });
 
-                var url = '{{ url("/get-fasilitas-belum-lapor") }}/' + idRuangan;
+                var url = '{{ url('/get-fasilitas-belum-lapor') }}/' + idRuangan;
                 $.get(url, function(data) {
                     let options = '<option value="">-- Pilih Fasilitas --</option>';
                     data.forEach(f => options +=
@@ -353,14 +363,13 @@
         $(document).ready(function() {
             $('#table_laporan').DataTable({
                 columnDefs: [{
-                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                        className: 'text-center',
-                    },{
-                        targets: [0, 1, 9],
-                        orderable: false,
-                        searchable: false,
-                    }
-                ], 
+                    targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    className: 'text-center',
+                }, {
+                    targets: [0, 1, 9],
+                    orderable: false,
+                    searchable: false,
+                }],
                 language: {
                     emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan yang tersedia",
                     zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan seperti keyword yang ingin dicari"

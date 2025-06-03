@@ -299,6 +299,10 @@
                                         </div>
                                         <div class="gedung-card-footer">
                                             <div class="gedung-card-actions">
+                                                <button onclick="modalAction('{{ url('/gedung/detail') }}/${gedung.id_gedung}')" 
+                                                        class="btn btn-sm btn-info" title="Detail">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
                                                 <button onclick="modalAction('{{ url('/gedung/edit') }}/${gedung.id_gedung}')" 
                                                         class="btn btn-sm btn-warning" title="Edit">
                                                     <i class="fa fa-edit"></i>

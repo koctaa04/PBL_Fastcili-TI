@@ -93,6 +93,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/', [GedungController::class, 'index'])->name('gedung.index');
 		Route::get('/create', [GedungController::class, 'create']);
 		Route::post('/', [GedungController::class, 'store'])->name('gedung.store');
+		Route::get('/detail/{id}', [GedungController::class, 'detail']);
 		Route::get('/edit/{id}', [GedungController::class, 'edit']);
 		Route::put('/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
 		Route::delete('/delete/{id}', [GedungController::class, 'destroy']);

@@ -39,6 +39,13 @@ class GedungController extends Controller
         return $gedung->paginate(12);
     }
 
+    public function detail(string $id)
+    {
+        $gedung = Gedung::find($id);
+
+        return view('gedung.detail', ['gedung' => $gedung]);
+    }
+
     public function create()
     {
         return view('gedung.create');
