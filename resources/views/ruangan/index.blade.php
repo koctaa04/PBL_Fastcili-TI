@@ -7,6 +7,7 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="mb-0">Kelola Data Ruangan</h3>
+            @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
             <div class="d-flex justify-content-center flex-wrap">
                 <button onclick="modalAction('{{ url('/ruangan/import') }}')" class="btn btn-warning text-truncate mr-2">
                     Import Data Ruangan (.xlsx)
@@ -15,6 +16,7 @@
                     Tambah Data Ruangan
                 </button>
             </div>
+            @endif
         </div>
         <div class="card p-4">
             <div class="card-body">
@@ -295,34 +297,35 @@
                         response.data.forEach((ruangan) => {
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                                    <div class="card ruangan-card">
+                                    <div class="card ruangan-card" style="cursor: pointer;" onclick="window.location.href = '{{ url('/fasilitas?id_ruangan=${ruangan.id_ruangan}') }}'">
                                         <div class="ruangan-card-body">
                                             <h5 class="ruangan-card-title">${ruangan.nama_ruangan}</h5>
                                             <p class="ruangan-card-text"><strong>Kode:</strong> <span class="ruangan-kode">${ruangan.kode_ruangan || '-'}</span></p>
                                             <p class="ruangan-card-text"><strong>Gedung:</strong> <span class="ruangan-gedung">${ruangan.gedung?.nama_gedung || 'Tidak ada gedung'}</span></p>
                                         </div>
-                                        <div class="ruangan-card-footer p-3 border-top bg-light">
+                                        <div class="ruangan-card-footer p-2 border-top bg-light">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 
                                                 {{-- Tombol menuju halaman Fasilitas dengan filter --}}
-                                                <a href="/fasilitas?id_ruangan=${ruangan.id_ruangan}" class="btn btn-sm btn-info d-flex align-items-center">
+                                                <a href="{{ url('/fasilitas?id_ruangan=${ruangan.id_ruangan}') }}" class="btn btn-sm btn-info d-flex align-items-center">
                                                     <i class="fas fa-door-open me-1"></i> Lihat Fasilitas
                                                 </a>
-
+                                                @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
                                                 <div class="d-flex ">
                                                     <button onclick="modalAction('{{ url('/ruangan/edit') }}/${ruangan.id_ruangan}')" 
                                                             class="btn btn-sm btn-warning mr-2" title="Edit">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
 
-                                                <form class="form-delete d-inline" action="{{ url('/ruangan/delete') }}/${ruangan.id_ruangan}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                    <form class="form-delete d-inline" action="{{ url('/ruangan/delete') }}/${ruangan.id_ruangan}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
+                                                @endif
                                             </div>
                                         </div>
 

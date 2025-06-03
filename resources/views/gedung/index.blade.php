@@ -7,9 +7,11 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="mb-0">Kelola Data Gedung</h3>
+            @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
             <button onclick="modalAction('{{ url('/gedung/create') }}')" class="btn btn-success text-truncate">
                 Tambah Data Gedung
             </button>
+            @endif
         </div>
 
         <div class="card p-4">
@@ -288,7 +290,7 @@
 
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                                    <div class="card gedung-card">
+                                    <div class="card gedung-card" style="cursor: pointer;" onclick="modalAction('{{ url('/gedung/detail') }}/${gedung.id_gedung}')" >
                                         <div class="gedung-card-img-container">
                                             <img src="${fotoGedung}" alt="Foto Gedung ${gedung.nama_gedung}" class="gedung-card-img">
                                         </div>
@@ -297,6 +299,7 @@
                                             <p class="gedung-card-text"><strong>Kode:</strong> <span class="gedung-kode">${gedung.kode_gedung || '-'}</span></p>
                                             <p class="gedung-card-text gedung-deskripsi">${gedung.deskripsi || 'Tidak ada deskripsi'}</p>
                                         </div>
+                                        @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
                                         <div class="gedung-card-footer">
                                             <div class="gedung-card-actions">
                                                 <button onclick="modalAction('{{ url('/gedung/detail') }}/${gedung.id_gedung}')" 
@@ -316,6 +319,7 @@
                                                 </form>
                                             </div>
                                         </div>
+                                        @endif
                                     </div>
                                 </div>
                             `;
