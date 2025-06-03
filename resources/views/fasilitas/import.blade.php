@@ -16,10 +16,24 @@
                     </a>
                     <small id="error-level_id" class="error-text form-text text-danger"></small>
                 </div>
-                <div class="">
+                {{-- <div class="">
                     <label for="file_fasilitas">Pilih File Excel (.xlsx)</label>
                     <input type="file" name="file_fasilitas" id="file_fasilitas" class="form-control" required>
                     <small id="error-file_fasilitas" class="error-text form-text text-danger"></small>
+                </div> --}}
+                <div class="form-group mt-3">
+                    <!-- Custom File Input -->
+                    <label for="file_fasilitas" class="d-block mb-2">File Import Fasiltas</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" name="file_fasilitas" id="file_fasilitas"
+                            required>
+                        <label class="custom-file-label bg-warning text-dark text-center w-100" for="file_fasilitas"
+                            id="file-label">
+                            <i class="fas fa-upload mr-2"></i>Pilih File (.xlsx)
+                        </label>
+                    </div>
+                    <small class="text-muted d-block mt-1">Format: Excel (.xlsx)</small>
+                    <small class="text-danger" id="error-file_fasilitas"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -30,6 +44,15 @@
     </div>
 </div>
 <script>
+    // Handle file input change
+    $('#file_fasilitas').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        if (fileName) {
+            $('#file-label').html('<i class="fas fa-file-image mr-2"></i>' + fileName);
+        } else {
+            $('#file-label').html('<i class="fas fa-upload mr-2"></i>Pilih File Gedung');
+        }
+    });
     $(document).ready(function() {
         // Submit form import
         $(document).on('submit', '#form-import', function(e) {

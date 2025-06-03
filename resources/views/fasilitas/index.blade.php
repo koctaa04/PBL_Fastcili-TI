@@ -9,7 +9,7 @@
             <h3 class="mb-0">Kelola Data Fasilitas</h3>
             <div class="d-flex justify-content-center flex-wrap">
                 <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
-                    Import Data Fasilitas (.xlsx)
+                    Impor Data Fasilitas
                 </button>
                 <button onclick="modalAction('{{ url('/fasilitas/create') }}')" class="btn btn-success">
                     Tambah Data Fasilitas
