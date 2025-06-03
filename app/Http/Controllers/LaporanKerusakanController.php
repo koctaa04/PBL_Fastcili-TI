@@ -220,7 +220,8 @@ class LaporanKerusakanController extends Controller
             if (!isset($skorPerLaporan[$idLaporan])) {
                 $skorPerLaporan[$idLaporan] = [
                     'skor' => 0,
-                    'total_pelapor' => 0
+                    'total_pelapor' => 0,
+                    'created_at' => $item->laporan->created_at ?? now() // Get the report creation date
                 ];
             }
 
@@ -236,11 +237,12 @@ class LaporanKerusakanController extends Controller
                 return [
                     'laporan' => $laporan,
                     'skor' => $item['skor'],
-                    'total_pelapor' => $item['total_pelapor']
+                    'total_pelapor' => $item['total_pelapor'],
+                    'created_at' => $item['created_at'] // Include created_at in the final data
                 ];
             })
-            ->filter() // Hapus null
-            ->values(); // Reset index agar urut
+            ->filter()
+            ->values();
 
         // Search
         if ($request->has('search') && !empty($request->search)) {
@@ -248,11 +250,18 @@ class LaporanKerusakanController extends Controller
             $data = $data->filter(function ($item) use ($searchTerm) {
                 return str_contains(strtolower($item['laporan']->fasilitas->nama_fasilitas ?? ''), $searchTerm) ||
                     str_contains(strtolower($item['laporan']->deskripsi ?? ''), $searchTerm);
-            })->values(); // Reset index lagi setelah filter
+            })->values();
         }
 
-        // Sort by skor descending
-        $sortedData = $data->sortByDesc('skor')->values();
+        // Multi-level sorting
+        $sortedData = $data->sortBy([
+            // Primary sort: skor (descending)
+            fn($a, $b) => $b['skor'] <=> $a['skor'],
+            // Secondary sort: total_pelapor (descending) if skor is equal
+            fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
+            // Tertiary sort: created_at (ascending - older reports first) if both skor and total_pelapor are equal
+            fn($a, $b) => $a['created_at'] <=> $b['created_at']
+        ])->values();
 
         // Beri ranking dan ambil top 10
         $rankedData = $sortedData->take(10)->map(function ($item, $index) {

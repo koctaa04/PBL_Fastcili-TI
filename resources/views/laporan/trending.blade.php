@@ -69,7 +69,7 @@
                                                     <i class="fas fa-star mr-1"></i> Skor: {{ $laporan['skor'] }}
                                                 </span>
                                             </div>
-                                            <button class="btn btn-primary btn-sm"
+                                            <button class="btn btn-danger btn-lg"
                                                 onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan['laporan']->id_laporan) }}')">
                                                 <i class="fas fa-star mr-1"></i> Beri Nilai
                                             </button>
