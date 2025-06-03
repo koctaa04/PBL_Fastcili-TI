@@ -21,9 +21,15 @@
 
                 <div class="form-group">
                     <label for="ruangan">Ruangan</label>
-                    <select name="id_ruangan" id="ruangan" class="form-control" disabled required>
+                    <select name="id_ruangan" id="ruangan" class="form-control"  required>
                         <option value="">Pilih Ruangan</option>
+                        @foreach ($ruangan as $r)
+                            <option value="{{ $r->id_ruangan }}">{{ $r->nama_ruangan }}</option>
+                        @endforeach
                     </select>
+                    {{-- <select name="id_ruangan" id="ruangan" class="form-control" disabled required>
+                        <option value="{{ $ruangan->id_ruangan }}">Pilih Ruangan</option>
+                    </select> --}}
                 </div>
 
                 <div class="form-group">
@@ -110,16 +116,17 @@
                     success: function(data) {
                         console.log('Response:', data); // Untuk debugging
                         let options = '<option value="">Pilih Ruangan</option>';
-                        
+
                         if (data && data.length > 0) {
                             $.each(data, function(i, ruangan) {
-                                options += '<option value="' + ruangan.id_ruangan + '">' + 
-                                ruangan.nama_ruangan + '</option>';
+                                options += '<option value="' + ruangan.id_ruangan +
+                                    '">' +
+                                    ruangan.nama_ruangan + '</option>';
                             });
                         } else {
                             options = '<option value="">Tidak ada ruangan</option>';
                         }
-                        
+
                         $('#ruangan').html(options).prop('disabled', false);
                     },
                     error: function(xhr, status, error) {
