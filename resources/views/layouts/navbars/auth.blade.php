@@ -20,8 +20,13 @@
                 }
             </style>
             <li class="{{ $elementActive == 'dashboard' ? 'active' : '' }}">
-                @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 3)
+                @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
                     <a href="{{ route('home') }}">
+                        <i class="nc-icon nc-sun-fog-29"></i>
+                        <p>{{ __('Dashboard') }}</p>
+                    </a>
+                @elseif (auth()->user()->id_level == 3)
+                    <a href="{{ route('teknisi') }}">
                         <i class="nc-icon nc-sun-fog-29"></i>
                         <p>{{ __('Dashboard') }}</p>
                     </a>
