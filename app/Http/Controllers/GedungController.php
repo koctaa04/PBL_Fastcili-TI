@@ -99,13 +99,21 @@ class GedungController extends Controller
     {
         $gedung = Gedung::findOrFail($id);
 
-        // Validasi input selain file
-        $validated = $request->validate([
-            'kode_gedung' => 'required|string|max:10',
-            'nama_gedung' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'foto_gedung' => 'nullable|image|max:2048' // Tidak wajib karena bisa tidak diubah
+        // Manual validation
+        $validator = Validator::make($request->all(), [
+            'nama_gedung' => 'required|string|max:50',
+            'deskripsi' => 'required|string|max:255',
+            'foto_gedung' => 'nullable|image|max:2048'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $validated = $validator->validated();
 
         // Cek apakah ada file baru yang diunggah
         if ($request->hasFile('foto_gedung')) {
@@ -124,7 +132,6 @@ class GedungController extends Controller
         }
 
         // Update field lain
-        $gedung->kode_gedung = $validated['kode_gedung'];
         $gedung->nama_gedung = $validated['nama_gedung'];
         $gedung->deskripsi = $validated['deskripsi'];
         $gedung->save();
