@@ -110,6 +110,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/update/{id}', [RuanganController::class, 'update']);
 		Route::delete('/delete/{id}', [RuanganController::class, 'destroy']);
 		Route::get('/ruangan/data', [RuanganController::class, 'getData'])->name('ruangan.data');
+		Route::get('/import', [RuanganController::class, 'import'])->name('users.import');
+		Route::post('/import_ajax', [RuanganController::class, 'import_ajax'])->name('users.import.ajax');
 	});
 
 	/** -----------------------------

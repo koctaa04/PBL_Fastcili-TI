@@ -28,8 +28,10 @@
                     <!-- Custom File Input -->
                     <label for="foto_gedung" class="d-block mb-2">Foto Gedung</label>
                     <div class="custom-file">
-                        <input type="file" class="custom-file-input" name="foto_gedung" id="foto_gedung" accept="image/*" required>
-                        <label class="custom-file-label bg-warning text-dark text-center w-100" for="foto_gedung" id="file-label">
+                        <input type="file" class="custom-file-input" name="foto_gedung" id="foto_gedung"
+                            accept="image/*" required>
+                        <label class="custom-file-label bg-warning text-dark text-center w-100" for="foto_gedung"
+                            id="file-label">
                             <i class="fas fa-upload mr-2"></i>Pilih File Gedung
                         </label>
                     </div>
@@ -48,7 +50,7 @@
 <script>
     $(document).ready(function() {
         // Handle file input change
-        $('#foto_gedung').on('change', function () {
+        $('#foto_gedung').on('change', function() {
             var fileName = $(this).val().split('\\').pop();
             if (fileName) {
                 $('#file-label').html('<i class="fas fa-file-image mr-2"></i>' + fileName);
@@ -58,31 +60,32 @@
         });
 
         // Reset form when modal is closed
-        $('#myModal').on('hidden.bs.modal', function () {
+        $('#myModal').on('hidden.bs.modal', function() {
             $('#form_create')[0].reset();
             $('.text-danger').text('');
             $('#file-label').html('<i class="fas fa-upload mr-2"></i>Pilih File Gedung');
         });
 
         // Form submission
-        $(document).on('submit', '#form_create', function (e) {
+        $(document).on('submit', '#form_create', function(e) {
             e.preventDefault();
             $('.text-danger').text('');
             var form = $(this);
             var formData = new FormData(this);
 
 
-             $.ajax({
+            $.ajax({
                 type: "POST",
                 url: form.attr('action'),
                 data: formData,
                 contentType: false,
                 processData: false,
                 dataType: "json",
-                beforeSend: function () {
-                    form.find('button[type=submit]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+                beforeSend: function() {
+                    form.find('button[type=submit]').prop('disabled', true).html(
+                        '<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
                 },
-                success: function (response) {
+                success: function(response) {
                     form.find('button[type=submit]').prop('disabled', false).html('Simpan');
                     if (response.success) {
                         $('#myModal').modal('hide');
@@ -90,23 +93,23 @@
                             icon: "success",
                             title: "Berhasil!",
                             text: response.message,
-                            timer: 2000,
-                            showConfirmButton: false
+                            showConfirmButton: true
                         }).then(() => {
                             loadGedungCards();
                         });
                     }
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     form.find('button[type=submit]').prop('disabled', false).html('Simpan');
                     let errors = xhr.responseJSON.errors;
-                    $.each(errors, function (field, messages) {
+                    $.each(errors, function(field, messages) {
                         $('#error-' + field).text(messages[0]);
                     });
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: xhr.responseJSON.message || 'Terjadi kesalahan saat memproses data.',
+                        text: xhr.responseJSON.message ||
+                            'Terjadi kesalahan saat memproses data.',
                     });
                 }
             });

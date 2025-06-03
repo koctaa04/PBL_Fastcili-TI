@@ -60,7 +60,8 @@
                 contentType: false,
                 processData: false,
                 beforeSend: function() {
-                    form.find('button[type=submit]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+                    form.find('button[type=submit]').prop('disabled', true).html(
+                        '<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
                 },
                 success: function(response) {
                     form.find('button[type=submit]').prop('disabled', false).html('Simpan');
@@ -70,8 +71,7 @@
                             icon: "success",
                             title: "Berhasil!",
                             text: response.message,
-                            timer: 2000,
-                            showConfirmButton: false
+                            showConfirmButton: true
                         }).then(() => {
                             loadRuanganCards(); // Memuat ulang data ruangan
                         });
@@ -80,13 +80,14 @@
                 error: function(xhr) {
                     form.find('button[type=submit]').prop('disabled', false).html('Simpan');
                     let errors = xhr.responseJSON.errors;
-                    $.each(errors, function (field, messages) {
+                    $.each(errors, function(field, messages) {
                         $('#error-' + field).text(messages[0]);
                     });
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: xhr.responseJSON.message || 'Terjadi kesalahan saat memproses data.',
+                        text: xhr.responseJSON.message ||
+                            'Terjadi kesalahan saat memproses data.',
                     });
                 }
             });
