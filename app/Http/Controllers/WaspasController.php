@@ -96,6 +96,11 @@ class WaspasController extends Controller
                 'deskripsi' => $original['deskripsi'] ?? null,
                 'status' => $original['nama_status'] ?? null,
                 'Q' => round($Q, 4),
+                'tingkat_kerusakan' => $original['tingkat_kerusakan'] ?? null, // Nilai asli dari kriteria
+                'frekuensi_digunakan' => $original['frekuensi_digunakan'] ?? null,
+                'dampak' => $original['dampak'] ?? null,
+                'estimasi_biaya' => $original['estimasi_biaya'] ?? null,
+                'potensi_bahaya' => $original['potensi_bahaya'] ?? null,
             ];
         }
 
