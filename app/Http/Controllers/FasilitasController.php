@@ -54,7 +54,6 @@ class FasilitasController extends Controller
         $ruangan = Ruangan::all();
 
         return view('fasilitas.index', compact('gedung', 'ruangan'));
-
     }
 
     public function list(Request $request)
@@ -192,25 +191,108 @@ class FasilitasController extends Controller
         return view('fasilitas.import');
     }
 
+    // public function import_ajax(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'file_fasilitas' => ['required', 'mimes:xlsx', 'max:1024']
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         if ($request->ajax() || $request->wantsJson()) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Validasi data import gagal',
+    //                 'errors' => $validator->errors()
+    //             ], 422);
+    //         }
+    //         return redirect()->back()->withErrors($validator)->withInput();
+    //     }
+
+
+    //     try {
+    //         $file = $request->file('file_fasilitas');
+    //         $reader = IOFactory::createReader('Xlsx');
+    //         $reader->setReadDataOnly(true);
+    //         $spreadsheet = $reader->load($file->getRealPath());
+    //         $sheet = $spreadsheet->getActiveSheet();
+    //         $data = $sheet->toArray();
+
+    //         $insert = [];
+    //         $errors = [];
+
+    //         foreach ($data as $index => $row) {
+    //             if ($index === 0) continue; // Skip header
+
+    //             // Validasi data
+    //             if (!Ruangan::find($row[0])) {
+    //                 $errors[] = "ID Ruangan {$row[0]} tidak ditemukan";
+    //                 continue;
+    //             }
+
+    //             $insert[] = [
+    //                 'id_ruangan' => $row[0],
+    //                 'nama_fasilitas' => $row[1],
+    //                 'jumlah' => $row[2],
+    //                 'created_at' => now(),
+    //                 'updated_at' => now()
+    //             ];
+    //         }
+
+    //         if (!empty($errors)) {
+    //             if ($request->ajax() || $request->wantsJson()) {
+    //                 return response()->json([
+    //                     'status' => false,
+    //                     'message' => 'Terdapat error validasi data',
+    //                     'msgField' => $this->convertErrorsToFields($errors), // tambahan agar bisa ditampilkan di bawah input
+    //                     'errors' => $errors // semua pesan error ditampilkan
+    //                 ], 422);
+    //             }
+
+    //             return redirect()->back()->with('error', implode('<br>', $errors));
+    //         }
+
+
+    //         if (!empty($insert)) {
+    //             Fasilitas::insert($insert);
+    //         }
+
+    //         if ($request->ajax() || $request->wantsJson()) {
+    //             return response()->json([
+    //                 'status' => true,
+    //                 'message' => 'Data Fasilitas berhasil diimport',
+    //                 'count' => count($insert)
+    //             ]);
+    //         }
+    //         return redirect()->route('fasilitas.index')->with('success', 'Data Fasilitas berhasil diimport (' . count($insert) . ' data)');
+    //     } catch (\Exception $e) {
+    //         if ($request->ajax() || $request->wantsJson()) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+    //                 'error' => $e->getMessage()
+    //             ], 500);
+    //         }
+    //         return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    //     }
+    // }
+
     public function import_ajax(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file_user' => ['required', 'mimes:xlsx', 'max:1024']
+            'file_fasilitas' => ['required', 'mimes:xlsx', 'max:1024']
         ]);
 
         if ($validator->fails()) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi data import gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-            return redirect()->back()->withErrors($validator)->withInput();
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi file gagal',
+                'errors' => $validator->errors(),
+                'msgField' => ['file_fasilitas' => $validator->errors()->get('file_fasilitas')]
+            ], 422);
         }
 
         try {
-            $file = $request->file('file_user');
+            $file = $request->file('file_fasilitas');
             $reader = IOFactory::createReader('Xlsx');
             $reader->setReadDataOnly(true);
             $spreadsheet = $reader->load($file->getRealPath());
@@ -221,64 +303,83 @@ class FasilitasController extends Controller
             $errors = [];
 
             foreach ($data as $index => $row) {
-                if ($index === 0) continue; // Skip header
+                if ($index === 0) continue; // skip header
+                $barisExcel = $index + 1;
 
-                // Validasi data
-                if (!Level::find($row[0])) {
-                    $errors[] = "Level ID {$row[0]} tidak ditemukan";
-                    continue;
+                $id_ruangan = trim($row[0] ?? '');
+                $nama_fasilitas = trim($row[1] ?? '');
+                $jumlah = $row[2] ?? null;
+
+                $rowErrors = [];
+
+                if ($id_ruangan === '' || $nama_fasilitas === '' || $jumlah === null || $jumlah === '') {
+                    $rowErrors[] = "Kolom tidak boleh kosong.";
                 }
 
-                if (User::where('email', $row[1])->exists()) {
-                    $errors[] = "Email {$row[1]} sudah terdaftar";
+                if (!is_numeric($id_ruangan) || !Ruangan::find($id_ruangan)) {
+                    $rowErrors[] = "ID Ruangan {$id_ruangan} tidak ditemukan.";
+                }
+
+                if (!is_numeric($jumlah) || $jumlah <= 0) {
+                    $rowErrors[] = "Jumlah harus berupa angka lebih dari 0.";
+                }
+
+                if ($rowErrors) {
+                    $errors[] = "Baris ke-{$barisExcel}: " . implode(' ', $rowErrors);
                     continue;
                 }
 
                 $insert[] = [
-                    'id_level' => $row[0],
-                    'email' => $row[1],
-                    'nama' => $row[2],
-                    'password' => Hash::make($row[3]),
+                    'id_ruangan' => $id_ruangan,
+                    'nama_fasilitas' => $nama_fasilitas,
+                    'jumlah' => $jumlah,
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
             }
 
-            if (!empty($errors)) {
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Terdapat error validasi data',
-                        'msgField' => $this->convertErrorsToFields($errors), // tambahan agar bisa ditampilkan di bawah input
-                        'errors' => $errors // semua pesan error ditampilkan
-                    ], 422);
-                }
-
-                return redirect()->back()->with('error', implode('<br>', $errors));
-            }
-
-
-            if (!empty($insert)) {
-                User::insert($insert);
-            }
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data user berhasil diimport',
-                    'count' => count($insert)
-                ]);
-            }
-            return redirect()->route('users.index')->with('success', 'Data user berhasil diimport (' . count($insert) . ' data)');
-        } catch (\Exception $e) {
-            if ($request->ajax() || $request->wantsJson()) {
+            if ($errors) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                    'error' => $e->getMessage()
-                ], 500);
+                    'message' => 'Terdapat kesalahan pada data Excel.',
+                    'errors' => $errors,
+                    'msgField' => ['file_fasilitas' => $errors]
+                ], 422);
             }
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            if ($insert) {
+                Fasilitas::insert($insert);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Fasilitas berhasil diimport.',
+                'count' => count($insert)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat proses import: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
+
+
+    protected function convertErrorsToFields($errors)
+    {
+        $result = [];
+        foreach ($errors as $error) {
+            if (str_contains($error, 'id_ruangan')) {
+                $result['id_ruangan'] = [$error];
+            } elseif (str_contains($error, 'nama_fasilitas') || str_contains($error, 'level_id')) {
+                $result['nama_fasilitas'] = [$error];
+            } elseif (str_contains($error, 'jumlah')) {
+                $result['jumlah'] = [$error];
+            } else {
+                $result['file_fasilitas'] = [$error];
+            }
+        }
+        return $result;
     }
 }
