@@ -76,11 +76,13 @@
                                                 $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
                                             @endphp
 
-                                            @if ($isEditable)
-                                                <button onclick="modalAction('{{ $laporanUrl }}')"
-                                                    class="btn btn-sm btn-warning mr-2">
-                                                    {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
-                                                </button>
+                                            @if (auth()->user()->id_level != 1)
+                                                @if ($isEditable)
+                                                    <button onclick="modalAction('{{ $laporanUrl }}')"
+                                                        class="btn btn-sm btn-warning mr-2">
+                                                        {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                                    </button>
+                                                @endif
                                             @endif
 
                                             <button onclick="modalAction('{{ $detailUrl }}')"
