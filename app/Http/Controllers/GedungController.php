@@ -46,7 +46,6 @@ class GedungController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $rules = [
             'kode_gedung' => 'required|string|max:10|unique:gedung,kode_gedung',
             'nama_gedung' => 'required|string|max:50',
@@ -59,7 +58,7 @@ class GedungController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi inputan gagal',
                 'msgField' => $validator->errors()
             ]);
         }

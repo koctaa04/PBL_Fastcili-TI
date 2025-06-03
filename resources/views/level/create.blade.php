@@ -50,7 +50,6 @@
                         icon: "success",
                         title: "Berhasil!",
                         text: response.message,
-                        timer: 3000,
                         showConfirmButton: true
                     });
                     dataLevel.ajax.reload();;
