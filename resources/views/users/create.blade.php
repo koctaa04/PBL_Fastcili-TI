@@ -43,53 +43,69 @@
 </div>
 
 <script>
-    $(document).on('submit', '#form_create', function(e) {
-        e.preventDefault();
+    $(document).ready(function() {
+        // Reset form saat modal ditutup
+        $('#myModal').on('hidden.bs.modal', function() {
+            $('#form_create')[0].reset();
+            $('.error-text').text('');
+        });
 
-        $('.error-text').text('');
+        $(document).on('submit', '#form_create', function(e) {
+            e.preventDefault();
+            $('.error-text').text('');
 
-        $.ajax({
-            type: "POST",
-            url: $(this).attr('action'),
-            data: $(this).serialize(),
-            dataType: "json",
-            beforeSend: function() {
-                $('#form_create button[type=submit]').prop('disabled', true).text('Menyimpan...');
-            },
-            success: function(response) {
-                $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
-                if (response.success) {
-                    $('#myModal').modal('hide');
-                    Swal.fire({
-                        icon: "success",
-                        title: "Berhasil!",
-                        text: response.messages,
-                        showConfirmButton: true
-                    });
-                    dataUser.ajax.reload();;
-                } else {
+            var form = $(this);
+            var formData = new FormData(this);
+
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: formData,
+                dataType: "json",
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    form.find('button[type=submit]').prop('disabled', true).html(
+                        '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'
+                    );
+                },
+                success: function(response) {
+                    form.find('button[type=submit]').prop('disabled', false).html('Simpan');
+                    if (response.success) {
+                        $('#myModal').modal('hide');
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: response.message,
+                            showConfirmButton: true
+                        }).then(() => {
+                            if (typeof dataUser !== 'undefined') {
+                                dataUser.ajax.reload();
+                            }
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    form.find('button[type=submit]').prop('disabled', false).html('Simpan');
+                    let response = xhr.responseJSON;
+
+                    // Tampilkan error field
+                    if (response && response.msgField) {
+                        $.each(response.msgField, function(field, messages) {
+                            $('#error-' + field).text(messages[0]);
+                        });
+                    }
+
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.message,
+                        text: response && response.message
+                            ? response.message
+                            : "Terjadi kesalahan. Silakan coba lagi."
                     });
                 }
-            },
-            error: function(xhr) {
-                $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
-                if (xhr.responseJSON && xhr.responseJSON.msgField) {
-                    let errors = xhr.responseJSON.msgField;
-                    $.each(errors, function(field, message) {
-                        $('#error-' + field).text(message[0]);
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Gagal!",
-                        text: response.message,
-                    });
-                }
-            }
+            });
         });
     });
 </script>
+
