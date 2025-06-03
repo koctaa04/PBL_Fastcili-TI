@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('gedung', function (Blueprint $table) {
             $table->id('id_gedung');
-            $table->string('kode_gedung');
+            $table->string('kode_gedung')->unique();
             $table->string('nama_gedung');
             $table->text('deskripsi')->nullable();
             $table->string('foto_gedung')->nullable();

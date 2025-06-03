@@ -21,7 +21,7 @@
 
                 <div class="form-group">
                     <label for="ruangan">Ruangan</label>
-                    <select name="id_ruangan" id="ruangan" class="form-control" disabledrequired>
+                    <select name="id_ruangan" id="ruangan" class="form-control" disabled required>
                         <option value="">Pilih Ruangan</option>
                         @foreach ($ruangan as $r)
                             <option value="{{ $r->id_ruangan }}">{{ $r->nama_ruangan }}</option>

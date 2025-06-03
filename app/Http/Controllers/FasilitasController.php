@@ -107,12 +107,13 @@ class FasilitasController extends Controller
         ];
 
         $validator = Validator::make($request->all(), $rules);
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Validasi',
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
                 'msgField' => $validator->errors()
-            ]);
+            ],422);
         }
 
 
@@ -134,12 +135,11 @@ class FasilitasController extends Controller
                 'created_at' => now()
             ]);
         }
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil menambahkan data!'
         ]);
-
-        redirect('/');
     }
 
     public function edit(string $id)
