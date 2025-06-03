@@ -79,18 +79,15 @@
                 },
                 error: function(xhr) {
                     form.find('button[type=submit]').prop('disabled', false).html('Simpan');
-                    if (xhr.status === 422) { // Validation error
-                        let errors = xhr.responseJSON.msgField;
-                        $.each(errors, function(field, messages) {
-                            $('#error-' + field).text(messages[0]);
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Gagal!",
-                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat menyimpan data',
-                        });
-                    }
+                    let errors = xhr.responseJSON.errors;
+                    $.each(errors, function (field, messages) {
+                        $('#error-' + field).text(messages[0]);
+                    });
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text: xhr.responseJSON.message || 'Terjadi kesalahan saat memproses data.',
+                    });
                 }
             });
         });

@@ -55,6 +55,7 @@ class RuanganController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $rules = [
             'id_gedung' => 'required|exists:gedung,id_gedung',
             'kode_ruangan' => 'required|string|max:20|unique:ruangan,kode_ruangan',
@@ -70,25 +71,23 @@ class RuanganController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
                 'msgField' => $validator->errors()
-            ], 422); // Tambahkan status code 422 untuk validation error
+            ], 422);
         }
 
-        try {
-            Ruangan::create([$request->all(), 'created_at' => now()]);
+        // Ruangan::create([$request->all(), 'created_at' => now()]);
+        Ruangan::create([
+            'id_gedung' => $request->id_gedung,
+            'kode_ruangan' => $request->kode_ruangan,
+            'nama_ruangan' => $request->nama_ruangan,
+            'created_at' => now()
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menambahkan data ruangan!'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menyimpan data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menambahkan data ruangan!'
+        ]);
     }
 
     public function edit(string $id)
