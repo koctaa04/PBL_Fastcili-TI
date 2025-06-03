@@ -18,6 +18,10 @@ class LaporanKerusakanSeeder extends Seeder
             ['id_fasilitas' => 3, 'deskripsi' => 'Port kabel tidak berfungsi', 'foto_kerusakan' => 'pcrusak.png', 'tanggal_lapor' => now(), 'id_status' => 1],
             ['id_fasilitas' => 23, 'deskripsi' => 'AC hanya mengeluarkan angin', 'foto_kerusakan' => 'ac-rusak.png', 'tanggal_lapor' => now(), 'id_status' => 1],
             ['id_fasilitas' => 4, 'deskripsi' => 'Papan Tulis Rusak', 'foto_kerusakan' => 'ppntulis-rusak.jpg', 'tanggal_lapor' => now(), 'id_status' => 1],
+            ['id_fasilitas' => 1, 'deskripsi' => 'Proyektor tidak bisa menyambung', 'foto_kerusakan' => 'pcrusak.png', 'tanggal_lapor' => now(), 'id_status' => 1],
+            ['id_fasilitas' => 16, 'deskripsi' => 'Kaki meja patah', 'foto_kerusakan' => 'ppntulis-rusak.jpg', 'tanggal_lapor' => now(), 'id_status' => 1],
+            ['id_fasilitas' => 20, 'deskripsi' => 'Printer rusak dan berdengung', 'foto_kerusakan' => 'ac-rusak.png', 'tanggal_lapor' => now(), 'id_status' => 1],
+            ['id_fasilitas' => 12, 'deskripsi' => 'Kipas angin tidak menyala', 'foto_kerusakan' => 'ac-rusak.png', 'tanggal_lapor' => now(), 'id_status' => 1],
         ]);
     }
 }
