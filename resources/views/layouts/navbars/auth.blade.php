@@ -20,7 +20,7 @@
                 }
             </style>
             <li class="{{ $elementActive == 'dashboard' ? 'active' : '' }}">
-                @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 3)
                     <a href="{{ route('home') }}">
                         <i class="nc-icon nc-sun-fog-29"></i>
                         <p>{{ __('Dashboard') }}</p>
@@ -163,13 +163,32 @@
                         style="display: none;">
                         @csrf
                     </form>
-                    <a onclick="document.getElementById('formLogOut').submit();" class="bg-danger"
+                    <a onclick="confirmLogout(event)" class="bg-danger"
                         style="display: block; margin-bottom: 20px;">
                         <i class="nc-icon nc-button-power text-white"></i>
                         <p class="text-white">{{ __('Log out') }}</p>
                     </a>
                 </li>
             </div>
+            <script>
+                function confirmLogout(event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi Log out',
+                        text: "Apakah Anda yakin ingin keluar?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, Keluar!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('formLogOut').submit();
+                        }
+                    });
+                }
+              </script>
         </ul>
     </div>
 </div>
