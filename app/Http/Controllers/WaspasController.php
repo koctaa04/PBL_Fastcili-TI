@@ -43,10 +43,10 @@ class WaspasController extends Controller
 
         // Kriteria dan Bobot
         $kriteria = [
-            'tingkat_kerusakan' => ['weight' => 0.35, 'type' => 'benefit'],
-            'frekuensi_digunakan' => ['weight' => 0.3, 'type' => 'benefit'],
-            'dampak' => ['weight' => 0.1, 'type' => 'benefit'],
-            'estimasi_biaya' => ['weight' => 0.05, 'type' => 'cost'],
+            'tingkat_kerusakan' => ['weight' => 0.3, 'type' => 'benefit'],
+            'frekuensi_digunakan' => ['weight' => 0.1, 'type' => 'benefit'],
+            'dampak' => ['weight' => 0.05, 'type' => 'benefit'],
+            'estimasi_biaya' => ['weight' => 0.35, 'type' => 'cost'],
             'potensi_bahaya' => ['weight' => 0.2, 'type' => 'benefit'],
         ];
 

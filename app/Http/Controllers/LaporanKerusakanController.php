@@ -379,7 +379,7 @@ class LaporanKerusakanController extends Controller
             ]);
 
             $penugasan->update([
-                'status_perbaikan' => 'Selesai Dikerjakan',
+                'status_perbaikan' => 'Selesai',
                 'komentar_sarpras' => null,
             ]);
         } else {

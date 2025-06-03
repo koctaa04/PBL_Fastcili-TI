@@ -11,9 +11,13 @@ class PerbaikanController extends Controller
 {
     public function index()
     {
-        $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
-            ->where('id_user', auth()->user()->id_user)
-            ->get();
+        if (auth()->user()->id_user === 1) {
+            $laporan = PenugasanTeknisi::all();
+        } else {
+            $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
+                ->where('id_user', auth()->user()->id_user)
+                ->get();
+        }
         // dd(auth()->user()->id_user);
         // dd($laporan);
         return view('perbaikan.index', ['laporan_kerusakan' => $laporan]);
