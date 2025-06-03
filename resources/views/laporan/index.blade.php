@@ -314,6 +314,7 @@
                 $('#form-laporan-baru').hide();
 
                 showFormDukungan();
+                updateSubmitButtonState();
             });
 
             // Klik tombol: Buat laporan baru
@@ -333,8 +334,9 @@
                 let enable = false;
 
                 if (isDukung) {
-                    const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
-                    enable = tambahanDeskripsi.length > 0;
+                    // const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
+                    // enable = tambahanDeskripsi.length > 0;
+                    enable = true;
                 }
 
                 if (isLaporanBaru) {

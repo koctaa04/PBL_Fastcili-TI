@@ -103,7 +103,7 @@ class FasilitasController extends Controller
         $rules = [
             'id_ruangan' => 'required|exists:ruangan,id_ruangan',
             'nama_fasilitas' => 'required|string|max:50',
-            'jumlah' => 'required|integer'
+            'jumlah' => 'required|integer|min:1'
         ];
 
         $validator = Validator::make($request->all(), $rules);
