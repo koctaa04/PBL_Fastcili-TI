@@ -196,7 +196,7 @@ class LaporanKerusakanController extends Controller
         }
     }
 
-    public function trending()
+    public function trending(Request $request)
     {
         $bobot = [
             'MHS' => 1,
@@ -205,43 +205,66 @@ class LaporanKerusakanController extends Controller
             'ADM' => 3
         ];
 
-        // Ambil semua pelapor dengan relasi user dan level, serta laporan yang statusnya 1 (aktif)
         $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
             ->whereHas('laporan', function ($query) {
                 $query->where('id_status', 1);
             })
             ->get();
 
-        // Hitung skor per id_laporan
         $skorPerLaporan = [];
-
         foreach ($pelapor as $item) {
             $idLaporan = $item->id_laporan;
             $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
             $skor = $bobot[$kodeLevel] ?? 0;
 
             if (!isset($skorPerLaporan[$idLaporan])) {
-                $skorPerLaporan[$idLaporan] = 0;
+                $skorPerLaporan[$idLaporan] = [
+                    'skor' => 0,
+                    'total_pelapor' => 0
+                ];
             }
 
-            $skorPerLaporan[$idLaporan] += $skor;
+            $skorPerLaporan[$idLaporan]['skor'] += $skor;
+            $skorPerLaporan[$idLaporan]['total_pelapor']++;
         }
 
-        // Ubah jadi koleksi dengan laporan
         $data = collect($skorPerLaporan)
-            ->map(function ($skor, $idLaporan) {
+            ->map(function ($item, $idLaporan) {
+                $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
+                if (!$laporan) return null;
+
                 return [
-                    'laporan' => LaporanKerusakan::with(['fasilitas', 'pelaporLaporan.user.level'])
-                        ->find($idLaporan),
-                    'skor' => $skor
+                    'laporan' => $laporan,
+                    'skor' => $item['skor'],
+                    'total_pelapor' => $item['total_pelapor']
                 ];
             })
-            ->sortByDesc('skor')
-            ->values(); // reset index
+            ->filter() // Hapus null
+            ->values(); // Reset index agar urut
 
-        return view('laporan.trending', compact('data'));
+        // Search
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = strtolower($request->search);
+            $data = $data->filter(function ($item) use ($searchTerm) {
+                return str_contains(strtolower($item['laporan']->fasilitas->nama_fasilitas ?? ''), $searchTerm) ||
+                    str_contains(strtolower($item['laporan']->deskripsi ?? ''), $searchTerm);
+            })->values(); // Reset index lagi setelah filter
+        }
+
+        // Sort by skor descending
+        $sortedData = $data->sortByDesc('skor')->values();
+
+        // Beri ranking dan ambil top 10
+        $rankedData = $sortedData->take(10)->map(function ($item, $index) {
+            $item['rank'] = $index + 1;
+            return $item;
+        });
+
+        return view('laporan.trending', [
+            'data' => $rankedData,
+            'search' => $request->input('search', '')
+        ]);
     }
-
 
     public function showPenilaian(string $id)
     {
@@ -267,8 +290,6 @@ class LaporanKerusakanController extends Controller
 
         return view('laporan.showPenilaian', compact('laporan', 'trendingNo'));
     }
-
-
 
     public function simpanPenilaian(Request $request, $id)
     {
