@@ -6,7 +6,7 @@
 @section('content')
     <div class="content">
         <div class="container">
-            @if ($penugasan->tanggal_selesai == null)
+            @if ($penugasan && $penugasan->tanggal_selesai == null)
                 <div class="card shadow rounded p-4">
                     <h3 class="mb-4 fw-bold">Penugasan Perbaikan</h3>
                     <div class="row g-0">
