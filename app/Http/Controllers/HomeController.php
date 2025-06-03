@@ -148,6 +148,73 @@ class HomeController extends Controller
             ->where('id_user', Auth::id())
             ->orderBy('created_at', 'desc')
             ->first();
-        return view('pages.teknisi.index', compact('riwayat', 'penugasan'));
+
+        //Hitung untuk card
+        $jmlPenugasan = PenugasanTeknisi::count();
+        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'sedang dikerjakan')->count();
+        $laporanSelesaiDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Selesai Dikerjakan')->count();
+        $laporanBlmPenugasan = LaporanKerusakan::whereIn('id_status', [1, 2])->count();
+
+        //Data Grafik Penugasan Per Gedung
+        $penugasanPerGedung = $this->getPenugasanPerGedung();
+
+        //Data Grafik Perbaikan Perbulan
+        $tahun = now()->year;
+        $perbaikanPerBulan = $this->getPerbaikanPerBulan($tahun);
+
+        return view('pages.teknisi.index', compact(
+            'riwayat', 'penugasan', 'jmlPenugasan', 'laporanDikerjakan',
+            'laporanSelesaiDikerjakan', 'laporanBlmPenugasan', 'penugasanPerGedung',
+            'perbaikanPerBulan'
+        ));
+    }
+
+    protected function getPenugasanPerGedung()
+    {
+        $countPerGedung = DB::table('penugasan_teknisi')
+            ->join('laporan_kerusakan', 'penugasan_teknisi.id_laporan', '=', 'laporan_kerusakan.id_laporan')
+            ->join('fasilitas', 'laporan_kerusakan.id_fasilitas', '=', 'fasilitas.id_fasilitas')
+            ->join('ruangan', 'fasilitas.id_ruangan', '=', 'ruangan.id_ruangan')
+            ->join('gedung', 'ruangan.id_gedung', '=', 'gedung.id_gedung')
+            ->select('gedung.id_gedung', DB::raw('COUNT(*) as jumlah'))
+            ->groupBy('gedung.id_gedung')
+            ->pluck('jumlah', 'gedung.id_gedung');
+
+        $gedungLabels = Gedung::pluck('kode_gedung', 'id_gedung');
+
+        return $gedungLabels->mapWithKeys(function ($kodeGedung, $id) use ($countPerGedung) {
+            return [$kodeGedung => $countPerGedung[$id] ?? 0];
+        });
+    }
+
+    protected function getPerbaikanPerBulan($tahun)
+    {
+        $bulanLengkap = collect([
+            'Jan' => 0,
+            'Feb' => 0,
+            'Mar' => 0,
+            'Apr' => 0,
+            'May' => 0,
+            'Jun' => 0,
+            'Jul' => 0,
+            'Aug' => 0,
+            'Sep' => 0,
+            'Oct' => 0,
+            'Nov' => 0,
+            'Dec' => 0
+        ]);
+
+        $dataPenugasan = PenugasanTeknisi::selectRaw('MONTH(tanggal_selesai) as bulan, COUNT(*) as jumlah')
+            ->whereYear('tanggal_selesai', $tahun)
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get()
+            ->pluck('jumlah', 'bulan')
+            ->mapWithKeys(function ($jumlah, $bulanAngka) {
+                $namaBulan = Carbon::create()->month($bulanAngka)->format('M');
+                return [$namaBulan => $jumlah];
+            });
+
+        return $bulanLengkap->merge($dataPenugasan);
     }
 }

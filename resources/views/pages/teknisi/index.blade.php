@@ -5,6 +5,84 @@
 
 @section('content')
     <div class="content">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
+                            <div class="col-5 col-md-4">
+                                <div class="icon-big text-center icon-warning">
+                                    <i class="nc-icon nc-paper"></i>
+                                </div>
+                            </div>
+                            <div class="col-8 col-md-8">
+                                <div class="numbers">
+                                    <p class="card-category">Total Penugasan</p>
+                                    <p class="card-title">{{ $jmlPenugasan }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
+                            <div class="col-5 col-md-2">
+                                <div class="icon-big text-center icon-warning">
+                                    <i class="nc-icon nc-book-bookmark"></i>
+                                </div>
+                            </div>
+                            <div class="col-8 col-md-10">
+                                <div class="numbers">
+                                    <p class="card-category text-nowrap">Laporan Belum Ditugaskan</p>
+                                    <p class="card-title">{{ $laporanBlmPenugasan }}<p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
+                            <div class="col-5 col-md-2">
+                                <div class="icon-big text-center icon-warning">
+                                    <i class="nc-icon nc-bullet-list-67"></i>
+                                </div>
+                            </div>
+                            <div class="col-8 col-md-10">
+                                <div class="numbers">
+                                    <p class="card-category text-nowrap">Laporan Sedang Diperbaikan</p>
+                                    <p class="card-title">{{ $laporanDikerjakan }}<p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
+                            <div class="col-5 col-md-2">
+                                <div class="icon-big text-center icon-warning">
+                                    <i class="nc-icon nc-single-copy-04"></i>
+                                </div>
+                            </div>
+                            <div class="col-8 col-md-10">
+                                <div class="numbers">
+                                    <p class="card-category text-nowrap">Laporan Sudah Diperbaiki</p>
+                                    <p class="card-title">{{ $laporanSelesaiDikerjakan }}<p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="container">
             @if ($penugasan && $penugasan->tanggal_selesai == null)
                 <div class="card shadow rounded p-4">
@@ -99,6 +177,29 @@
                 </div>
             @endif
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card ">
+                    <div class="card-header ">
+                        <h5 class="card-title">Penugasan</h5>
+                        <p class="card-category">Perbaikan per bulan</p>
+                    </div>
+                    <div class="card-body ">
+                        <canvas id=perbaikanPerBulan width="400" height="170"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-chart">
+                    <div class="card-header">
+                        <h5 class="card-title">Penugasan per gedung</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="penugasanGedungChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
@@ -113,5 +214,59 @@
             });
         }
         var dataLaporan;
+
+        //grafik penugasan per bulan
+        const ctx1 = document.getElementById('perbaikanPerBulan').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($perbaikanPerBulan->keys()) !!},
+                datasets: [{
+                    label: 'Jumlah Perbaikan',
+                    data: {!! json_encode($perbaikanPerBulan->values()) !!},
+                    borderColor: 'rgba(218, 165, 32, 1)',
+                    backgroundColor: 'rgba(218, 165, 32, 1)',
+                    fill: true,
+                    tension: 0.1,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        //graik penugasan per gedung
+            const ctx3 = document.getElementById('penugasanGedungChart');
+            new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($penugasanPerGedung->keys()) !!},
+                    datasets: [{
+                        label: 'Jumlah Penugasan',
+                        data: {!! json_encode($penugasanPerGedung->values()) !!},
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
     </script>
 @endpush
