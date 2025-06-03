@@ -94,19 +94,19 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_laporan">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_laporan">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Foto Kerusakan</th>
-                                <th>Fasilitas</th>
-                                <th>Gedung</th>
-                                <th>Ruangan</th>
-                                <th>Pelapor</th>
-                                <th>Deskripsi</th>
-                                <th>Status</th>
-                                <th>Tanggal Lapor</th>
-                                <th>Aksi</th>
+                                <th width="5%">No</th>
+                                <th width="15%">Foto Kerusakan</th>
+                                <th width="10%">Fasilitas</th>
+                                <th width="10%">Gedung</th>
+                                <th width="15%">Ruangan</th>
+                                <th width="10%">Pelapor</th>
+                                <th width="15%">Deskripsi</th>
+                                <th width="7%">Status</th>
+                                <th width="7%">Tanggal Lapor</th>
+                                <th width="6%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,7 +141,7 @@
                                     <td>
                                         <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $item->id }}"
                                             data-nama="{{ $item->user->nama }}">
-                                            <i class="fas fa-trash"></i> Hapus
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
 
@@ -351,7 +351,21 @@
     </script>
     <script>
         $(document).ready(function() {
-            $('#table_laporan').DataTable();
+            $('#table_laporan').DataTable({
+                columnDefs: [{
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                        className: 'text-center',
+                    },{
+                        targets: [0, 1, 9],
+                        orderable: false,
+                        searchable: false,
+                    }
+                ], 
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan seperti keyword yang ingin dicari"
+                }
+            });
         });
     </script>
 

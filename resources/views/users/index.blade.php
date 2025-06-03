@@ -19,20 +19,6 @@
             </div>
         </div>
         <div class="card p-4">
-            {{-- <h3>Data User</h3>
-        <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex justify-content-center flex-wrap">
-                    <button onclick="modalAction('{{ url('/users/import') }}')" 
-                            class="btn btn-lg btn-warning mr-5 mb-2">
-                        Import Data User (.xlsx)
-                    </button>
-                    <button onclick="modalAction('{{ url('/users/create') }}')" 
-                            class="btn btn-lg btn-success mb-2">
-                        Tambah Data User
-                    </button>
-                </div>
-            </div> --}}
             <div class="card-body">
                 {{-- Filtering --}}
                 <div class="row pr-auto">
@@ -46,7 +32,6 @@
                                         <option value="{{ $item->id_level }}">{{ $item->nama_level }} </option>
                                     @endforeach
                                 </select>
-                                {{-- <small class="form-text text-muted">Level User</small> --}}
                             </div>
                         </div>
                     </div>
@@ -140,7 +125,11 @@
                     targets: [0, 3, 4, 5],
                     orderable: false,
                     searchable: false
-                }]
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data user yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data user seperti keyword yang ingin dicari"
+                }
             });
 
             // Ubah event change filter

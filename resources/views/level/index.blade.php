@@ -70,7 +70,11 @@
                     targets: [0, 1],
                     orderable: false,
                     searchable: true
-                }]
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data level yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data level seperti keyword yang ingin dicari"
+                }
             });
 
             $("#form-delete").validate({

@@ -74,7 +74,8 @@
         $(document).ready(function() {
             var datalaporan = $('#table_prioritas').DataTable({
                 language: {
-                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas perbaikan yang tersedia"
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas perbaikan yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas perbaikan seperti keyword yang ingin dicari"
                 }
             });
         });

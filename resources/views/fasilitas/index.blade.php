@@ -378,7 +378,7 @@
                         });
                     } else {
                         container.append(
-                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data fasilitas</p></div>'
+                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data fasilitas seperti keyword yang ingin dicari</p></div>'
                         );
                     }
 

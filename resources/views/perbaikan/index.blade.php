@@ -164,7 +164,12 @@
             });
         });
         $(document).ready(function() {
-            var datalaporan = $('#table_perbaikan').DataTable();
+            var datalaporan = $('#table_perbaikan').DataTable({
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan seperti keyword yang ingin dicari"
+                }
+            });
         });
     </script>
 @endpush
