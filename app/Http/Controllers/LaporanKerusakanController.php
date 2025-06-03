@@ -196,7 +196,7 @@ class LaporanKerusakanController extends Controller
         }
     }
 
-    public function trending()
+    public function trending(Request $request)
     {
         $bobot = [
             'MHS' => 1,
@@ -205,43 +205,75 @@ class LaporanKerusakanController extends Controller
             'ADM' => 3
         ];
 
-        // Ambil semua pelapor dengan relasi user dan level, serta laporan yang statusnya 1 (aktif)
         $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
             ->whereHas('laporan', function ($query) {
                 $query->where('id_status', 1);
             })
             ->get();
 
-        // Hitung skor per id_laporan
         $skorPerLaporan = [];
-
         foreach ($pelapor as $item) {
             $idLaporan = $item->id_laporan;
             $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
             $skor = $bobot[$kodeLevel] ?? 0;
 
             if (!isset($skorPerLaporan[$idLaporan])) {
-                $skorPerLaporan[$idLaporan] = 0;
+                $skorPerLaporan[$idLaporan] = [
+                    'skor' => 0,
+                    'total_pelapor' => 0,
+                    'created_at' => $item->laporan->created_at ?? now() // Get the report creation date
+                ];
             }
 
-            $skorPerLaporan[$idLaporan] += $skor;
+            $skorPerLaporan[$idLaporan]['skor'] += $skor;
+            $skorPerLaporan[$idLaporan]['total_pelapor']++;
         }
 
-        // Ubah jadi koleksi dengan laporan
         $data = collect($skorPerLaporan)
-            ->map(function ($skor, $idLaporan) {
+            ->map(function ($item, $idLaporan) {
+                $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
+                if (!$laporan) return null;
+
                 return [
-                    'laporan' => LaporanKerusakan::with(['fasilitas', 'pelaporLaporan.user.level'])
-                        ->find($idLaporan),
-                    'skor' => $skor
+                    'laporan' => $laporan,
+                    'skor' => $item['skor'],
+                    'total_pelapor' => $item['total_pelapor'],
+                    'created_at' => $item['created_at'] // Include created_at in the final data
                 ];
             })
-            ->sortByDesc('skor')
-            ->values(); // reset index
+            ->filter()
+            ->values();
 
-        return view('laporan.trending', compact('data'));
+        // Search
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = strtolower($request->search);
+            $data = $data->filter(function ($item) use ($searchTerm) {
+                return str_contains(strtolower($item['laporan']->fasilitas->nama_fasilitas ?? ''), $searchTerm) ||
+                    str_contains(strtolower($item['laporan']->deskripsi ?? ''), $searchTerm);
+            })->values();
+        }
+
+        // Multi-level sorting
+        $sortedData = $data->sortBy([
+            // Primary sort: skor (descending)
+            fn($a, $b) => $b['skor'] <=> $a['skor'],
+            // Secondary sort: total_pelapor (descending) if skor is equal
+            fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
+            // Tertiary sort: created_at (ascending - older reports first) if both skor and total_pelapor are equal
+            fn($a, $b) => $a['created_at'] <=> $b['created_at']
+        ])->values();
+
+        // Beri ranking dan ambil top 10
+        $rankedData = $sortedData->take(10)->map(function ($item, $index) {
+            $item['rank'] = $index + 1;
+            return $item;
+        });
+
+        return view('laporan.trending', [
+            'data' => $rankedData,
+            'search' => $request->input('search', '')
+        ]);
     }
-
 
     public function showPenilaian(string $id)
     {
@@ -267,8 +299,6 @@ class LaporanKerusakanController extends Controller
 
         return view('laporan.showPenilaian', compact('laporan', 'trendingNo'));
     }
-
-
 
     public function simpanPenilaian(Request $request, $id)
     {

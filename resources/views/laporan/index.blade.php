@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="content">
-        <h3>Laporan kerusakan</h3>
+        <h3>Laporan Kerusakan</h3>
         <div class="card p-4">
             <div class="card-header">
                 <h3 class="mb-0">Form Laporan Kerusakan</h3>
@@ -98,70 +98,72 @@
                 </div>
             </div>
         </div>
-        <div class="card p-4">
-            <div class="card-header">
-                <h3>Daftar Laporan Kerusakan</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-row-bordered" id="table_laporan">
-                        <thead>
-                            <tr>
-                                <th width="5%">No</th>
-                                <th width="15%">Foto Kerusakan</th>
-                                <th width="10%">Fasilitas</th>
-                                <th width="10%">Gedung</th>
-                                <th width="15%">Ruangan</th>
-                                <th width="10%">Pelapor</th>
-                                <th width="15%">Deskripsi</th>
-                                <th width="7%">Status</th>
-                                <th width="7%">Tanggal Lapor</th>
-                                <th width="6%">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($laporan as $i => $item)
+        @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
+            <div class="card p-4">
+                <div class="card-header">
+                    <h3>Daftar Laporan Kerusakan</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-row-bordered" id="table_laporan">
+                            <thead>
                                 <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
-                                            alt="Foto Kerusakan" class="card-img-top img-fluid"
-                                            style="height: 120px; object-fit: cover;">
-                                    </td>
-                                    <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
-                                    <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
-                                    <td>{{ $item->laporan->fasilitas->ruangan->nama_ruangan }}</td>
-                                    <td>{{ $item->user->nama }}</td>
-                                    <td>{{ $item->deskripsi_tambahan ?? '-' }}</td>
-                                    <td>
-
-                                        @php
-                                            $statusColor = match ($item->laporan->status->id_status) {
-                                                1 => 'bg-warning',
-                                                2 => 'bg-primary text-white',
-                                                3 => 'bg-secondary text-white',
-                                                4 => 'bg-success text-white',
-                                                default => 'bg-dark',
-                                            };
-                                        @endphp
-                                        <p class=" p-2 badge {{ $statusColor }}">
-                                            {{ $item->laporan->status->nama_status }}</p>
-                                    </td>
-                                    <td>{{ $item->laporan->tanggal_lapor }}</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $item->id }}"
-                                            data-nama="{{ $item->user->nama }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-
+                                    <th width="5%">No</th>
+                                    <th width="15%">Foto Kerusakan</th>
+                                    <th width="10%">Fasilitas</th>
+                                    <th width="10%">Gedung</th>
+                                    <th width="15%">Ruangan</th>
+                                    <th width="10%">Pelapor</th>
+                                    <th width="15%">Deskripsi</th>
+                                    <th width="7%">Status</th>
+                                    <th width="7%">Tanggal Lapor</th>
+                                    <th width="6%">Aksi</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($laporan as $i => $item)
+                                    <tr>
+                                        <td>{{ $i + 1 }}</td>
+                                        <td>
+                                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
+                                                alt="Foto Kerusakan" class="card-img-top img-fluid"
+                                                style="height: 120px; object-fit: cover;">
+                                        </td>
+                                        <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
+                                        <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
+                                        <td>{{ $item->laporan->fasilitas->ruangan->nama_ruangan }}</td>
+                                        <td>{{ $item->user->nama }}</td>
+                                        <td>{{ $item->deskripsi_tambahan ?? '-' }}</td>
+                                        <td>
+
+                                            @php
+                                                $statusColor = match ($item->laporan->status->id_status) {
+                                                    1 => 'bg-warning',
+                                                    2 => 'bg-primary text-white',
+                                                    3 => 'bg-secondary text-white',
+                                                    4 => 'bg-success text-white',
+                                                    default => 'bg-dark',
+                                                };
+                                            @endphp
+                                            <p class=" p-2 badge {{ $statusColor }}">
+                                                {{ $item->laporan->status->nama_status }}</p>
+                                        </td>
+                                        <td>{{ $item->laporan->tanggal_lapor }}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $item->id }}"
+                                                data-nama="{{ $item->user->nama }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 @endsection
 

@@ -27,6 +27,7 @@ class WaspasController extends Controller
             ->select(
                 'l.id_laporan',
                 'l.deskripsi',         // ambil deskripsi laporan
+                'l.foto_kerusakan',       // ambil foto
                 's.nama_status',       // ambil nama status dari join status_laporan
                 'k.tingkat_kerusakan',
                 'k.frekuensi_digunakan',
@@ -91,9 +92,15 @@ class WaspasController extends Controller
 
             $results[] = [
                 'id_laporan' => $original['id_laporan'],
+                'foto_kerusakan' => $original['foto_kerusakan'],
                 'deskripsi' => $original['deskripsi'] ?? null,
                 'status' => $original['nama_status'] ?? null,
                 'Q' => round($Q, 4),
+                'tingkat_kerusakan' => $original['tingkat_kerusakan'] ?? null, // Nilai asli dari kriteria
+                'frekuensi_digunakan' => $original['frekuensi_digunakan'] ?? null,
+                'dampak' => $original['dampak'] ?? null,
+                'estimasi_biaya' => $original['estimasi_biaya'] ?? null,
+                'potensi_bahaya' => $original['potensi_bahaya'] ?? null,
             ];
         }
 

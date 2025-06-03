@@ -7,6 +7,7 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="mb-0">Kelola Data Fasilitas</h3>
+            @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
             <div class="d-flex justify-content-center flex-wrap">
                 <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
                     Impor Data Fasilitas
@@ -15,6 +16,7 @@
                     Tambah Data Fasilitas
                 </button>
             </div>
+            @endif
         </div>
 
         <div class="card p-4">
@@ -350,6 +352,7 @@
                                             <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
                                             <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
                                         </div>
+                                        @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
                                         <div class="fasilitas-card-footer">
                                             <div class="fasilitas-card-actions">
                                                 <button onclick="modalAction('{{ url('/fasilitas/edit') }}/${fasilitas.id_fasilitas}')" 
@@ -365,6 +368,7 @@
                                                 </form>
                                             </div>
                                         </div>
+                                        @endif
                                     </div>
                                 </div>
                             `;

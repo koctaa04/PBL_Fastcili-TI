@@ -103,7 +103,7 @@
             </li>
             
             {{-- Laporan --}}
-            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6 )
                 <li
                     class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'prioritas' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#laporan">
@@ -122,18 +122,20 @@
                                     <span class="sidebar-normal">{{ __(' Laporan Kerusakan ') }}</span>
                                 </a>
                             </li>
-                            <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
-                                <a href="{{ route('trending.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('V') }}</span>
-                                    <span class="sidebar-normal">{{ __(' Laporan Trending ') }}</span>
-                                </a>
-                            </li>
-                            <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">
-                                <a href="{{ route('prioritas.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('P') }}</span>
-                                    <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
-                                </a>
-                            </li>
+                            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                                <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
+                                    <a href="{{ route('trending.index') }}">
+                                        <span class="sidebar-mini-icon">{{ __('V') }}</span>
+                                        <span class="sidebar-normal">{{ __(' Laporan Trending ') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">
+                                    <a href="{{ route('prioritas.index') }}">
+                                        <span class="sidebar-mini-icon">{{ __('P') }}</span>
+                                        <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </li>

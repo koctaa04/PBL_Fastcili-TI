@@ -306,10 +306,10 @@ class UserController extends Controller
             // Coba deteksi field dari string error
             if (str_contains($error, 'email')) {
                 $result['email'] = [$error];
-            } elseif (str_contains($error, 'level') || str_contains($error, 'level_id')) {
-                $result['level_id'] = [$error];
+            } elseif (str_contains($error, 'level') || str_contains($error, 'id_level')) {
+                $result['id_level'] = [$error];
             } elseif (str_contains($error, 'nama')) {
-                $result['name'] = [$error];
+                $result['nama'] = [$error];
             } else {
                 $result['file_user'] = [$error]; // fallback ke file_user
             }
