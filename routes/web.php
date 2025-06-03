@@ -11,6 +11,7 @@ use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\VerifikasiLaporanController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PenugasanTeknisiController;
 use App\Http\Controllers\WaspasController;
 
 /*
@@ -187,6 +188,13 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('pelapor.delete');
 		Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
 		Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
+	});
+
+	Route::middleware(['authorize:1,3'])->group(function () {
+		Route::get('/teknisi', [HomeController::class, 'teknisi'])->name('teknisi');
+		Route::get('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedback'])->name('teknisi.feedback');
+		Route::put('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedbackTeknisi'])->name('teknisi.feedbacksimpan');
+		Route::get('/detail-riwayat/{id}', [PenugasanTeknisiController::class, 'detailRiwayat'])->name('teknisi.detailRiwayat');
 	});
 	/** -----------------------------
 	 *  Verifikasi laporan perbaikan dan Penugasan Teknisi
