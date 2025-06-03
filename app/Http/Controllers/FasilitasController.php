@@ -231,11 +231,11 @@ class FasilitasController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
             $data = $sheet->toArray();
 
-            $insert = [];
             $errors = [];
+            $berhasil = 0;
 
             foreach ($data as $index => $row) {
-                if ($index === 0) continue; // skip header
+                if ($index === 0) continue; // Skip header
                 $barisExcel = $index + 1;
 
                 $id_ruangan = trim($row[0] ?? '');
@@ -261,13 +261,28 @@ class FasilitasController extends Controller
                     continue;
                 }
 
-                $insert[] = [
-                    'id_ruangan' => $id_ruangan,
-                    'nama_fasilitas' => $nama_fasilitas,
-                    'jumlah' => $jumlah,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ];
+                // Cek apakah fasilitas dengan nama dan ruangan sudah ada
+                $fasilitas = Fasilitas::where('id_ruangan', $id_ruangan)
+                    ->where('nama_fasilitas', $nama_fasilitas)
+                    ->first();
+
+                if ($fasilitas) {
+                    // Update jumlah
+                    $fasilitas->jumlah += (int)$jumlah;
+                    $fasilitas->updated_at = now();
+                    $fasilitas->save();
+                } else {
+                    // Buat baru
+                    Fasilitas::create([
+                        'id_ruangan' => $id_ruangan,
+                        'nama_fasilitas' => $nama_fasilitas,
+                        'jumlah' => (int)$jumlah,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+
+                $berhasil++;
             }
 
             if ($errors) {
@@ -279,14 +294,10 @@ class FasilitasController extends Controller
                 ], 422);
             }
 
-            if ($insert) {
-                Fasilitas::insert($insert);
-            }
-
             return response()->json([
                 'status' => true,
                 'message' => 'Data Fasilitas berhasil diimport.',
-                'count' => count($insert)
+                'count' => $berhasil
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -296,6 +307,7 @@ class FasilitasController extends Controller
             ], 500);
         }
     }
+
 
 
     protected function convertErrorsToFields($errors)

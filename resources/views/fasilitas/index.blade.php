@@ -6,7 +6,7 @@
 @section('content')
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="mb-0">Kelola Data User</h3>
+            <h3 class="mb-0">Kelola Data Fasilitas</h3>
             <div class="d-flex justify-content-center flex-wrap">
                 <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
                     Import Data Fasilitas (.xlsx)

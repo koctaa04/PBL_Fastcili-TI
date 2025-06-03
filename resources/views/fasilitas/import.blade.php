@@ -77,7 +77,7 @@
                             title: 'Berhasil!',
                             text: response.message || response.messages,
                         });
-                        dataUser.ajax.reload();
+                        loadFasilitasCards();;
                     } else {
                         Swal.fire({
                             icon: 'error',
