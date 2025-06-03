@@ -12,16 +12,16 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="table_trending">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_trending">
                         <thead>
                             <tr>
-                                <th>Rank</th>
-                                <th>Foto Kerusakan</th>
-                                <th>Fasilitas</th>
-                                <th>Deskripsi</th>
-                                <th>Total Pelapor</th>
-                                <th>Skor Trending</th>
-                                <th>Aksi</th>
+                                <th width="7%">Rank</th>
+                                <th width="20%">Foto Kerusakan</th>
+                                <th width="10%">Fasilitas</th>
+                                <th width="20%">Deskripsi</th>
+                                <th width="15%">Total Pelapor</th>
+                                <th width="15%">Skor Trending</th>
+                                <th width="8%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,7 +65,21 @@
         var datalaporan;
 
         $(document).ready(function() {
-            var datalaporan = $('#table_trending').DataTable();
+            var datalaporan = $('#table_trending').DataTable({
+                columnDefs: [{
+                        targets: [0, 1, 2, 3, 4, 5, 6],
+                        className: 'text-center',
+                    },{
+                        targets: [0, 1, 6],
+                        orderable: false,
+                        searchable: false,
+                    }
+                ], 
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data laporan trending yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data laporan trending seperti keyword yang ingin dicari"
+                }
+            });
         });
     </script>
 @endpush

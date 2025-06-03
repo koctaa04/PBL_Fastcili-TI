@@ -9,15 +9,15 @@
         <div class="card p-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_prioritas">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_prioritas">
                         <thead>
                             <tr>
-                                <th scope="col">Rank</th>
-                                <th scope="col">Laporan</th>
-                                <th scope="col">Nilai</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Catatan Sarpras</th>
-                                <th scope="col">Aksi</th>
+                                <th width="10%">Rank</th>
+                                <th width="30%">Laporan</th>
+                                <th width="15%">Nilai</th>
+                                <th width="15%">Status</th>
+                                <th width="20%">Catatan Sarpras</th>
+                                <th width="10%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -27,7 +27,7 @@
                                     $statusPerbaikan = $penugasan->status_perbaikan ?? null;
                                 @endphp
                                 <tr>
-                                    <td>{{ $r['rank'] }}</td>
+                                    <td><b><i>#{{ $r['rank'] }}</i></b></td>
                                     <td>{{ $r['deskripsi'] ?? '-' }}</td>
                                     <td>{{ number_format($r['Q'], 4) }}</td>
                                     <td>{{ $statusPerbaikan ?? 'Belum Dikerjakan' }}</td>
@@ -73,8 +73,22 @@
 
         $(document).ready(function() {
             var datalaporan = $('#table_prioritas').DataTable({
+                columnDefs: [{
+                        targets: [0, 1, 2, 3, 4, 5],
+                        className: 'text-center',
+                    },{
+                        targets: [0, 5],
+                        orderable: false,
+                        searchable: false,
+                    },{
+                        targets: [1, 4],
+                        orderable: false,
+                    }
+
+                ], 
                 language: {
-                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas perbaikan yang tersedia"
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas perbaikan yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas perbaikan seperti keyword yang ingin dicari"
                 }
             });
         });

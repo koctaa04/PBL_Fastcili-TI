@@ -17,62 +17,48 @@
             </div>
         </div>
         <div class="card p-4">
-        {{-- <h3>Data Ruangan</h3>
-        <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex flex-wrap justify-content-center gap-3">
-                    <button onclick="modalAction('{{ url('/ruangan/import') }}')" 
-                            class="btn btn-action btn-warning text-truncate">
-                        Import Data Ruangan (.xlsx)
-                    </button>
-                    <button onclick="modalAction('{{ url('/ruangan/create') }}')" 
-                            class="btn btn-action btn-success text-truncate">
-                        Tambah Data Ruangan
-                    </button>
-                </div>
-            </div> --}}
-        <div class="card-body">
-            {{-- Search and Filtering --}}
-            <div class="row pr-auto">
-                <div class="col-md-12">
-                    <div class="form-group row mb-3">
-                        <label class="col-2 control-label col-form-label">Cari Data Ruangan:</label>
-                        <div class="col-10">
-                            <input type="text" class="form-control" id="search" placeholder="Cari ruangan...">
-                            <small class="form-text text-muted">Masukkan nama ruangan</small>
+            <div class="card-body">
+                {{-- Search and Filtering --}}
+                <div class="row pr-auto">
+                    <div class="col-md-12">
+                        <div class="form-group row mb-3">
+                            <label class="col-2 control-label col-form-label">Cari Data Ruangan:</label>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="search" placeholder="Cari ruangan...">
+                                <small class="form-text text-muted">Masukkan nama ruangan</small>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row mb-5">
-                        <label class="col-2 control-label col-form-label">Filter:</label>
-                        <div class="col-5">
-                            <select class="form-control" id="id_gedung" name="id_gedung" required>
-                                <option value="">- Semua Gedung -</option>
-                                @foreach ($gedung as $item)
-                                    <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
-                                @endforeach
-                            </select>
-                            <small class="form-text text-muted">Gedung</small>
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Filter:</label>
+                            <div class="col-5">
+                                <select class="form-control" id="id_gedung" name="id_gedung" required>
+                                    <option value="">- Semua Gedung -</option>
+                                    @foreach ($gedung as $item)
+                                        <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Gedung</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Card View --}}
-            <span class="badge badge-info p-2 mb-3">
-                <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Data Terakhir Ditambahkan
-            </span>
-            <div class="row g-3" id="ruangan-container">
-                <!-- Ruangan cards will be loaded here -->
-            </div>
+                {{-- Card View --}}
+                <span class="badge badge-info p-2 mb-3">
+                    <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Data Terakhir Ditambahkan
+                </span>
+                <div class="row g-3" id="ruangan-container">
+                    <!-- Ruangan cards will be loaded here -->
+                </div>
 
-            {{-- Pagination --}}
-            <div class="row mt-4">
-                <div class="col-md-12 d-flex justify-content-center">
-                    <div id="pagination-links"></div>
+                {{-- Pagination --}}
+                <div class="row mt-4">
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <div id="pagination-links"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
     <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
         aria-hidden="true"></div>
@@ -325,7 +311,7 @@
                         });
                     } else {
                         container.append(
-                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data ruangan</p></div>'
+                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data ruangan seperti keyword yang ingin dicari</p></div>'
                         );
                     }
 

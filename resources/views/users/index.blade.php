@@ -124,7 +124,11 @@
                     targets: [0, 3, 4, 5],
                     orderable: false,
                     searchable: false
-                }]
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data user yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data user seperti keyword yang ingin dicari"
+                }
             });
 
             // Ubah event change filter

@@ -319,7 +319,7 @@
                         });
                     } else {
                         container.append(
-                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data gedung</p></div>'
+                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data gedung seperti keyword yang ingin dicari</p></div>'
                             );
                     }
 
