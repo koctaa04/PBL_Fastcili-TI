@@ -18,20 +18,6 @@
         </div>
 
         <div class="card p-4">
-            {{-- <h3>Data Fasilitas</h3>
-        <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex flex-wrap justify-content-center gap-3">
-                    <button onclick="modalAction('{{ url('/fasilitas/import') }}')" 
-                            class="btn btn-action btn-warning text-truncate">
-                        Import Data Fasilitas (.xlsx)
-                    </button>
-                    <button onclick="modalAction('{{ url('/fasilitas/create') }}')" 
-                            class="btn btn-action btn-success text-truncate">
-                        Tambah Data Fasilitas
-                    </button>
-                </div>
-            </div> --}}
             <div class="card-body">
                 {{-- Search and Filtering --}}
                 <div class="row pr-auto">

@@ -16,14 +16,9 @@
                     </a>
                     <small id="error-level_id" class="error-text form-text text-danger"></small>
                 </div>
-                <div class="form-group">
-                    <div class="custom-file">
-                        <input type="file" name="file_user" id="file_user" class="custom-file-input" required>
-                        <label class="custom-file-label btn-warning text-dark" for="file_user"
-                            style="cursor: pointer; width: 100%; border-radius: .25rem;">
-                            <i class="fa fa-folder-open"></i> Pilih File Excel (.xlsx)
-                        </label>
-                    </div>
+                <div class="">
+                    <label for="file_user">Pilih File Excel (.xlsx)</label>
+                    <input type="file" name="file_user" id="file_user" class="form-control" required>
                     <small id="error-file_user" class="error-text form-text text-danger"></small>
                 </div>
             </div>
@@ -112,9 +107,9 @@
 
                         if (xhr.responseJSON.errors && Array.isArray(xhr.responseJSON
                                 .errors)) {
-                                    
+
                             xhr.responseJSON.errors.forEach(function(err) {
-                               err;
+                                err;
                             });
                         }
                     }

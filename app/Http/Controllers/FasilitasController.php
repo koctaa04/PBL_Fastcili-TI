@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Fasilitas;
 use App\Models\Gedung;
 use App\Models\Ruangan;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Fasilitas;
+use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 
 class FasilitasController extends Controller
 {
@@ -184,5 +185,100 @@ class FasilitasController extends Controller
         }
 
         redirect('/');
+    }
+
+    public function import()
+    {
+        return view('fasilitas.import');
+    }
+
+    public function import_ajax(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file_user' => ['required', 'mimes:xlsx', 'max:1024']
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi data import gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            $file = $request->file('file_user');
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray();
+
+            $insert = [];
+            $errors = [];
+
+            foreach ($data as $index => $row) {
+                if ($index === 0) continue; // Skip header
+
+                // Validasi data
+                if (!Level::find($row[0])) {
+                    $errors[] = "Level ID {$row[0]} tidak ditemukan";
+                    continue;
+                }
+
+                if (User::where('email', $row[1])->exists()) {
+                    $errors[] = "Email {$row[1]} sudah terdaftar";
+                    continue;
+                }
+
+                $insert[] = [
+                    'id_level' => $row[0],
+                    'email' => $row[1],
+                    'nama' => $row[2],
+                    'password' => Hash::make($row[3]),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            if (!empty($errors)) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Terdapat error validasi data',
+                        'msgField' => $this->convertErrorsToFields($errors), // tambahan agar bisa ditampilkan di bawah input
+                        'errors' => $errors // semua pesan error ditampilkan
+                    ], 422);
+                }
+
+                return redirect()->back()->with('error', implode('<br>', $errors));
+            }
+
+
+            if (!empty($insert)) {
+                User::insert($insert);
+            }
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data user berhasil diimport',
+                    'count' => count($insert)
+                ]);
+            }
+            return redirect()->route('users.index')->with('success', 'Data user berhasil diimport (' . count($insert) . ' data)');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

@@ -122,6 +122,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::delete('/delete/{id}', [FasilitasController::class, 'destroy']);
 		Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan'])->name('fasilitas.getRuangan');
 		Route::get('/list', [FasilitasController::class, 'list'])->name('fasilitas.list');
+		Route::get('/import', [FasilitasController::class, 'import'])->name('users.import');
+		Route::post('/import_ajax', [FasilitasController::class, 'import_ajax'])->name('users.import.ajax');
 	});
 
 
