@@ -22,6 +22,11 @@
                         required>
                 </div>
                 <div class="form-group">
+                    <label>Nama Fasilitas</label>
+                    <input type="text" class="form-control" name="kode_fasilitas" value="{{ $fasilitas->kode_fasilitas }}"
+                        required>
+                </div>
+                <div class="form-group">
                     <label>Jumlah</label>
                     <input type="text" class="form-control" name="jumlah" value="{{ $fasilitas->jumlah }}"
                         required>

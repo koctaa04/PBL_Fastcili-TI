@@ -101,12 +101,13 @@ class FasilitasController extends Controller
         $rules = [
             'id_ruangan' => 'required|exists:ruangan,id_ruangan',
             'nama_fasilitas' => 'required|string|max:50',
-            'kode_fasilitas' => 'required|string|max:50',
+            'kode_fasilitas' => 'required|string|unique:fasilitas,kode_fasilitas|max:50',
             'jumlah' => 'required|integer|min:1'
         ];
 
         $validator = Validator::make($request->all(), $rules, [
-            'jumlah' => 'Jumlah harus merupakan angka dan lebih dari 0'
+            'jumlah' => 'Jumlah harus merupakan angka dan lebih dari 0',
+            'kode_fasilitas' => 'Kode Fasilitas sudah digunakan'
         ]);
 
         if ($validator->fails()) {
@@ -121,6 +122,7 @@ class FasilitasController extends Controller
         // Cek apakah fasilitas dengan nama dan ruangan yang sama sudah ada
         $fasilitas = Fasilitas::where('id_ruangan', $request->id_ruangan)
             ->where('nama_fasilitas', $request->nama_fasilitas)
+            ->where('kode_fasilitas', $request->kode_fasilitas)
             ->first();
 
         if ($fasilitas) {
@@ -133,6 +135,7 @@ class FasilitasController extends Controller
                 'id_ruangan' => $request->id_ruangan,
                 'nama_fasilitas' => $request->nama_fasilitas,
                 'jumlah' => $request->jumlah,
+                'kode_fasilitas' => $request->kode_fasilitas,
                 'created_at' => now()
             ]);
         }
@@ -153,10 +156,13 @@ class FasilitasController extends Controller
     {
         $rules = [
             'nama_fasilitas' => 'required|string|max:50',
+            'kode_fasilitas' => 'required|string|max:50|unique:fasilitas,kode_fasilitas,' . $id . ',id_fasilitas',
             'jumlah' => 'required|integer'
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules, [
+            'kode_fasilitas' => 'Kode Fasilitas sudah digunakan'
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
