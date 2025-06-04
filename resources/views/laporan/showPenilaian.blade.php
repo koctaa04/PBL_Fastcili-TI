@@ -186,10 +186,17 @@
                         icon: "success",
                         title: "Berhasil!",
                         text: response.messages,
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        location.reload();
                     });
-                    location.reload();
                 } else {
-                    alert('Gagal menyimpan data.');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text: response.messages,
+                        confirmButtonColor: '#dc3545'
+                    });
                 }
             },
             error: function(xhr) {
@@ -204,6 +211,7 @@
                         icon: "error",
                         title: "Gagal!",
                         text: response.messages,
+                        confirmButtonColor: '#dc3545'
                     });
                 }
             }

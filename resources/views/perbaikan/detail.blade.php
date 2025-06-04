@@ -20,6 +20,7 @@
                             </p>
                             <p><strong>Deskripsi Kerusakan:</strong> {{ $perbaikan->laporan->deskripsi }}</p>
                             <p><strong>Tanggal Lapor:</strong> {{ $perbaikan->laporan->tanggal_lapor }}</p>
+                            <p><strong>Teknisi yang ditugaskan:</strong> {{ $perbaikan->laporan->penugasan->user->nama }}</p>
                         </td>
                     </tr>
                 </table>

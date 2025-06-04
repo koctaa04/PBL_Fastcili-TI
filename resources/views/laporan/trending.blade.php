@@ -62,10 +62,10 @@
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <span class="badge badge-pill badge-primary px-3 py-1 mr-2">
-                                                    <i class="fas fa-users mr-1"></i> {{ $laporan['total_pelapor'] }} Pelapor
+                                                <span class="badge badge-pill badge-primary px-3 py-2 mr-2">
+                                                    <i class="fas fa-users mr-1"></i> Pelapor: {{ $laporan['total_pelapor'] }}
                                                 </span>
-                                                <span class="badge badge-pill badge-warning px-3 py-1">
+                                                <span class="badge badge-pill badge-warning px-3 py-2">
                                                     <i class="fas fa-star mr-1"></i> Skor: {{ $laporan['skor'] }}
                                                 </span>
                                             </div>
