@@ -14,8 +14,8 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Foto Kerusakan</th>
-                                <th scope="col">Nama Fasilitas</th>
                                 <th scope="col">Deskripsi</th>
+                                <th scope="col">Teknisi</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Catatan Teknisi</th>
                                 <th scope="col">Dokumentasi Perbaikan</th>
@@ -35,11 +35,11 @@
                                             onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
                                     </td>
 
-                                    {{-- Nama Fasilitas --}}
-                                    <td>{{ $laporan->laporan->fasilitas->nama_fasilitas ?? '-' }}</td>
-
                                     {{-- Deskripsi --}}
                                     <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
+
+                                    {{-- Nama Teknisi --}}
+                                    <td>{{ $laporan->laporan->penugasan->user->nama ?? '-' }}</td>
 
                                     <td>
                                         <span
