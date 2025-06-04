@@ -196,10 +196,14 @@
                                 </div>
                                 <div class="form-check text-left mt-3 pl-0">
                                     <label class="form-check-label text-dark">
-                                        <input class="form-check-input" name="agree_terms_and_conditions" type="checkbox">
+                                        <input class="form-check-input" type="checkbox"
+                                            name="agree_terms_and_conditions" value="1"
+                                            {{ old('agree_terms_and_conditions') ? 'checked' : '' }}>
                                         <span class="form-check-sign"></span>
-                                        {{ __('Saya setuju dengan') }}
-                                        <a href="#" class="text-info" >{{ __('syarat dan ketentuan') }}</a>.
+                                        Saya setuju dengan
+                                        <a href="#" class="text-info" data-toggle="modal" data-target="#termsModal">
+                                            Syarat dan Ketentuan
+                                        </a>
                                     </label>
                                     @if ($errors->has('agree_terms_and_conditions'))
                                         <span class="invalid-feedback" style="display: block;" role="alert">
@@ -207,7 +211,6 @@
                                         </span>
                                     @endif
                                 </div>
-
                                 <div class="card-footer bg-white border-0 pt-0">
                                     <button type="submit"
                                         class="btn btn-info btn-round btn-block">{{ __('Register') }}</button>
@@ -272,10 +275,18 @@
 
                             $.each(errors, function(key, messages) {
                                 var input = $('[name="' + key + '"]');
-                                input.addClass('is-invalid');
-                                input.after(
-                                    '<span class="invalid-feedback" style="display:block;"><strong>' +
-                                    messages[0] + '</strong></span>');
+                                if (key === 'agree_terms_and_conditions') {
+                                    input.closest('.form-check').find('.form-check-label').addClass(
+                                        'is-invalid');
+                                    input.closest('.form-check').append(
+                                        '<span class="invalid-feedback" style="display:block;"><strong>' +
+                                        messages[0] + '</strong></span>');
+                                } else {
+                                    input.addClass('is-invalid');
+                                    input.after(
+                                        '<span class="invalid-feedback" style="display:block;"><strong>' +
+                                        messages[0] + '</strong></span>');
+                                }
                                 errorList.push(messages[0]);
                             });
 
