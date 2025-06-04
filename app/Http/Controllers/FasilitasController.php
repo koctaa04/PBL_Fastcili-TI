@@ -47,6 +47,17 @@ class FasilitasController extends Controller
             $fasilitas->where('fasilitas.nama_fasilitas', 'like', '%' . $request->search . '%');
         }
 
+        // Filter status_fasilitas di query jika ada
+        if ($request->filled('status_fasilitas')) {
+            $status = $request->status_fasilitas;
+
+            $fasilitas->whereHas('laporan', function ($q) use ($status) {
+                if ($status === 'Rusak') {
+                    $q->where('id_status', '!=', '4');
+                }
+            }, $status === 'Rusak' ? '>=' : '=', $status === 'Rusak' ? 1 : 0);
+        }
+
         $perPage = $request->get('per_page', 16);
         $page = $request->get('page', 1);
 
@@ -58,22 +69,6 @@ class FasilitasController extends Controller
             $item->status_fasilitas = $item->laporan->count() > 0 ? 'Rusak' : 'Baik';
             return $item;
         });
-
-        // Filter status_fasilitas di collection hasil paginate (jika ada filter status)
-        if ($request->filled('status_fasilitas')) {
-            $status = $request->status_fasilitas;
-
-            // Filter collection hasil paginate
-            $filtered = $result->getCollection()->filter(function ($item) use ($status) {
-                return $item->status_fasilitas === $status;
-            });
-
-            // Karena sudah filter, kita buat ulang paginator manual dari collection hasil filter
-            $result->setCollection($filtered->values());
-            // Perlu diingat: ini bukan pagination sesungguhnya, 
-            // jumlah halaman/total data tidak berubah dari query asli,
-            // hanya data halaman yang ditampilkan yang dipotong.
-        }
 
         return response()->json([
             'data' => $result->items(),
