@@ -26,21 +26,6 @@ class LaporanKerusakan extends Model
         return $this->hasMany(PelaporLaporan::class, 'id_laporan');
     }
 
-
-    // public function getSkorTrendingAttribute()
-    // {
-    //     $bobot = [
-    //         'ADM' => 0,
-    //         'MHS' => 1,
-    //         'DSN' => 3,
-    //         'TDK' => 2
-    //     ];
-
-    //     return $this->pelaporLaporan->sum(function ($pelapor) use ($bobot) {
-    //         return $bobot[$pelapor->user->level->kode_level];
-    //     });
-    // }
-
     public function ruangan()
     {
         return $this->belongsTo(Ruangan::class, 'id_ruangan');
