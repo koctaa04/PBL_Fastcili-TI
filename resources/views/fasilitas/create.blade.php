@@ -30,6 +30,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Kode Fasilitas</label>
+                    <input type="text" class="form-control" name="kode_fasilitas" id="kode_fasilitas" required>
+                    <small class="text-danger error-text" id="error-kode_fasilitas"></small>
+                </div>
+                <div class="form-group">
                     <label>Nama Fasilitas</label>
                     <input type="text" class="form-control" name="nama_fasilitas" id="nama_fasilitas" required>
                     <small class="text-danger error-text" id="error-nama_fasilitas"></small>

@@ -24,7 +24,11 @@ class FasilitasController extends Controller
     {
         $fasilitas = Fasilitas::with(['ruangan', 'ruangan.gedung'])
             ->select('fasilitas.id_fasilitas', 'fasilitas.id_ruangan', 'fasilitas.nama_fasilitas', 'fasilitas.jumlah')
-            ->join('ruangan', 'ruangan.id_ruangan', '=', 'fasilitas.id_ruangan');
+            ->join('ruangan', 'ruangan.id_ruangan', '=', 'fasilitas.id_ruangan')
+            ->orderBy('fasilitas.created_at', 'desc') // Primary sort by created_at (newest first)
+            ->orderBy('fasilitas.id_ruangan', 'asc'); // Secondary sort by id_ruangan
+            ;
+            
 
         // Add ruangan filter if provided
         if ($request->has('id_ruangan') && $request->id_ruangan != '') {
@@ -67,6 +71,7 @@ class FasilitasController extends Controller
         $rules = [
             'id_ruangan' => 'required|exists:ruangan,id_ruangan',
             'nama_fasilitas' => 'required|string|max:50',
+            'kode_fasilitas' => 'required|string|max:50',
             'jumlah' => 'required|integer|min:1'
         ];
 
