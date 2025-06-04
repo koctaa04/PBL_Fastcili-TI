@@ -60,8 +60,8 @@ class FasilitasController extends Controller
         });
 
         // Filter status_fasilitas di collection hasil paginate (jika ada filter status)
-        if ($request->filled('status')) {
-            $status = $request->status;
+        if ($request->filled('status_fasilitas')) {
+            $status = $request->status_fasilitas;
 
             // Filter collection hasil paginate
             $filtered = $result->getCollection()->filter(function ($item) use ($status) {
