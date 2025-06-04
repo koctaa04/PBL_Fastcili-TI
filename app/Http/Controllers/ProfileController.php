@@ -19,7 +19,7 @@ class ProfileController extends Controller
         $user = Auth::user();
         return view('profile.edit', compact('user'));
     }
-
+    
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -30,12 +30,20 @@ class ProfileController extends Controller
             'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $user->nama = $request->nama;
-        $user->email = $request->email;
+        // Cek apakah ada perubahan data
+        $isChanged = false;
+
+        if ($request->nama !== $user->nama || $request->email !== $user->email) {
+            $isChanged = true;
+            $user->nama = $request->nama;
+            $user->email = $request->email;
+        }
 
         if ($request->hasFile('foto_profil')) {
-            // Hapus foto lama jika ada
-            $oldPhotoPath = public_path('uploads/foto_profil/' . $user->foto_profil);
+            $isChanged = true;
+
+            // Hapus foto lama
+            $oldPhotoPath = public_path('storage/uploads/foto_profil/' . $user->foto_profil);
             if ($user->foto_profil && File::exists($oldPhotoPath)) {
                 File::delete($oldPhotoPath);
             }
@@ -43,14 +51,19 @@ class ProfileController extends Controller
             // Simpan foto baru
             $file = $request->file('foto_profil');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/foto_profil'), $filename);
+            $file->move(public_path('storage/uploads/foto_profil'), $filename);
             $user->foto_profil = $filename;
+        }
+
+        if (!$isChanged) {
+            return redirect()->route('profile.edit')->with('info', 'Tidak ada perubahan yang disimpan.');
         }
 
         $user->save();
 
         return redirect()->route('profile.edit')->with('status', 'Profil berhasil diperbarui!');
     }
+
 
     public function updatePassword(Request $request)
     {
