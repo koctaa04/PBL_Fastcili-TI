@@ -9,11 +9,13 @@
         <div class="card p-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_perbaikan">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_perbaikan">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col">No</th>
+                                @if (auth()->user()->id_level == 1)
                                 <th scope="col">Foto Kerusakan</th>
+                                @endif
                                 <th scope="col">Deskripsi</th>
                                 <th scope="col">Teknisi</th>
                                 <th scope="col">Status</th>
@@ -27,14 +29,14 @@
                             @foreach ($laporan_kerusakan as $index => $laporan)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
-
+                                    @if (auth()->user()->id_level == 1)
                                     {{-- Foto Kerusakan --}}
                                     <td>
                                         <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
                                             alt="Foto Kerusakan" height="65"
                                             onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
                                     </td>
-
+                                    @endif
                                     {{-- Deskripsi --}}
                                     <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
 
@@ -49,7 +51,7 @@
                                     </td>
 
                                     {{-- Catatan Teknisi --}}
-                                    <td>{{ $laporan->catatan_teknisi ?? '-' }}</td>
+                                    <td style>{{ $laporan->catatan_teknisi ?? '-' }}</td>
 
                                     {{-- Dokumentasi --}}
                                     <td>
@@ -57,7 +59,7 @@
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
                                                 alt="Foto Kerusakan" height="65">
                                         @else
-                                            <span class="text-danger">Belum ada dokumentasi</span>
+                                            <span class="text-danger">(Belum ada dokumentasi)</span>
                                         @endif
                                     </td>
 
@@ -167,6 +169,17 @@
         });
         $(document).ready(function() {
             var datalaporan = $('#table_perbaikan').DataTable({
+                columnDefs: [{
+                    targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    className: 'text-center',
+                }, {
+                    targets: [0, 1, 2, 5, 6, 7, 8],
+                    orderable: false,
+                    searchable: true,
+                },{
+                    targets: [3, 4],
+                    searchable: true,
+                }],
                 language: {
                     emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan yang tersedia",
                     zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan seperti keyword yang ingin dicari"

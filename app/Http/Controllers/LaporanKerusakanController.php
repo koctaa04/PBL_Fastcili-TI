@@ -326,12 +326,12 @@ class LaporanKerusakanController extends Controller
         if ($kriteria) {
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil diverifikasi'
+                'messages' => 'Laporan berhasil diberi nilai'
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Diverifikasi'
+                'messages' => 'Gagal diberi nilai'
             ]);
         }
 
@@ -353,12 +353,6 @@ class LaporanKerusakanController extends Controller
 
         return view('laporan_prioritas.verifikasi', compact('laporan'));
     }
-    // public function verifikasiPerbaikan($id)
-    // {
-    //     $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
-    //     return view('laporan_prioritas.modal-verifikasi', compact('laporan'));
-    // }
-
 
     public function simpanPenugasan(Request $request)
     {
