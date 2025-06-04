@@ -24,6 +24,12 @@ The above copyright notice and this permission notice shall be included in all c
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('logo-round.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('logo-round.png') }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    @php
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+    @endphp
+    
 
     <!-- Extra details for Live View on GitHub Pages -->
 
