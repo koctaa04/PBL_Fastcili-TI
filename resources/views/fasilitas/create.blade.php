@@ -53,7 +53,7 @@
 
     $(document).on('submit', '#form_create', function(e) {
         e.preventDefault();
-        
+
         if (isSubmitting) return;
         isSubmitting = true;
 
@@ -71,14 +71,19 @@
                 isSubmitting = false;
                 $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
                 if (response.success) {
-                    $('#myModal').modal('hide');
+                    $('#modal-master').modal('hide'); 
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
                         text: response.message,
                         showConfirmButton: true
+                    }).then(() => {
+                        loadFasilitasCards();
+                        $('#form_create')[0].reset();
+                        $('#gedung').val('');
+                        $('#ruangan').html('<option value="">Pilih Ruangan</option>').prop('disabled', true);
+                        $('.error-text').text('');
                     });
-                    loadFasilitasCards();
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -99,7 +104,8 @@
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.message,
+                        title: "Gagal!",
+                        text: "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.", 
                     });
                 }
             }
@@ -117,7 +123,7 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function(data) {
-                        console.log('Response:', data); // Untuk debugging
+                        console.log('Response:', data); 
                         let options = '<option value="">Pilih Ruangan</option>';
 
                         if (data && data.length > 0) {
@@ -133,7 +139,7 @@
                         $('#ruangan').html(options).prop('disabled', false);
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error:', status, error); // Untuk debugging
+                        console.error('Error:', status, error); 
                         $('#ruangan').html('<option value="">Gagal memuat ruangan</option>')
                             .prop('disabled', true);
                     }
@@ -142,6 +148,19 @@
                 $('#ruangan').html('<option value="">Pilih Gedung terlebih dahulu</option>')
                     .prop('disabled', true);
             }
+        });
+
+        $('#modal-master').on('hidden.bs.modal', function () {
+            $('#form_create')[0].reset();
+            $('#gedung').val(''); 
+            $('#ruangan').html('<option value="">Pilih Ruangan</option>').prop('disabled', true);
+            $('.error-text').text(''); 
+        });
+
+        $('#modal-master').on('show.bs.modal', function () {
+            $('#gedung').val(''); 
+            $('#ruangan').html('<option value="">Pilih Ruangan</option>').prop('disabled', true);
+            $('.error-text').text('');
         });
     });
 </script>
