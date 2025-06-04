@@ -21,7 +21,6 @@ The above copyright notice and this permission notice shall be included in all c
 
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('logo-round.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('logo-round.png') }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
