@@ -369,7 +369,7 @@
                                         <p class="fasilitas-card-text"><strong>Ruangan:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
                                         <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
                                         <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
-                                        <span class="badge badge-pill ${statusBadgeClass}">Status: ${fasilitas.status_fasilitas}</span> 
+                                        <span class="badge badge-pill ${statusBadgeClass} p-2 mt-2">Status: ${fasilitas.status_fasilitas}</span> 
                                     </div>
                                     @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
                                     <div class="fasilitas-card-footer p-2">

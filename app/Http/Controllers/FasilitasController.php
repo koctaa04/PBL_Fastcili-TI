@@ -47,6 +47,17 @@ class FasilitasController extends Controller
             $fasilitas->where('fasilitas.nama_fasilitas', 'like', '%' . $request->search . '%');
         }
 
+        // Filter status_fasilitas di query jika ada
+        if ($request->filled('status_fasilitas')) {
+            $status = $request->status_fasilitas;
+
+            $fasilitas->whereHas('laporan', function ($q) use ($status) {
+                if ($status === 'Rusak') {
+                    $q->where('id_status', '!=', '4');
+                }
+            }, $status === 'Rusak' ? '>=' : '=', $status === 'Rusak' ? 1 : 0);
+        }
+
         $perPage = $request->get('per_page', 16);
         $page = $request->get('page', 1);
 
@@ -58,22 +69,6 @@ class FasilitasController extends Controller
             $item->status_fasilitas = $item->laporan->count() > 0 ? 'Rusak' : 'Baik';
             return $item;
         });
-
-        // Filter status_fasilitas di collection hasil paginate (jika ada filter status)
-        if ($request->filled('status_fasilitas')) {
-            $status = $request->status_fasilitas;
-
-            // Filter collection hasil paginate
-            $filtered = $result->getCollection()->filter(function ($item) use ($status) {
-                return $item->status_fasilitas === $status;
-            });
-
-            // Karena sudah filter, kita buat ulang paginator manual dari collection hasil filter
-            $result->setCollection($filtered->values());
-            // Perlu diingat: ini bukan pagination sesungguhnya, 
-            // jumlah halaman/total data tidak berubah dari query asli,
-            // hanya data halaman yang ditampilkan yang dipotong.
-        }
 
         return response()->json([
             'data' => $result->items(),
@@ -106,12 +101,13 @@ class FasilitasController extends Controller
         $rules = [
             'id_ruangan' => 'required|exists:ruangan,id_ruangan',
             'nama_fasilitas' => 'required|string|max:50',
-            'kode_fasilitas' => 'required|string|max:50',
+            'kode_fasilitas' => 'required|string|unique:fasilitas,kode_fasilitas|max:50',
             'jumlah' => 'required|integer|min:1'
         ];
 
         $validator = Validator::make($request->all(), $rules, [
-            'jumlah' => 'Jumlah harus merupakan angka dan lebih dari 0'
+            'jumlah' => 'Jumlah harus merupakan angka dan lebih dari 0',
+            'kode_fasilitas' => 'Kode Fasilitas sudah digunakan'
         ]);
 
         if ($validator->fails()) {
@@ -126,6 +122,7 @@ class FasilitasController extends Controller
         // Cek apakah fasilitas dengan nama dan ruangan yang sama sudah ada
         $fasilitas = Fasilitas::where('id_ruangan', $request->id_ruangan)
             ->where('nama_fasilitas', $request->nama_fasilitas)
+            ->where('kode_fasilitas', $request->kode_fasilitas)
             ->first();
 
         if ($fasilitas) {
@@ -138,6 +135,7 @@ class FasilitasController extends Controller
                 'id_ruangan' => $request->id_ruangan,
                 'nama_fasilitas' => $request->nama_fasilitas,
                 'jumlah' => $request->jumlah,
+                'kode_fasilitas' => $request->kode_fasilitas,
                 'created_at' => now()
             ]);
         }
@@ -158,10 +156,13 @@ class FasilitasController extends Controller
     {
         $rules = [
             'nama_fasilitas' => 'required|string|max:50',
+            'kode_fasilitas' => 'required|string|max:50|unique:fasilitas,kode_fasilitas,' . $id . ',id_fasilitas',
             'jumlah' => 'required|integer'
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules, [
+            'kode_fasilitas' => 'Kode Fasilitas sudah digunakan'
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
