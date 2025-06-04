@@ -179,3 +179,38 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    @if (session('status'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('status') }}',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    @endif
+    @if (session('info'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi kesalahan!',
+                text: '{{ session('info') }}',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    @endif
+
+    @if ($errors->any())
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi kesalahan!',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                confirmButtonText: 'OK'
+            });
+        </script>
+    @endif
+
+@endpush
