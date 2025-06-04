@@ -79,7 +79,7 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'id_level' => ['required', 'exists:level,id_level'],
-            'agree_terms_and_conditions' => ['required'],
+            'agree_terms_and_conditions' => ['required', 'accepted'],
         ]);
 
         if ($validator->fails()) {
