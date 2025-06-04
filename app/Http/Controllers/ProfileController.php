@@ -29,13 +29,13 @@ class ProfileController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id_user . ',id_user',
             'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
+        
         $user->nama = $request->nama;
         $user->email = $request->email;
 
         if ($request->hasFile('foto_profil')) {
             // Hapus foto lama jika ada
-            $oldPhotoPath = public_path('uploads/foto_profil/' . $user->foto_profil);
+            $oldPhotoPath = public_path('storage/uploads/foto_profil/' . $user->foto_profil);
             if ($user->foto_profil && File::exists($oldPhotoPath)) {
                 File::delete($oldPhotoPath);
             }
@@ -43,7 +43,7 @@ class ProfileController extends Controller
             // Simpan foto baru
             $file = $request->file('foto_profil');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/foto_profil'), $filename);
+            $file->move(public_path('storage/   uploads/foto_profil'), $filename);
             $user->foto_profil = $filename;
         }
 
