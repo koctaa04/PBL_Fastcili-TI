@@ -7,61 +7,76 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="mb-0">Kelola Data Fasilitas</h3>
-            @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
-            <div class="d-flex justify-content-center flex-wrap">
-                <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
-                    Impor Data Fasilitas
-                </button>
-                <button onclick="modalAction('{{ url('/fasilitas/create') }}')" class="btn btn-success">
-                    Tambah Data Fasilitas
-                </button>
-            </div>
+            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                <div class="d-flex justify-content-center flex-wrap">
+                    <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
+                        Impor Data Fasilitas
+                    </button>
+                    <button onclick="modalAction('{{ url('/fasilitas/create') }}')" class="btn btn-success">
+                        Tambah Data Fasilitas
+                    </button>
+                </div>
             @endif
         </div>
 
         <div class="card p-4">
             <div class="card-body">
-                {{-- Search and Filtering --}}
-                <div class="row pr-auto">
-                    <div class="col-md-12">
-                        <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Cari Data Fasilitas:</label>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
-                                <small class="form-text text-muted">Masukkan nama fasilitas</small>
+                <div class="row mb-4">
+                    <!-- Kolom Kiri: Cari Fasilitas & Status -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="search">Cari Fasilitas:</label>
+                            <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
+                            <small class="form-text text-muted">Masukkan nama fasilitas</small>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label>Status Fasilitas:</label>
+                            <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
+                                <label class="btn btn-outline-secondary active flex-fill text-center mx-1">
+                                    <input type="radio" name="status_filter" id="status_all" value=""
+                                        autocomplete="off" checked> Semua
+                                </label>
+                                <label class="btn btn-outline-success flex-fill text-center mx-1">
+                                    <input type="radio" name="status_filter" id="status_baik" value="Baik"
+                                        autocomplete="off"> Baik
+                                </label>
+                                <label class="btn btn-outline-danger flex-fill text-center mx-1">
+                                    <input type="radio" name="status_filter" id="status_rusak" value="Rusak"
+                                        autocomplete="off"> Rusak
+                                </label>
                             </div>
                         </div>
-                        <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Filter:</label>
-                            <div class="col-5">
-                                <select class="form-control" id="id_gedung" name="id_gedung" required>
-                                    <option value="">- Semua Gedung -</option>
-                                    @foreach ($gedung as $item)
-                                        <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
+                    </div>
+
+                    <!-- Kolom Kanan: Filter Gedung & Ruangan -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_gedung">Filter Gedung:</label>
+                            <select class="form-control" id="id_gedung" name="id_gedung">
+                                <option value="">- Semua Gedung -</option>
+                                @foreach ($gedung as $item)
+                                    <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }}</option>
+                                @endforeach
+                            </select>
+                            <small class="form-text text-muted">Gedung</small>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="id_ruangan">Filter Ruangan:</label>
+                            <select class="form-control" id="id_ruangan" name="id_ruangan"
+                                {{ request('id_ruangan') ? '' : 'disabled' }}>
+                                <option value="">- Semua Ruangan -</option>
+                                @if (isset($ruangan))
+                                    @foreach ($ruangan as $item)
+                                        <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
+                                            {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
+                                            {{ $item->nama_ruangan }}
+                                        </option>
                                     @endforeach
-                                </select>
-                                <small class="form-text text-muted">Gedung</small>
-                            </div>
-                            <div class="col-5">
-                                {{-- <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled> --}}
-                                <select class="form-control" id="id_ruangan" name="id_ruangan"
-                                    {{ request('id_ruangan') ? '' : 'disabled' }}>
-
-                                    <option value="">- Semua Ruangan -</option>
-                                    @if (isset($ruangan))
-                                        @foreach ($ruangan as $item)
-                                            {{-- <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">
-                                                {{ $item->nama_ruangan }} </option> --}}
-
-                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
-                                                {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
-                                                {{ $item->nama_ruangan }}
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <small class="form-text text-muted">Ruangan</small>
-                            </div>
+                                @endif
+                            </select>
+                            <small class="form-text text-muted">Ruangan</small>
                         </div>
                     </div>
                 </div>
@@ -319,21 +334,29 @@
                     loadFasilitasCards();
                 }, 500);
             });
+
+            // Status radio filter event
+            $('input[name="status_filter"]').on('input', function() {
+                currentPage = 1;
+                loadFasilitasCards();
+            });
         });
 
         function loadFasilitasCards() {
-            const idRuangan = $('#id_ruangan').val();
+            const search = $('#search').val();
             const idGedung = $('#id_gedung').val();
-            const searchTerm = $('#search').val();
+            const idRuangan = $('#id_ruangan').val();
+            const status = $('input[name="status_filter"]:checked').val();
 
             $.ajax({
                 url: "{{ url('fasilitas/list') }}",
                 type: "GET",
                 dataType: "json",
                 data: {
-                    id_ruangan: idRuangan,
+                    search: search,
                     id_gedung: idGedung,
-                    search: searchTerm,
+                    id_ruangan: idRuangan,
+                    status: status,
                     page: currentPage,
                     per_page: perPage
                 },
@@ -343,7 +366,8 @@
 
                     if (response.data && response.data.length > 0) {
                         response.data.forEach((fasilitas) => {
-                            const statusBadgeClass = fasilitas.status_fasilitas === 'Rusak' ? 'badge-danger' : 'badge-success';
+                            const statusBadgeClass = fasilitas.status_fasilitas === 'Rusak' ?
+                                'badge-danger' : 'badge-success';
 
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
@@ -356,7 +380,7 @@
                                             <span class="badge badge-pill ${statusBadgeClass}">Status: ${fasilitas.status_fasilitas}</span> 
 
                                         </div>
-                                        @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
+                                        @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
                                         <div class="fasilitas-card-footer">
                                             <div class="fasilitas-card-actions">
                                                 <button onclick="modalAction('{{ url('/fasilitas/edit') }}/${fasilitas.id_fasilitas}')" 
@@ -365,7 +389,10 @@
                                                 </button>
                                                 <form class="form-delete d-inline" action="{{ url('/fasilitas/delete') }}/${fasilitas.id_fasilitas}" method="POST">
                                                     @csrf
-                                                    @method('DELETE')
+                                                    @extends('layouts.app', [
+    'class' => '',
+    'elementActive' => 'fasilitas',
+])
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
                                                         <i class="fa fa-trash"></i>
                                                     </button>

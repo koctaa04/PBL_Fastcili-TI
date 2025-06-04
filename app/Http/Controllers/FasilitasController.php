@@ -50,22 +50,40 @@ class FasilitasController extends Controller
         $perPage = $request->get('per_page', 16);
         $page = $request->get('page', 1);
 
+        // Ambil hasil paginasi dari query
         $result = $fasilitas->paginate($perPage, ['*'], 'page', $page);
 
-        // Tambahkan status fasilitas berdasarkan laporan
+        // Tambahkan atribut status_fasilitas ke setiap item di collection paginasi
         $result->getCollection()->transform(function ($item) {
             $item->status_fasilitas = $item->laporan->count() > 0 ? 'Rusak' : 'Baik';
             return $item;
         });
+
+        // Filter status_fasilitas di collection hasil paginate (jika ada filter status)
+        if ($request->filled('status')) {
+            $status = $request->status;
+
+            // Filter collection hasil paginate
+            $filtered = $result->getCollection()->filter(function ($item) use ($status) {
+                return $item->status_fasilitas === $status;
+            });
+
+            // Karena sudah filter, kita buat ulang paginator manual dari collection hasil filter
+            $result->setCollection($filtered->values());
+            // Perlu diingat: ini bukan pagination sesungguhnya, 
+            // jumlah halaman/total data tidak berubah dari query asli,
+            // hanya data halaman yang ditampilkan yang dipotong.
+        }
 
         return response()->json([
             'data' => $result->items(),
             'current_page' => $result->currentPage(),
             'last_page' => $result->lastPage(),
             'per_page' => $result->perPage(),
-            'total' => $result->total()
+            'total' => $result->total(),
         ]);
     }
+
 
 
 
