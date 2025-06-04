@@ -60,7 +60,7 @@
                                         <div class="documentation-preview text-center">
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->dokumentasi) }}"
                                                  onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
-                                                 alt="Dokumentasi Perbaikan" 
+                                                 alt="Belum ada dokumentasi diberikan" 
                                                  class="img-fluid rounded shadow-sm border"
                                                  style="max-height: 200px; width: auto;">
                                         </div>
