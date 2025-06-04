@@ -16,11 +16,6 @@
                     </a>
                     <small id="error-level_id" class="error-text form-text text-danger"></small>
                 </div>
-                {{-- <div class="">
-                    <label for="file_fasilitas">Pilih File Excel (.xlsx)</label>
-                    <input type="file" name="file_fasilitas" id="file_fasilitas" class="form-control" required>
-                    <small id="error-file_fasilitas" class="error-text form-text text-danger"></small>
-                </div> --}}
                 <div class="form-group mt-3">
                     <!-- Custom File Input -->
                     <label for="file_fasilitas" class="d-block mb-2">File Import Fasiltas</label>

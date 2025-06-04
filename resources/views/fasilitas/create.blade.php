@@ -1,53 +1,70 @@
-<div id="modal-master" class="modal-dialog" role="document">
+<div id="modal-master" class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
         <form method="POST" action="{{ route('fasilitas.store') }}" id="form_create">
             @csrf
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Data Fasilitas</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title font-weight-bold">Tambah Data Fasilitas</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="gedung">Gedung</label>
-                    <select name="id_gedung" id="gedung" class="form-control" required>
-                        <option value="">Pilih Gedung</option>
-                        @foreach ($gedung as $g)
-                            <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
-                        @endforeach
-                    </select>
+            <div class="modal-body py-4">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="gedung" class="font-weight-bold">Gedung <span class="text-danger">*</span></label>
+                        <select name="id_gedung" id="gedung" class="form-control " required>
+                            <option value="">Pilih Gedung</option>
+                            @foreach ($gedung as $g)
+                                <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
+                            @endforeach
+                        </select>
+                        <small class="form-text text-muted">Pilih gedung tempat fasilitas berada</small>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="ruangan" ><b>Ruangan <span class="text-danger">*</span></b> (Pilih Gedung terlebih dahulu)</label>
+                        <select name="id_ruangan" id="ruangan" class="form-control " required>
+                            <option value="">Pilih Ruangan</option>
+                            @foreach ($ruangan as $r)
+                                <option value="{{ $r->id_ruangan }}">{{ $r->nama_ruangan }}</option>
+                            @endforeach
+                        </select>
+                        <small class="form-text text-muted">Pilih ruangan tempat fasilitas berada</small>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="ruangan">Ruangan</label>
-                    <select name="id_ruangan" id="ruangan" class="form-control" disabled required>
-                        <option value="">Pilih Ruangan</option>
-                        @foreach ($ruangan as $r)
-                            <option value="{{ $r->id_ruangan }}">{{ $r->nama_ruangan }}</option>
-                        @endforeach
-                    </select>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="kode_fasilitas" class="font-weight-bold">Kode Fasilitas <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="kode_fasilitas" id="kode_fasilitas" required>
+                        <small class="form-text text-muted">Masukkan kode unik fasilitas</small>
+                        <small class="text-danger error-text" id="error-kode_fasilitas"></small>
+                    </div>
+                    
+                    <div class="form-group col-md-6">
+                        <label for="nama_fasilitas" class="font-weight-bold">Nama Fasilitas <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="nama_fasilitas" id="nama_fasilitas" required>
+                        <small class="form-text text-muted">Masukkan nama fasilitas</small>
+                        <small class="text-danger error-text" id="error-nama_fasilitas"></small>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Kode Fasilitas</label>
-                    <input type="text" class="form-control" name="kode_fasilitas" id="kode_fasilitas" required>
-                    <small class="text-danger error-text" id="error-kode_fasilitas"></small>
-                </div>
-                <div class="form-group">
-                    <label>Nama Fasilitas</label>
-                    <input type="text" class="form-control" name="nama_fasilitas" id="nama_fasilitas" required>
-                    <small class="text-danger error-text" id="error-nama_fasilitas"></small>
-                </div>
-                <div class="form-group">
-                    <label>Jumlah</label>
-                    <input type="text" class="form-control" name="jumlah" id="jumlah" required>
-                    <small class="text-danger error-text" id="error-jumlah"></small>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="jumlah" class="font-weight-bold">Jumlah <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="jumlah" id="jumlah" min="1" required>
+                        <small class="form-text text-muted">Masukkan jumlah fasilitas yang tersedia</small>
+                        <small class="text-danger error-text" id="error-jumlah"></small>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Tutup
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save mr-1"></i> Simpan
+                </button>
             </div>
         </form>
     </div>
@@ -70,11 +87,11 @@
             data: $(this).serialize(),
             dataType: "json",
             beforeSend: function() {
-                $('#form_create button[type=submit]').prop('disabled', true).text('Menyimpan...');
+                $('#form_create button[type=submit]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...');
             },
             success: function(response) {
                 isSubmitting = false;
-                $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
+                $('#form_create button[type=submit]').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
                 if (response.success) {
                     $('#modal-master').modal('hide'); 
                     Swal.fire({
@@ -83,11 +100,7 @@
                         text: response.message,
                         showConfirmButton: true
                     }).then(() => {
-                        loadFasilitasCards();
-                        $('#form_create')[0].reset();
-                        $('#gedung').val('');
-                        $('#ruangan').html('<option value="">Pilih Ruangan</option>').prop('disabled', true);
-                        $('.error-text').text('');
+                        location.reload(); // Reload halaman setelah modal ditutup
                     });
                 } else {
                     Swal.fire({
@@ -99,7 +112,7 @@
             },
             error: function(xhr) {
                 isSubmitting = false;
-                $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
+                $('#form_create button[type=submit]').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
                 if (xhr.responseJSON && xhr.responseJSON.msgField) {
                     let errors = xhr.responseJSON.msgField;
                     $.each(errors, function(field, message) {
@@ -118,6 +131,14 @@
     });
 
     $(document).ready(function() {
+        // Inisialisasi select2 jika tersedia
+        // if ($.fn.select2) {
+        //     $('.select2').select2({
+        //         placeholder: "Pilih opsi",
+        //         allowClear: true
+        //     });
+        // }
+
         $('#gedung').change(function() {
             let gedungId = $(this).val();
             $('#ruangan').html('<option value="">Memuat...</option>').prop('disabled', true);
@@ -142,6 +163,9 @@
                         }
 
                         $('#ruangan').html(options).prop('disabled', false);
+                        // if ($.fn.select2) {
+                        //     $('#ruangan').trigger('change.select2');
+                        // }
                     },
                     error: function(xhr, status, error) {
                         console.error('Error:', status, error); 
@@ -155,16 +179,16 @@
             }
         });
 
+        // Event ketika modal ditutup
         $('#modal-master').on('hidden.bs.modal', function () {
-            $('#form_create')[0].reset();
-            $('#gedung').val(''); 
-            $('#ruangan').html('<option value="">Pilih Ruangan</option>').prop('disabled', true);
-            $('.error-text').text(''); 
+            // location.reload(); // Reload halaman ketika modal ditutup
+            $('#ruangan').html(options).prop('disabled', false);
         });
 
         $('#modal-master').on('show.bs.modal', function () {
             $('#gedung').val(''); 
-            $('#ruangan').html('<option value="">Pilih Ruangan</option>').prop('disabled', true);
+            // $('#ruangan').html('<option value="">Pilih Ruangan</option>').prop('disabled', false);
+            $('#ruangan').html(options).prop('disabled', false);
             $('.error-text').text('');
         });
     });

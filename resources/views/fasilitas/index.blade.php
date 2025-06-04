@@ -51,16 +51,12 @@
                                 <small class="form-text text-muted">Gedung</small>
                             </div>
                             <div class="col-5">
-                                {{-- <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled> --}}
                                 <select class="form-control" id="id_ruangan" name="id_ruangan"
                                     {{ request('id_ruangan') ? '' : 'disabled' }}>
 
                                     <option value="">- Semua Ruangan -</option>
                                     @if (isset($ruangan))
                                         @foreach ($ruangan as $item)
-                                            {{-- <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">
-                                               {{ $item->nama_ruangan }} </option> --}}
-
                                             <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
                                                 {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
                                                 {{ $item->nama_ruangan }}
@@ -200,6 +196,11 @@
         .fasilitas-jumlah {
             font-weight: bold;
             color: #28a745;
+        }
+
+        .fasilitas-kode {
+            font-weight: bolder;
+            color: #ffa200;
         }
 
         .fasilitas-ruangan {
@@ -366,7 +367,8 @@
                                 <div class="card fasilitas-card">
                                     <div class="fasilitas-card-body p-3">
                                         <h5 class="fasilitas-card-title">${fasilitas.nama_fasilitas}</h5>
-                                        <p class="fasilitas-card-text"><strong>Ruangan:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
+                                        <p class="fasilitas-card-text"><strong>Kode:</strong> <span class="fasilitas-kode">${fasilitas.kode_fasilitas || '-'}</span></p>
+                                        <p class="fasilitas-card-text"><strong>Nama:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
                                         <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
                                         <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
                                         <span class="badge badge-pill ${statusBadgeClass} p-2 mt-2">Status: ${fasilitas.status_fasilitas}</span> 

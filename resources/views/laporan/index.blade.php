@@ -41,7 +41,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="deskripsi">Deskripsi</label>
+                                        <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika diperlukan)</label>
                                         <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
                                     </div>
 

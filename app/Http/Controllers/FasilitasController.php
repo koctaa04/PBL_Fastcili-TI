@@ -29,7 +29,7 @@ class FasilitasController extends Controller
                 $q->where('id_status', '!=', '4'); // 4 = status selesai
             }
         ])
-            ->select('fasilitas.id_fasilitas', 'fasilitas.id_ruangan', 'fasilitas.nama_fasilitas', 'fasilitas.jumlah')
+            ->select('fasilitas.id_fasilitas', 'fasilitas.kode_fasilitas', 'fasilitas.id_ruangan', 'fasilitas.nama_fasilitas', 'fasilitas.jumlah')
             ->join('ruangan', 'ruangan.id_ruangan', '=', 'fasilitas.id_ruangan')
             ->orderBy('fasilitas.created_at', 'desc')
             ->orderBy('fasilitas.id_ruangan', 'asc');
@@ -120,25 +120,25 @@ class FasilitasController extends Controller
 
 
         // Cek apakah fasilitas dengan nama dan ruangan yang sama sudah ada
-        $fasilitas = Fasilitas::where('id_ruangan', $request->id_ruangan)
-            ->where('nama_fasilitas', $request->nama_fasilitas)
-            ->where('kode_fasilitas', $request->kode_fasilitas)
-            ->first();
+        // $fasilitas = Fasilitas::where('id_ruangan', $request->id_ruangan)
+        //     ->where('nama_fasilitas', $request->nama_fasilitas)
+        //     ->where('kode_fasilitas', $request->kode_fasilitas)
+        //     ->first();
 
-        if ($fasilitas) {
-            // Jika ada, update jumlah saja
-            $fasilitas->jumlah += $request->jumlah;
-            $fasilitas->save();
-        } else {
-            // Jika tidak ada, buat data baru
-            Fasilitas::create([
-                'id_ruangan' => $request->id_ruangan,
-                'nama_fasilitas' => $request->nama_fasilitas,
-                'jumlah' => $request->jumlah,
-                'kode_fasilitas' => $request->kode_fasilitas,
-                'created_at' => now()
-            ]);
-        }
+        // if ($fasilitas) {
+        //     // Jika ada, update jumlah saja
+        //     $fasilitas->jumlah += $request->jumlah;
+        //     $fasilitas->save();
+        // } else {
+        // Jika tidak ada, buat data baru
+        Fasilitas::create([
+            'id_ruangan' => $request->id_ruangan,
+            'nama_fasilitas' => $request->nama_fasilitas,
+            'jumlah' => $request->jumlah,
+            'kode_fasilitas' => $request->kode_fasilitas,
+            'created_at' => now()
+        ]);
+        // }
 
         return response()->json([
             'success' => true,
