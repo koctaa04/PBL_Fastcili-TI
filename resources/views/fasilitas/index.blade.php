@@ -21,62 +21,55 @@
 
         <div class="card p-4">
             <div class="card-body">
-                <div class="row mb-4">
-                    <!-- Kolom Kiri: Cari Fasilitas & Status -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="search">Cari Fasilitas:</label>
-                            <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
-                            <small class="form-text text-muted">Masukkan nama fasilitas</small>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label>Status Fasilitas:</label>
-                            <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
-                                <label class="btn btn-outline-secondary active flex-fill text-center mx-1">
-                                    <input type="radio" name="status_filter" id="status_all" value=""
-                                        autocomplete="off" checked> Semua
-                                </label>
-                                <label class="btn btn-outline-success flex-fill text-center mx-1">
-                                    <input type="radio" name="status_filter" id="status_baik" value="Baik"
-                                        autocomplete="off"> Baik
-                                </label>
-                                <label class="btn btn-outline-danger flex-fill text-center mx-1">
-                                    <input type="radio" name="status_filter" id="status_rusak" value="Rusak"
-                                        autocomplete="off"> Rusak
-                                </label>
+                {{-- Search and Filtering --}}
+                <div class="row pr-auto">
+                    <div class="col-md-12">
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Cari Data Fasilitas:</label>
+                            <div class="col-5">
+                                <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
+                                <small class="form-text text-muted">Masukkan nama fasilitas</small>
+                            </div>
+                            <label class="col-1 control-label col-form-label">Filter Status:</label>
+                            <div class="col-4">
+                                <select class="form-control" id="status_fasilitas" name="status_fasilitas" required>
+                                    <option value="">- Semua Status -</option>
+                                    <option value="Baik">Baik</option>
+                                    <option value="Rusak">Rusak</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Kolom Kanan: Filter Gedung & Ruangan -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_gedung">Filter Gedung:</label>
-                            <select class="form-control" id="id_gedung" name="id_gedung">
-                                <option value="">- Semua Gedung -</option>
-                                @foreach ($gedung as $item)
-                                    <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }}</option>
-                                @endforeach
-                            </select>
-                            <small class="form-text text-muted">Gedung</small>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label for="id_ruangan">Filter Ruangan:</label>
-                            <select class="form-control" id="id_ruangan" name="id_ruangan"
-                                {{ request('id_ruangan') ? '' : 'disabled' }}>
-                                <option value="">- Semua Ruangan -</option>
-                                @if (isset($ruangan))
-                                    @foreach ($ruangan as $item)
-                                        <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
-                                            {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
-                                            {{ $item->nama_ruangan }}
-                                        </option>
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Filter:</label>
+                            <div class="col-5">
+                                <select class="form-control" id="id_gedung" name="id_gedung" required>
+                                    <option value="">- Semua Gedung -</option>
+                                    @foreach ($gedung as $item)
+                                        <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
                                     @endforeach
-                                @endif
-                            </select>
-                            <small class="form-text text-muted">Ruangan</small>
+                                </select>
+                                <small class="form-text text-muted">Gedung</small>
+                            </div>
+                            <div class="col-5">
+                                {{-- <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled> --}}
+                                <select class="form-control" id="id_ruangan" name="id_ruangan"
+                                    {{ request('id_ruangan') ? '' : 'disabled' }}>
+
+                                    <option value="">- Semua Ruangan -</option>
+                                    @if (isset($ruangan))
+                                        @foreach ($ruangan as $item)
+                                            {{-- <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">
+                                               {{ $item->nama_ruangan }} </option> --}}
+
+                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
+                                                {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
+                                                {{ $item->nama_ruangan }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <small class="form-text text-muted">Ruangan</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -325,6 +318,11 @@
                 currentPage = 1;
                 loadFasilitasCards();
             });
+            // Filter change events
+            $('#status_fasilitas').on('change', function() {
+                currentPage = 1;
+                loadFasilitasCards();
+            });
 
             // Search input event with debounce
             $('#search').on('input', function() {
@@ -334,29 +332,23 @@
                     loadFasilitasCards();
                 }, 500);
             });
-
-            // Status radio filter event
-            $('input[name="status_filter"]').on('input', function() {
-                currentPage = 1;
-                loadFasilitasCards();
-            });
         });
 
         function loadFasilitasCards() {
-            const search = $('#search').val();
-            const idGedung = $('#id_gedung').val();
             const idRuangan = $('#id_ruangan').val();
-            const status = $('input[name="status_filter"]:checked').val();
+            const idGedung = $('#id_gedung').val();
+            const statusFasilitas = $('#status_fasilitas').val();
+            const searchTerm = $('#search').val();
 
             $.ajax({
                 url: "{{ url('fasilitas/list') }}",
                 type: "GET",
                 dataType: "json",
                 data: {
-                    search: search,
-                    id_gedung: idGedung,
                     id_ruangan: idRuangan,
-                    status: status,
+                    id_gedung: idGedung,
+                    search: searchTerm,
+                    status_fasilitas: statusFasilitas,
                     page: currentPage,
                     per_page: perPage
                 },
@@ -370,39 +362,39 @@
                                 'badge-danger' : 'badge-success';
 
                             const cardHtml = `
-                                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                                    <div class="card fasilitas-card">
-                                        <div class="fasilitas-card-body">
-                                            <h5 class="fasilitas-card-title">${fasilitas.nama_fasilitas}</h5>
-                                            <p class="fasilitas-card-text"><strong>Ruangan:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
-                                            <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
-                                            <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
+                               <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
+                                   <div class="card fasilitas-card">
+                                       <div class="fasilitas-card-body">
+                                           <h5 class="fasilitas-card-title">${fasilitas.nama_fasilitas}</h5>
+                                           <p class="fasilitas-card-text"><strong>Ruangan:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
+                                           <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
+                                           <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
                                             <span class="badge badge-pill ${statusBadgeClass}">Status: ${fasilitas.status_fasilitas}</span> 
 
-                                        </div>
-                                        @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
-                                        <div class="fasilitas-card-footer">
-                                            <div class="fasilitas-card-actions">
-                                                <button onclick="modalAction('{{ url('/fasilitas/edit') }}/${fasilitas.id_fasilitas}')" 
-                                                        class="btn btn-sm btn-warning" title="Edit">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <form class="form-delete d-inline" action="{{ url('/fasilitas/delete') }}/${fasilitas.id_fasilitas}" method="POST">
-                                                    @csrf
-                                                    @extends('layouts.app', [
+                                       </div>
+                                       @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                                       <div class="fasilitas-card-footer">
+                                           <div class="fasilitas-card-actions">
+                                               <button onclick="modalAction('{{ url('/fasilitas/edit') }}/${fasilitas.id_fasilitas}')" 
+                                                       class="btn btn-sm btn-warning" title="Edit">
+                                                   <i class="fa fa-edit"></i>
+                                               </button>
+                                               <form class="form-delete d-inline" action="{{ url('/fasilitas/delete') }}/${fasilitas.id_fasilitas}" method="POST">
+                                                   @csrf
+                                                   @extends('layouts.app', [
     'class' => '',
     'elementActive' => 'fasilitas',
 ])
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            `;
+                                                   <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                       <i class="fa fa-trash"></i>
+                                                   </button>
+                                               </form>
+                                           </div>
+                                       </div>
+                                       @endif
+                                   </div>
+                               </div>
+                           `;
                             container.append(cardHtml);
                         });
                     } else {
@@ -431,52 +423,52 @@
                 // Previous button
                 if (response.current_page > 1) {
                     paginationHtml += `
-                        <li class="page-item">
-                            <a class="page-link" href="#" onclick="changePage(${response.current_page - 1})" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                    `;
+                       <li class="page-item">
+                           <a class="page-link" href="#" onclick="changePage(${response.current_page - 1})" aria-label="Previous">
+                               <span aria-hidden="true">&laquo;</span>
+                           </a>
+                       </li>
+                   `;
                 } else {
                     paginationHtml += `
-                        <li class="page-item disabled">
-                            <span class="page-link" aria-hidden="true">&laquo;</span>
-                        </li>
-                    `;
+                       <li class="page-item disabled">
+                           <span class="page-link" aria-hidden="true">&laquo;</span>
+                       </li>
+                   `;
                 }
 
                 // Page numbers
                 for (let i = 1; i <= response.last_page; i++) {
                     if (i === response.current_page) {
                         paginationHtml += `
-                            <li class="page-item active">
-                                <span class="page-link">${i}</span>
-                            </li>
-                        `;
+                           <li class="page-item active">
+                               <span class="page-link">${i}</span>
+                           </li>
+                       `;
                     } else {
                         paginationHtml += `
-                            <li class="page-item">
-                                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
-                            </li>
-                        `;
+                           <li class="page-item">
+                               <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                           </li>
+                       `;
                     }
                 }
 
                 // Next button
                 if (response.current_page < response.last_page) {
                     paginationHtml += `
-                        <li class="page-item">
-                            <a class="page-link" href="#" onclick="changePage(${response.current_page + 1})" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    `;
+                       <li class="page-item">
+                           <a class="page-link" href="#" onclick="changePage(${response.current_page + 1})" aria-label="Next">
+                               <span aria-hidden="true">&raquo;</span>
+                           </a>
+                       </li>
+                   `;
                 } else {
                     paginationHtml += `
-                        <li class="page-item disabled">
-                            <span class="page-link" aria-hidden="true">&raquo;</span>
-                        </li>
-                    `;
+                       <li class="page-item disabled">
+                           <span class="page-link" aria-hidden="true">&raquo;</span>
+                       </li>
+                   `;
                 }
 
                 paginationHtml += '</ul>';
