@@ -55,7 +55,7 @@
                             </div>
                             <div class="col-8 col-md-10">
                                 <div class="numbers">
-                                    <p class="card-category text-nowrap">Laporan Sedang Diperbaikan</p>
+                                    <p class="card-category text-nowrap">Laporan Sedang Diperbaiki</p>
                                     <p class="card-title">{{ $laporanDikerjakan }}<p>
                                 </div>
                             </div>

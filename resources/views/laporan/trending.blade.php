@@ -48,11 +48,11 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 d-flex">
-                                <div class="mr-3" style="width: 220px;">
+                                <div class="mr-3">
                                     <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan['laporan']->foto_kerusakan) }}"
                                         alt="Foto Kerusakan"
                                         class="img-fluid rounded"
-                                        style="height: 140px; width: 100%; object-fit: cover;">
+                                        style="height: 180px; width: 250px; object-fit: cover;">
                                 </div>
                                 <div class="flex-grow-1 d-flex flex-column">
                                     <div>
