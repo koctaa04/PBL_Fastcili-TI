@@ -22,35 +22,52 @@ class FasilitasController extends Controller
 
     public function list(Request $request)
     {
-        $fasilitas = Fasilitas::with(['ruangan', 'ruangan.gedung'])
+        $fasilitas = Fasilitas::with([
+            'ruangan',
+            'ruangan.gedung',
+            'laporan' => function ($q) {
+                $q->where('id_status', '!=', '4'); // 4 = status selesai
+            }
+        ])
             ->select('fasilitas.id_fasilitas', 'fasilitas.id_ruangan', 'fasilitas.nama_fasilitas', 'fasilitas.jumlah')
             ->join('ruangan', 'ruangan.id_ruangan', '=', 'fasilitas.id_ruangan')
-            ->orderBy('fasilitas.created_at', 'desc') // Primary sort by created_at (newest first)
-            ->orderBy('fasilitas.id_ruangan', 'asc'); // Secondary sort by id_ruangan
-            ;
-            
+            ->orderBy('fasilitas.created_at', 'desc')
+            ->orderBy('fasilitas.id_ruangan', 'asc');
 
-        // Add ruangan filter if provided
-        if ($request->has('id_ruangan') && $request->id_ruangan != '') {
+        // Filter opsional
+        if ($request->filled('id_ruangan')) {
             $fasilitas->where('ruangan.id_ruangan', $request->id_ruangan);
         }
 
-        // Add gedung filter if provided
-        if ($request->has('id_gedung') && $request->id_gedung != '') {
+        if ($request->filled('id_gedung')) {
             $fasilitas->where('ruangan.id_gedung', $request->id_gedung);
         }
 
-        // Add search filter if provided
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = '%' . $request->search . '%';
-            $fasilitas->where('fasilitas.nama_fasilitas', 'like', $searchTerm);
+        if ($request->filled('search')) {
+            $fasilitas->where('fasilitas.nama_fasilitas', 'like', '%' . $request->search . '%');
         }
 
-        $perPage = $request->has('per_page') ? $request->per_page : 16;
-        $page = $request->has('page') ? $request->page : 1;
+        $perPage = $request->get('per_page', 16);
+        $page = $request->get('page', 1);
 
-        return response()->json($fasilitas->paginate($perPage, ['*'], 'page', $page));
+        $result = $fasilitas->paginate($perPage, ['*'], 'page', $page);
+
+        // Tambahkan status fasilitas berdasarkan laporan
+        $result->getCollection()->transform(function ($item) {
+            $item->status_fasilitas = $item->laporan->count() > 0 ? 'Rusak' : 'Baik';
+            return $item;
+        });
+
+        return response()->json([
+            'data' => $result->items(),
+            'current_page' => $result->currentPage(),
+            'last_page' => $result->lastPage(),
+            'per_page' => $result->perPage(),
+            'total' => $result->total()
+        ]);
     }
+
+
 
     public function getRuangan($id)
     {

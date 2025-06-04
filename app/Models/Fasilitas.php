@@ -21,5 +21,5 @@ class Fasilitas extends Model
     public function laporan()
     {
         return $this->hasMany(LaporanKerusakan::class, 'id_fasilitas');
-    }
+    }   
 }

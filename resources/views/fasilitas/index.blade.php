@@ -343,6 +343,8 @@
 
                     if (response.data && response.data.length > 0) {
                         response.data.forEach((fasilitas) => {
+                            const statusBadgeClass = fasilitas.status_fasilitas === 'Rusak' ? 'badge-danger' : 'badge-success';
+
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                                     <div class="card fasilitas-card">
@@ -351,6 +353,8 @@
                                             <p class="fasilitas-card-text"><strong>Ruangan:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
                                             <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
                                             <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
+                                            <span class="badge badge-pill ${statusBadgeClass}">Status: ${fasilitas.status_fasilitas}</span> 
+
                                         </div>
                                         @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
                                         <div class="fasilitas-card-footer">
