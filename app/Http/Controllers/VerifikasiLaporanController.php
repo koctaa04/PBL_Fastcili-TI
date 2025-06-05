@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\LaporanKerusakan;
 use App\Models\KriteriaPenilaian;
+use App\Notifications\PelaporNotifikasi;
 use Illuminate\Support\Facades\DB;
 
 class VerifikasiLaporanController extends Controller
