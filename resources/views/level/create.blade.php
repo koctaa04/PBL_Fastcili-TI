@@ -49,25 +49,30 @@
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
-                        text: response.messages,
+                        text: response.message,
+                        showConfirmButton: true
                     });
-                    location.reload();
+                    dataLevel.ajax.reload();;
                 } else {
-                    alert('Gagal menyimpan data.');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text: response.message,
+                    });
                 }
             },
             error: function(xhr) {
                 $('#form_create button[type=submit]').prop('disabled', false).text('Simpan');
                 if (xhr.responseJSON && xhr.responseJSON.msgField) {
                     let errors = xhr.responseJSON.msgField;
-                    $.each(errors, function(field, messages) {
-                        $('#error-' + field).text(messages[0]);
+                    $.each(errors, function(field, message) {
+                        $('#error-' + field).text(message[0]);
                     });
                 } else {
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.messages,
+                        text: response.message,
                     });
                 }
             }

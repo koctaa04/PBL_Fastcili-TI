@@ -10,13 +10,11 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Kode Level</label>
-                    <input type="text" class="form-control" name="kode_level" value="{{ $level->kode_level }}"
-                        required>
+                    <input type="text" class="form-control" name="kode_level" value="{{ $level->kode_level }}" required>
                 </div>
                 <div class="form-group">
                     <label>Nama Level</label>
-                    <input type="text" class="form-control" name="nama_level" value="{{ $level->nama_level }}"
-                        required>
+                    <input type="text" class="form-control" name="nama_level" value="{{ $level->nama_level }}" required>
                 </div>
             </div>
             <div class="modal-footer">
@@ -47,25 +45,31 @@
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
-                        text: response.messages,
+                        text: response.message,
+                        timer: 3000,
+                        showConfirmButton: true
                     });
-                    location.reload();
+                    dataLevel.ajax.reload();
                 } else {
-                    alert('Gagal menyimpan data.');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text: response.message,
+                    });
                 }
             },
             error: function(xhr) {
                 $('#form_edit button[type=submit]').prop('disabled', false).text('Simpan');
                 if (xhr.responseJSON && xhr.responseJSON.msgField) {
                     let errors = xhr.responseJSON.msgField;
-                    $.each(errors, function(field, messages) {
-                        $('#error-' + field).text(messages[0]);
+                    $.each(errors, function(field, message) {
+                        $('#error-' + field).text(message[0]);
                     });
                 } else {
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.messages,
+                        text: response.message,
                     });
                 }
             }

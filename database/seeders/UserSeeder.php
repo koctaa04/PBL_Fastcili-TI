@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\DB;
 
 class UserSeeder extends Seeder
 {
@@ -14,13 +15,36 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::insert([
-            ['nama' => 'Admin JTI', 'no_induk' => '2341720123',   'password' => Hash::make('password'), 'email' => 'admin@jti.com',  'id_level' => 1],
-            ['nama' => 'Mahasiswa 1', 'no_induk' => '2341720456', 'password' => Hash::make('password'),  'email' => 'mhs@jti.com',  'id_level' => 4],
-            ['nama' => 'Dosen 1', 'no_induk' => '2341720678', 'password' => Hash::make('password'),  'email' => 'dosen@jti.com',  'id_level' => 4],
-            ['nama' => 'Tendik 1', 'no_induk' => '2341720112', 'password' => Hash::make('password'),  'email' => 'tendik1@jti.com',  'id_level' => 4],
-            ['nama' => 'Sarpras', 'no_induk' => '2341720113', 'password' => Hash::make('password'),  'email' => 'tendik2@jti.com',  'id_level' => 2],
-            ['nama' => 'Teknisi', 'no_induk' => '2341720113', 'password' => Hash::make('password'),  'email' => 'teknisi@jti.com',  'id_level' => 3],
-        ]);
+        // 1
+        $data = [
+            ['nama' => 'Admin JTI', 'akses' => '1', 'password' => Hash::make('password'), 'email' => 'admin@jti.com', 'id_level' => 1],
+        ];
+
+        // 2-8
+        for ($i = 1; $i <= 7; $i++) {
+            $data[] = ['nama' => "Sarpras $i",   'akses' => '1', 'password' => Hash::make('password'), 'email' => "sarpras$i@jti.com", 'id_level' => 2];
+        }
+
+        //9-15
+        for ($i = 1; $i <= 7; $i++) {
+            $data[] = ['nama' => "Teknisi $i",   'akses' => '1', 'password' => Hash::make('password'), 'email' => "teknisi$i@jti.com", 'id_level' => 3];
+        }
+
+        //16-25
+        for ($i = 1; $i <= 10; $i++) {
+            $data[] = ['nama' => "Dosen $i",     'akses' => '1', 'password' => Hash::make('password'), 'email' => "dosen$i@jti.com", 'id_level' => 5];
+        }
+
+        //26-30
+        for ($i = 1; $i <= 5; $i++) {
+            $data[] = ['nama' => "Tendik $i",    'akses' => '1', 'password' => Hash::make('password'), 'email' => "tendik$i@jti.com", 'id_level' => 6];
+        }
+
+        //31-50
+        for ($i = 1; $i <= 20; $i++) {
+            $data[] = ['nama' => "Mahasiswa $i", 'akses' => '1', 'password' => Hash::make('password'), 'email' => "mhs$i@jti.com", 'id_level' => 4];
+        }
+
+        DB::table('users')->insert($data);
     }
 }

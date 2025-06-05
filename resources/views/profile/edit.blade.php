@@ -15,124 +15,34 @@
                 {{ session('password_status') }}
             </div>
         @endif
-        <div class="row">
+        <div class="row ">
             <div class="col-md-4">
                 <div class="card card-user">
                     <div class="image">
                         <img src="{{ asset('paper/img/damir-bosnjak.jpg') }}" alt="...">
                     </div>
                     <div class="card-body">
-                        <div class="author">
+                        <div class="author text-center">
                             <a href="#">
-                                <img class="avatar border-gray" src="{{ asset('paper/img/mike.jpg') }}" alt="...">
-
-                                <h5 class="title">{{ __(auth()->user()->name)}}</h5>
+                                @if (auth()->user()->foto_profil)
+                                    <img class="avatar border-gray rounded-circle" 
+                                         src="{{ asset('uploads/foto_profil/' . auth()->user()->foto_profil) }}" 
+                                         alt="Foto Profil" width="120" height="120">
+                                @else
+                                    <img class="avatar border-gray rounded-circle" 
+                                         src="{{ asset('default-avatar.jpg') }}" 
+                                         alt="Foto Default" width="120" height="120">
+                                @endif
+                    
+                                <h5 class="title mt-2 text-dark">{{ auth()->user()->nama }}</h5>
                             </a>
                             <p class="description">
-                            @ {{ __(auth()->user()->name)}}
+                                {{ auth()->user()->level->nama_level ?? '-' }}
                             </p>
                         </div>
-                        <p class="description text-center">
-                            {{ __('I like the way you work it') }}
-                            <br> {{ __('No diggity') }}
-                            <br> {{ __('I wanna bag it up') }}
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <hr>
-                        <div class="button-container">
-                            <div class="row">
-                                <div class="col-lg-3 col-md-6 col-6 ml-auto">
-                                    <h5>{{ __('12') }}
-                                        <br>
-                                        <small>{{ __('Files') }}</small>
-                                    </h5>
-                                </div>
-                                <div class="col-lg-4 col-md-6 col-6 ml-auto mr-auto">
-                                    <h5>{{ __('2GB') }}
-                                        <br>
-                                        <small>{{ __('Used') }}</small>
-                                    </h5>
-                                </div>
-                                <div class="col-lg-3 mr-auto">
-                                    <h5>{{ __('24,6$') }}
-                                        <br>
-                                        <small>{{ __('Spent') }}</small>
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">{{ __('Team Members') }}</h4>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled team-members">
-                            <li>
-                                <div class="row">
-                                    <div class="col-md-2 col-2">
-                                        <div class="avatar">
-                                            <img src="{{ asset('paper/img/faces/ayo-ogunseinde-2.jpg') }}" alt="Circle Image"
-                                                class="img-circle img-no-padding img-responsive">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-7 col-7">
-                                        {{ __('DJ Khaled') }}
-                                        <br />
-                                        <span class="text-muted">
-                                            <small>{{ __('Offline') }}</small>
-                                        </span>
-                                    </div>
-                                    <div class="col-md-3 col-3 text-right">
-                                        <button class="btn btn-sm btn-outline-success btn-round btn-icon"><i
-                                                class="fa fa-envelope"></i></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="row">
-                                    <div class="col-md-2 col-2">
-                                        <div class="avatar">
-                                            <img src="{{ asset('paper/img/faces/joe-gardner-2.jpg') }}" alt="Circle Image"
-                                                class="img-circle img-no-padding img-responsive">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-7 col-7">
-                                            {{ __('Creative Tim') }}
-                                        <br />
-                                        <span class="text-success">
-                                            <small>{{ __('Available') }}</small>
-                                        </span>
-                                    </div>
-                                    <div class="col-md-3 col-3 text-right">
-                                        <button class="btn btn-sm btn-outline-success btn-round btn-icon"><i
-                                                class="fa fa-envelope"></i></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="row">
-                                    <div class="col-md-2 col-2">
-                                        <div class="avatar">
-                                            <img src="{{ asset('paper/img/faces/clem-onojeghuo-2.jpg') }}" alt="Circle Image"
-                                                class="img-circle img-no-padding img-responsive">
-                                        </div>
-                                    </div>
-                                    <div class="col-ms-7 col-7">
-                                        {{ __('Flume') }}
-                                        <br />
-                                        <span class="text-danger">
-                                            <small>{{ __('Busy') }}</small>
-                                        </span>
-                                    </div>
-                                    <div class="col-md-3 col-3 text-right">
-                                        <button class="btn btn-sm btn-outline-success btn-round btn-icon"><i
-                                                class="fa fa-envelope"></i></button>
-                                    </div>
-                                </div>
-                            </li>
+                        <ul class="list-group list-group-flush text-start mt-3">
+                            <li class="list-group-item"><strong>Nama:</strong> {{ auth()->user()->nama }}</li>
+                            <li class="list-group-item"><strong>Email:</strong> {{ auth()->user()->email }}</li>
                         </ul>
                     </div>
                 </div>
@@ -143,18 +53,18 @@
                     @method('PUT')
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="title">{{ __('Edit Profile') }}</h5>
+                            <h5 class="title">{{ __('Edit Profil') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <label class="col-md-3 col-form-label">{{ __('Name') }}</label>
+                                <label class="col-md-3 col-form-label">{{ __('Nama') }}</label>
                                 <div class="col-md-9">
                                     <div class="form-group">
-                                        <input type="text" name="name" class="form-control" placeholder="Name" value="{{ auth()->user()->name }}" required>
+                                        <input type="text" name="nama" class="form-control" placeholder="Nama" value="{{ auth()->user()->nama }}" required>
                                     </div>
-                                    @if ($errors->has('name'))
+                                    @if ($errors->has('nama'))
                                         <span class="invalid-feedback" style="display: block;" role="alert">
-                                            <strong>{{ $errors->first('name') }}</strong>
+                                            <strong>{{ $errors->first('nama') }}</strong>
                                         </span>
                                     @endif
                                 </div>
@@ -172,11 +82,19 @@
                                     @endif
                                 </div>
                             </div>
+                            <div class="row">
+                                <label class="col-md-3 col-form-label">{{ __('Foto Profil') }}</label>
+                                <div class="col-md-9">
+                                    <div class="mb-3">
+                                        <input type="file" class="form-control" name="foto_profil">
+                                    </div>                            
+                                </div>
+                            </div>
                         </div>
                         <div class="card-footer ">
                             <div class="row">
                                 <div class="col-md-12 text-center">
-                                    <button type="submit" class="btn btn-info btn-round">{{ __('Save Changes') }}</button>
+                                    <button type="submit" class="btn btn-info btn-round">{{ __('Simpan Perubahan') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -187,14 +105,14 @@
                     @method('PUT')
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="title">{{ __('Change Password') }}</h5>
+                            <h5 class="title">{{ __('Ganti Kata Sandi') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <label class="col-md-3 col-form-label">{{ __('Old Password') }}</label>
+                                <label class="col-md-3 col-form-label">{{ __('Kata Sandi Lama') }}</label>
                                 <div class="col-md-9">
                                     <div class="form-group">
-                                        <input type="password" name="old_password" class="form-control" placeholder="Old password" required>
+                                        <input type="password" name="old_password" class="form-control" placeholder="Kata Sandi Lama" required>
                                     </div>
                                     @if ($errors->has('old_password'))
                                         <span class="invalid-feedback" style="display: block;" role="alert">
@@ -204,10 +122,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-3 col-form-label">{{ __('New Password') }}</label>
+                                <label class="col-md-3 col-form-label">{{ __('Kata Sandi Baru') }}</label>
                                 <div class="col-md-9">
                                     <div class="form-group">
-                                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                                        <input type="password" name="password" class="form-control" placeholder="Kata Sandi" required>
                                     </div>
                                     @if ($errors->has('password'))
                                         <span class="invalid-feedback" style="display: block;" role="alert">
@@ -217,10 +135,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-3 col-form-label">{{ __('Password Confirmation') }}</label>
+                                <label class="col-md-3 col-form-label">{{ __('Konfirmasi Kata Sandi') }}</label>
                                 <div class="col-md-9">
                                     <div class="form-group">
-                                        <input type="password" name="password_confirmation" class="form-control" placeholder="Password Confirmation" required>
+                                        <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi Kata Sandi" required>
                                     </div>
                                     @if ($errors->has('password_confirmation'))
                                         <span class="invalid-feedback" style="display: block;" role="alert">
@@ -233,7 +151,7 @@
                         <div class="card-footer ">
                             <div class="row">
                                 <div class="col-md-12 text-center">
-                                    <button type="submit" class="btn btn-info btn-round">{{ __('Save Changes') }}</button>
+                                    <button type="submit" class="btn btn-info btn-round">{{ __('Simpan Perubahan') }}</button>
                                 </div>
                             </div>
                         </div>

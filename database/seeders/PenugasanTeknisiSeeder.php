@@ -13,12 +13,12 @@ class PenugasanTeknisiSeeder extends Seeder
      */
     public function run(): void
     {
-        PenugasanTeknisi::insert([
-            ['id_laporan' => 1, 'id_user' => 5, 'tanggal_selesai' => null, 'status_perbaikan' => 'Sedang dikerjakan'],
-            ['id_laporan' => 2, 'id_user' => 5, 'tanggal_selesai' => null, 'status_perbaikan' => 'Sedang dikerjakan'],
-            ['id_laporan' => 3, 'id_user' => 5, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Selesai Dikerjakan'],
-            ['id_laporan' => 4, 'id_user' => 5, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Sedang dikerjakan'],
-            ['id_laporan' => 5, 'id_user' => 5, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Selesai Dikerjakan'],
-        ]);
+        // PenugasanTeknisi::insert([
+        //     ['id_laporan' => 1, 'id_user' => 6, 'tanggal_selesai' => null, 'status_perbaikan' => 'Sedang dikerjakan'],
+        //     ['id_laporan' => 2, 'id_user' => 6, 'tanggal_selesai' => null, 'status_perbaikan' => 'Sedang dikerjakan'],
+        //     ['id_laporan' => 3, 'id_user' => 6, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Selesai Dikerjakan'],
+        //     ['id_laporan' => 4, 'id_user' => 6, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Sedang dikerjakan'],
+        //     ['id_laporan' => 5, 'id_user' => 6, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Selesai Dikerjakan'],
+        // ]);
     }
 }

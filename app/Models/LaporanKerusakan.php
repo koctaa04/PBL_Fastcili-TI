@@ -8,17 +8,44 @@ use Illuminate\Database\Eloquent\Model;
 class LaporanKerusakan extends Model
 {
     use HasFactory;
+
     protected $table = 'laporan_kerusakan';
     protected $primaryKey = 'id_laporan';
 
     protected $fillable = [
-        'id_user', 'id_fasilitas', 'id_status', 'deskripsi', 'foto', 'tanggal_laporan'
+        'id_fasilitas',
+        'deskripsi',
+        'foto_kerusakan',
+        'tanggal_lapor',
+        'id_status',
+        'keterangan',
     ];
 
-    public function user()
+    public function pelaporLaporan()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->hasMany(PelaporLaporan::class, 'id_laporan');
     }
+
+
+    // public function getSkorTrendingAttribute()
+    // {
+    //     $bobot = [
+    //         'ADM' => 0,
+    //         'MHS' => 1,
+    //         'DSN' => 3,
+    //         'TDK' => 2
+    //     ];
+
+    //     return $this->pelaporLaporan->sum(function ($pelapor) use ($bobot) {
+    //         return $bobot[$pelapor->user->level->kode_level];
+    //     });
+    // }
+
+    public function ruangan()
+    {
+        return $this->belongsTo(Ruangan::class, 'id_ruangan');
+    }
+
 
     public function fasilitas()
     {
@@ -30,6 +57,7 @@ class LaporanKerusakan extends Model
         return $this->belongsTo(StatusLaporan::class, 'id_status');
     }
 
+    //Kriteria
     public function kriteria()
     {
         return $this->hasMany(KriteriaPenilaian::class, 'id_laporan');
