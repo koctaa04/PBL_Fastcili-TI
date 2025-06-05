@@ -48,11 +48,11 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 d-flex">
-                                <div class="mr-3" style="width: 220px;">
+                                <div class="mr-3">
                                     <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan['laporan']->foto_kerusakan) }}"
                                         alt="Foto Kerusakan"
                                         class="img-fluid rounded"
-                                        style="height: 140px; width: 100%; object-fit: cover;">
+                                        style="height: 180px; width: 250px; object-fit: cover;">
                                 </div>
                                 <div class="flex-grow-1 d-flex flex-column">
                                     <div>
@@ -62,10 +62,10 @@
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <span class="badge badge-pill badge-primary px-3 py-1 mr-2">
-                                                    <i class="fas fa-users mr-1"></i> {{ $laporan['total_pelapor'] }} Pelapor
+                                                <span class="badge badge-pill badge-primary px-3 py-2 mr-2">
+                                                    <i class="fas fa-users mr-1"></i> Pelapor: {{ $laporan['total_pelapor'] }}
                                                 </span>
-                                                <span class="badge badge-pill badge-warning px-3 py-1">
+                                                <span class="badge badge-pill badge-warning px-3 py-2">
                                                     <i class="fas fa-star mr-1"></i> Skor: {{ $laporan['skor'] }}
                                                 </span>
                                             </div>

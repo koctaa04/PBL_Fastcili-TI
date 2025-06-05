@@ -41,7 +41,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="deskripsi">Deskripsi</label>
+                                        <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika diperlukan)</label>
                                         <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
                                     </div>
 
@@ -316,6 +316,7 @@
                 $('#form-laporan-baru').hide();
 
                 showFormDukungan();
+                updateSubmitButtonState();
             });
 
             // Klik tombol: Buat laporan baru
@@ -335,8 +336,9 @@
                 let enable = false;
 
                 if (isDukung) {
-                    const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
-                    enable = tambahanDeskripsi.length > 0;
+                    // const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
+                    // enable = tambahanDeskripsi.length > 0;
+                    enable = true;
                 }
 
                 if (isLaporanBaru) {
@@ -368,7 +370,7 @@
                     targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                     className: 'text-center',
                 }, {
-                    targets: [0, 1, 9],
+                    targets: [0, 1, 4, 9],
                     orderable: false,
                     searchable: false,
                 }],

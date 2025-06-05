@@ -38,11 +38,12 @@ class LaporanKerusakanController extends Controller
         return Ruangan::where('id_gedung', $idGedung)->get();
     }
 
+    // Untuk Card sebelah kanan
     public function getFasilitasTerlapor($idRuangan)
     {
         return LaporanKerusakan::with('fasilitas')
             ->whereHas('fasilitas', fn($q) => $q->where('id_ruangan', $idRuangan))
-            // ->whereIn('id_status', [1, 2, 3, 4])
+            ->whereIn('id_status', [1, 2, 3])
             // ->where('id_user', '!=', Auth::user()->id)
             ->get()
             ->map(fn($lap) => [
@@ -54,10 +55,10 @@ class LaporanKerusakanController extends Controller
             ]);
     }
 
-
+    // Untuk drop-down sebelah kiri
     public function getFasilitasBelumLapor($idRuangan)
     {
-        $terlaporIds = LaporanKerusakan::whereIn('id_status', [1, 2, 3, 4])
+        $terlaporIds = LaporanKerusakan::whereIn('id_status', [1, 2, 3])
             ->pluck('id_fasilitas')
             ->toArray();
 
@@ -106,9 +107,19 @@ class LaporanKerusakanController extends Controller
     {
         $userId = auth()->id();
 
+
+
         // Jika dukungan laporan sudah ada
         if ($request->filled('dukungan_laporan')) {
             $laporanId = $request->dukungan_laporan;
+            // Jika Fasilitas yang dilaporkan sedang tahap perbaikan
+            $sedangDiperbaiki = KriteriaPenilaian::where('id_laporan', $laporanId);
+            if ($sedangDiperbaiki) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fasilitas ini sedang dalam proses perbaikan atau sudah dilaporkan.'
+                ]);
+            }
 
             // Cek apakah user sudah mendukung laporan ini
             $sudahMendukung = PelaporLaporan::where('id_laporan', $laporanId)
@@ -151,22 +162,19 @@ class LaporanKerusakanController extends Controller
                 ->whereIn('id_status', [1, 2, 3, 4]) // status aktif
                 ->first();
 
-            if ($existing) {
-                // Cek apakah user sudah pernah melaporkan laporan aktif ini
-                $sudahMelaporkan = PelaporLaporan::where('id_laporan', $existing->id_laporan)
-                    ->where('id_user', $userId)
-                    ->exists();
 
-                if ($sudahMelaporkan) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Anda sudah pernah melaporkan kerusakan ini sebelumnya.'
-                    ]);
-                }
+            // Cek apakah user sudah pernah melaporkan laporan aktif ini
+            $sudahMelaporkan = PelaporLaporan::where('id_laporan', $existing->id_laporan)
+                ->where('id_user', $userId)
+                ->whereHas('laporan', function ($query) use ($request) {
+                    $query->where('id_status', '!=', 4);
+                }) // hanya laporan aktif yang dicek
+                ->exists();
 
+            if ($sudahMelaporkan) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Fasilitas ini sudah memiliki laporan aktif. Anda dapat memberikan dukungan.'
+                    'message' => 'Anda sudah pernah melaporkan kerusakan ini sebelumnya.'
                 ]);
             }
 
@@ -327,12 +335,12 @@ class LaporanKerusakanController extends Controller
         if ($kriteria) {
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil diverifikasi'
+                'messages' => 'Laporan berhasil diberi nilai'
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Diverifikasi'
+                'messages' => 'Gagal diberi nilai'
             ]);
         }
 
@@ -350,16 +358,9 @@ class LaporanKerusakanController extends Controller
     public function verifikasiPerbaikan($id)
     {
         $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
-        // dd($laporan);
 
         return view('laporan_prioritas.verifikasi', compact('laporan'));
     }
-    // public function verifikasiPerbaikan($id)
-    // {
-    //     $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
-    //     return view('laporan_prioritas.modal-verifikasi', compact('laporan'));
-    // }
-
 
     public function simpanPenugasan(Request $request)
     {
@@ -425,6 +426,9 @@ class LaporanKerusakanController extends Controller
             ]);
         }
 
+        $kriteria = KriteriaPenilaian::find($idLaporan);
+        $kriteria->delete();
+
         return response()->json([
             'success' => true,
             'messages' => 'Verifikasi berhasil diproses.',
@@ -440,60 +444,60 @@ class LaporanKerusakanController extends Controller
 
 
 
-    public function edit(string $id)
-    {
-        $laporan = LaporanKerusakan::find($id);
+    // public function edit(string $id)
+    // {
+    //     $laporan = LaporanKerusakan::find($id);
 
-        return view('laporan.edit', ['laporan' => $laporan]);
-    }
+    //     return view('laporan.edit', ['laporan' => $laporan]);
+    // }
 
-    public function update(Request $request, $id)
-    {
-        $laporan = LaporanKerusakan::findOrFail($id);
+    // public function update(Request $request, $id)
+    // {
+    //     $laporan = LaporanKerusakan::findOrFail($id);
 
-        // Validasi data input
-        $rules = [
-            'deskripsi' => 'required|string|max:255',
-            'foto_kerusakan' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-        ];
+    //     // Validasi data input
+    //     $rules = [
+    //         'deskripsi' => 'required|string|max:255',
+    //         'foto_kerusakan' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    //     ];
 
-        $validator = Validator::make($request->all(), $rules);
+    //     $validator = Validator::make($request->all(), $rules);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'msgField' => $validator->errors()
-            ]);
-        }
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validasi gagal',
+    //             'msgField' => $validator->errors()
+    //         ]);
+    //     }
 
-        // Update deskripsi
-        $laporan->deskripsi = $request->deskripsi;
-        $laporan->id_status = 1;
+    //     // Update deskripsi
+    //     $laporan->deskripsi = $request->deskripsi;
+    //     $laporan->id_status = 1;
 
-        // Cek apakah ada file baru yang diunggah
-        if ($request->hasFile('foto_kerusakan')) {
-            // Hapus file lama jika ada
-            if ($laporan->foto_kerusakan && Storage::exists('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan)) {
-                Storage::delete('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan);
-            }
+    //     // Cek apakah ada file baru yang diunggah
+    //     if ($request->hasFile('foto_kerusakan')) {
+    //         // Hapus file lama jika ada
+    //         if ($laporan->foto_kerusakan && Storage::exists('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan)) {
+    //             Storage::delete('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan);
+    //         }
 
-            // Simpan file baru
-            $file = $request->file('foto_kerusakan');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/uploads/laporan_kerusakan', $filename);
+    //         // Simpan file baru
+    //         $file = $request->file('foto_kerusakan');
+    //         $filename = time() . '_' . $file->getClientOriginalName();
+    //         $file->storeAs('public/uploads/laporan_kerusakan', $filename);
 
-            $laporan->foto_kerusakan = $filename;
-        }
+    //         $laporan->foto_kerusakan = $filename;
+    //     }
 
 
-        $laporan->save();
+    //     $laporan->save();
 
-        return response()->json([
-            'success' => true,
-            'messages' => 'Data berhasil diperbarui'
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'messages' => 'Data berhasil diperbarui'
+    //     ]);
+    // }
 
 
 

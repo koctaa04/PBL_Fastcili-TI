@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use App\Models\PenugasanTeknisi;
 use App\Observers\PenugasanTeknisiObserver;
@@ -26,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         PenugasanTeknisi::observe(PenugasanTeknisiObserver::class);
         PelaporLaporan::observe(UpdateLaporanObserver::class);
         LaporanKerusakan::observe(LaporanKerusakanObserver::class);

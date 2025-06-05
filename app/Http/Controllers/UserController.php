@@ -25,8 +25,8 @@ class UserController extends Controller
             return Datatables::of($users)
                 ->addColumn('profil', function ($user) {
                     return $user->foto_profil
-                        ? '<img src="' . asset('uploads/foto_profil/' . $user->foto_profil) . '" width="50" style="border-radius:10px;">'
-                        : '<img src="' . asset('default-avatar.jpg') . '" width="50" style="border-radius:10px;">';
+                        ? '<img src="' . asset('storage/uploads/foto_profil/' . $user->foto_profil) . '" width="150px" style="border-radius:10px;">'
+                        : '<img src="' . asset('default-avatar.jpg') . '" width="150px" style="border-radius:10px;">';
                 })
                 ->addColumn('akses', function ($user) {
                     return $user->akses
@@ -69,33 +69,34 @@ class UserController extends Controller
             'email' => 'required|string|max:50|unique:users,email',
         ];
 
-        $validator = Validator::make($request->all(), $rules, [
-            'email.unique' => 'Email ini sudah digunakan oleh pengguna lain'
-        ]);
+        $customMessages = [
+            'email.unique' => 'Email ini sudah digunakan oleh pengguna lain',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $customMessages);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
                 'msgField' => $validator->errors()
             ], 422);
         }
 
-        try {
-            User::create($request->all());
+        User::create([
+            'id_level' => $request->id_level,
+            'nama' => $request->nama,
+            'email' => $request->email,
+            'password' => Hash::make('password'),
+            'created_at' => now()
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menambahkan data!'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menambahkan data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menambahkan data!'
+        ]);
     }
+
 
     public function edit(string $id)
     {
@@ -112,29 +113,37 @@ class UserController extends Controller
             'email' => 'required|string|max:50|unique:users,email,' . $id . ',id_user',
         ];
 
-        $validator = Validator::make($request->all(), $rules, [
+        $messages = [
             'email.unique' => 'Email ini sudah digunakan oleh pengguna lain'
-        ]);
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
                 'msgField' => $validator->errors()
             ], 422);
         }
 
-        $data = User::find($id);
+        $user = User::find($id);
 
-        if (!$data) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data tidak ditemukan!'
+                'message' => 'Data pengguna tidak ditemukan!'
             ], 404);
         }
 
         try {
-            $data->update($request->all());
+            $user->update([
+                'id_level' => $request->id_level,
+                'nama' => $request->nama,
+                'email' => $request->email,
+                // tambahkan field lain jika perlu
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mengubah data!'
@@ -142,11 +151,12 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengubah data',
+                'message' => 'Terjadi kesalahan saat menyimpan data.',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
+
 
     public function destroy(Request $request, $id)
     {

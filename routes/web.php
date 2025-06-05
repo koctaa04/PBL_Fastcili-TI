@@ -137,10 +137,7 @@ Route::group(['middleware' => 'auth'], function () {
 	 *  ---------------------------- */
 	Route::prefix('lapor_kerusakan')->group(function () {
 		Route::get('/', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
-		Route::get('/create', [LaporanKerusakanController::class, 'create']);
 		Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
-		// Route::get('/edit/{id}', [LaporanKerusakanController::class, 'edit']);
-		// Route::put('/update/{id}', [LaporanKerusakanController::class, 'update']);
 		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('laporan.destroy');
 		Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
 		Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
@@ -156,16 +153,6 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/get-fasilitas-belum-lapor/{idRuangan}', [LaporanKerusakanController::class, 'getFasilitasBelumLapor']);
 
 
-	/** -----------------------------
-	 *  Verifikasi Laporan (Untuk Sarpras verifikasi laporan)
-	 *  ---------------------------- */
-	Route::prefix('verifikasi')->group(function () {
-		Route::get('/', [VerifikasiLaporanController::class, 'index']);
-		Route::get('/true/{id}', [VerifikasiLaporanController::class, 'verif']);
-		Route::post('/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
-		Route::get('/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
-		Route::put('/tolak/{id}', [VerifikasiLaporanController::class, 'tolak'])->name('laporan.tolak');
-	});
 
 	/** -----------------------------
 	 *  WASPAS

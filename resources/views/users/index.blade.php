@@ -10,7 +10,7 @@
             <div class="card-tools">
                 <div class="card-tools d-flex justify-content-center flex-wrap">
                     <button onclick="modalAction('{{ url('/users/import') }}')" class="btn btn-warning mr-2">
-                        Import Data User (.xlsx)
+                        Impor Data User
                     </button>
                     <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-success">
                         Tambah Data User

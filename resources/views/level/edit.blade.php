@@ -10,11 +10,17 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Kode Level</label>
-                    <input type="text" class="form-control" name="kode_level" value="{{ $level->kode_level }}" required>
+                    <input type="text" class="form-control" name="kode_level" value="{{ $level->kode_level }}"
+                        required>
+                    <small class="text-danger error-text" id="error-kode_level"></small>
+
                 </div>
                 <div class="form-group">
                     <label>Nama Level</label>
-                    <input type="text" class="form-control" name="nama_level" value="{{ $level->nama_level }}" required>
+                    <input type="text" class="form-control" name="nama_level" value="{{ $level->nama_level }}"
+                        required>
+                    <small class="text-danger error-text" id="error-nama_level"></small>
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -27,19 +33,20 @@
 <script>
     $(document).on('submit', '#form_edit', function(e) {
         e.preventDefault();
-
         $('.error-text').text('');
+
+        let form = $(this);
 
         $.ajax({
             type: "POST",
-            url: $(this).attr('action'),
-            data: $(this).serialize(),
+            url: form.attr('action'),
+            data: form.serialize(),
             dataType: "json",
             beforeSend: function() {
-                $('#form_edit button[type=submit]').prop('disabled', true).text('Menyimpan...');
+                form.find('button[type=submit]').prop('disabled', true).text('Menyimpan...');
             },
             success: function(response) {
-                $('#form_edit button[type=submit]').prop('disabled', false).text('Simpan');
+                form.find('button[type=submit]').prop('disabled', false).text('Simpan');
                 if (response.success) {
                     $('#myModal').modal('hide');
                     Swal.fire({
@@ -48,28 +55,35 @@
                         text: response.message,
                         timer: 3000,
                         showConfirmButton: true
+                    }).then(() => {
+                        dataLevel.ajax.reload();
                     });
-                    dataLevel.ajax.reload();
                 } else {
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.message,
+                        text: response.message || 'Terjadi kesalahan saat mengubah data.',
                     });
                 }
             },
             error: function(xhr) {
-                $('#form_edit button[type=submit]').prop('disabled', false).text('Simpan');
-                if (xhr.responseJSON && xhr.responseJSON.msgField) {
+                form.find('button[type=submit]').prop('disabled', false).text('Simpan');
+                if (xhr.status === 422 && xhr.responseJSON?.msgField) {
                     let errors = xhr.responseJSON.msgField;
                     $.each(errors, function(field, message) {
                         $('#error-' + field).text(message[0]);
+                    });
+                    Swal.fire({
+                        icon: "error",
+                        title: "Validasi Gagal!",
+                        text: xhr.responseJSON.message || 'Periksa kembali input Anda.',
                     });
                 } else {
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: response.message,
+                        text: xhr.responseJSON?.message ||
+                            'Terjadi kesalahan saat memproses data.',
                     });
                 }
             }

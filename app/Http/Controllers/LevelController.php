@@ -39,31 +39,38 @@ class LevelController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $rules = [
-            'kode_level' => 'required|string|max:10|unique:level,kode_level',
-            'nama_level' => 'required|string|max:25'
-        ];
+{
+    $rules = [
+        'kode_level' => 'required|string|max:10|unique:level,kode_level',
+        'nama_level' => 'required|string|max:25'
+    ];
 
-        $validator = Validator::make($request->all(), $rules);
+    $validator = Validator::make($request->all(), $rules);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi inputan gagal',
-                'msgField' => $validator->errors()
-            ]);
-        }
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validasi inputan gagal. Silakan periksa kembali!',
+            'msgField' => $validator->errors()
+        ], 422);
+    }
 
+    try {
         Level::create($request->only(['kode_level', 'nama_level']));
 
         return response()->json([
             'success' => true,
             'message' => 'Data level berhasil ditambahkan'
         ]);
-
-        redirect('/');
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan saat menyimpan data',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     public function edit(string $id)
     {
@@ -73,39 +80,47 @@ class LevelController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $rules = [
-            'kode_level' => 'required|string|max:10|unique:level,kode_level,' . $id . ',id_level',
-            'nama_level' => 'required|string|max:25'
-        ];
+{
+    $rules = [
+        'kode_level' => 'required|string|max:10|unique:level,kode_level,' . $id . ',id_level',
+        'nama_level' => 'required|string|max:25'
+    ];
 
-        $validator = Validator::make($request->all(), $rules);
+    $validator = Validator::make($request->all(), $rules);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi inputan gagal',
-                'msgField' => $validator->errors()
-            ]);
-        }
-
-        $data = Level::find($id);
-
-        if ($data) {
-            $data->update($request->all());
-            return response()->json([
-                'success' => true,
-                'message' => 'Data level berhasil diubah'
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan',
-            ]);
-        }
-
-        redirect('/');
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validasi inputan gagal',
+            'msgField' => $validator->errors()
+        ], 422);
     }
+
+    $data = Level::find($id);
+
+    if (!$data) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak ditemukan',
+        ], 404);
+    }
+
+    try {
+        $data->update($request->only(['kode_level', 'nama_level']));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data level berhasil diubah'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan saat mengupdate data',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
 
     public function destroy(Request $request, $id)
     {
