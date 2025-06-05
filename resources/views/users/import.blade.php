@@ -14,12 +14,20 @@
                     <a href="{{ asset('template_user.xlsx') }}" class="btn btn-info btn-sm" download>
                         <i class="fa fa-file-excel"></i> Download
                     </a>
-                    <small id="error-level_id" class="error-text form-text text-danger"></small>
                 </div>
-                <div class="">
-                    <label for="file_user">Pilih File Excel (.xlsx)</label>
-                    <input type="file" name="file_user" id="file_user" class="form-control" required>
-                    <small id="error-file_user" class="error-text form-text text-danger"></small>
+                <div class="form-group ">
+                    <!-- Custom File Input -->
+                    <label for="file_user" class="d-block mb-2">File Import User</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" name="file_user" id="file_user" required>
+                        <label class="custom-file-label bg-warning text-dark text-center w-100" for="file_user"
+                            id="file-label">
+                            <i class="fas fa-upload mr-2"></i>Pilih File (.xlsx)
+                        </label>
+                    </div>
+                    <small class="text-muted d-block mt-1">Format: Excel (.xlsx)</small>
+                    <small id="error-level_id" class="error-text form-text text-danger"></small>
+                    <small class="error-text form-text text-danger" id="error-file_user"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -30,6 +38,15 @@
     </div>
 </div>
 <script>
+    // Handle file input change
+    $('#file_user').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        if (fileName) {
+            $('#file-label').html('<i class="fas fa-file-image mr-2"></i>' + fileName);
+        } else {
+            $('#file-label').html('<i class="fas fa-upload mr-2"></i>Pilih File Gedung');
+        }
+    });
     $(document).ready(function() {
         // Submit form import
         $(document).on('submit', '#form-import', function(e) {

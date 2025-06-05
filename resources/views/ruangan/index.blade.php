@@ -10,7 +10,7 @@
             @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
             <div class="d-flex justify-content-center flex-wrap">
                 <button onclick="modalAction('{{ url('/ruangan/import') }}')" class="btn btn-warning text-truncate mr-2">
-                    Import Data Ruangan (.xlsx)
+                    Impor Data Ruangan
                 </button>
                 <button onclick="modalAction('{{ url('/ruangan/create') }}')" class="btn btn-success text-truncate">
                     Tambah Data Ruangan

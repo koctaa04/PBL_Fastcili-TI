@@ -6,6 +6,7 @@ use App\Models\Gedung;
 use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
 
@@ -187,7 +188,7 @@ class RuanganController extends Controller
             $data = $sheet->toArray();
 
             $errors = [];
-            $berhasil = 0;
+            $rowsToInsert = [];
 
             foreach ($data as $index => $row) {
                 if ($index === 0) continue; // skip header
@@ -206,6 +207,7 @@ class RuanganController extends Controller
                 if (!is_numeric($id_gedung) || !Gedung::find($id_gedung)) {
                     $rowErrors[] = "ID Gedung '{$id_gedung}' tidak ditemukan.";
                 }
+
                 if (Ruangan::where('kode_ruangan', $kode_ruangan)->exists()) {
                     $rowErrors[] = "Kode Ruangan '{$kode_ruangan}' sudah ada di database.";
                 }
@@ -215,16 +217,13 @@ class RuanganController extends Controller
                     continue;
                 }
 
-
-                Ruangan::create([
+                $rowsToInsert[] = [
                     'id_gedung' => $id_gedung,
                     'kode_ruangan' => $kode_ruangan,
                     'nama_ruangan' => $nama_ruangan,
                     'created_at' => now(),
                     'updated_at' => now()
-                ]);
-
-                $berhasil++;
+                ];
             }
 
             if (!empty($errors)) {
@@ -236,9 +235,14 @@ class RuanganController extends Controller
                 ], 422);
             }
 
+            // ✅ Simpan semua data hanya jika tidak ada error
+            DB::transaction(function () use ($rowsToInsert) {
+                Ruangan::insert($rowsToInsert);
+            });
+
             return response()->json([
                 'status' => true,
-                'message' => "Berhasil mengimpor {$berhasil} data ruangan."
+                'message' => "Berhasil mengimpor " . count($rowsToInsert) . " data ruangan."
             ]);
         } catch (\Exception $e) {
             return response()->json([

@@ -9,11 +9,13 @@
         <div class="card p-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_perbaikan">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_perbaikan">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col">No</th>
+                                @if (auth()->user()->id_level != 1)
                                 <th scope="col">Foto Kerusakan</th>
+                                @endif
                                 <th scope="col">Deskripsi</th>
                                 <th scope="col">Teknisi</th>
                                 <th scope="col">Status</th>
@@ -27,14 +29,14 @@
                             @foreach ($laporan_kerusakan as $index => $laporan)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
-
+                                    @if (auth()->user()->id_level != 1)
                                     {{-- Foto Kerusakan --}}
                                     <td>
                                         <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
                                             alt="Foto Kerusakan" height="65"
                                             onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
                                     </td>
-
+                                    @endif
                                     {{-- Deskripsi --}}
                                     <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
 
@@ -49,7 +51,7 @@
                                     </td>
 
                                     {{-- Catatan Teknisi --}}
-                                    <td>{{ $laporan->catatan_teknisi ?? '-' }}</td>
+                                    <td>{{ Str::limit($laporan->catatan_teknisi, 20) ?? '-' }}</td>
 
                                     {{-- Dokumentasi --}}
                                     <td>
@@ -57,18 +59,18 @@
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
                                                 alt="Foto Kerusakan" height="65">
                                         @else
-                                            <span class="text-danger">Belum ada dokumentasi</span>
+                                            <span class="text-danger">(Belum ada dokumentasi)</span>
                                         @endif
                                     </td>
 
                                     {{-- Catatan Teknisi --}}
-                                    <td>{{ $laporan->komentar_sarpras ?? '-' }}</td>
+                                    <td>{{ Str::limit($laporan->komentar_sarpras, 20) ?? '-' }}</td>
 
                                     {{-- Tombol Aksi --}}
                                     <td>
                                         <div class="d-flex">
                                             @php
-                                                $isEditable = $laporan->status_perbaikan != 'Selesai Dikerjakan';
+                                                $isEditable = $laporan->status_perbaikan != 'Selesai';
                                                 $isRejected = !is_null($laporan->komentar_sarpras);
                                                 $isReported = !is_null($laporan->dokumentasi);
 
@@ -79,7 +81,7 @@
                                             @if (auth()->user()->id_level != 1)
                                                 @if ($isEditable)
                                                     <button onclick="modalAction('{{ $laporanUrl }}')"
-                                                        class="btn btn-sm btn-warning mr-2">
+                                                        class="btn btn-sm btn-danger mr-2">
                                                         {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
                                                     </button>
                                                 @endif
@@ -165,13 +167,53 @@
                 }
             });
         });
+        const user = {
+            id_level: {{ auth()->user()->id_level }} // Data user di-pass dari backend
+        };
+
         $(document).ready(function() {
-            var datalaporan = $('#table_perbaikan').DataTable({
+            // Common configuration options
+            var commonConfig = {
                 language: {
                     emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan yang tersedia",
                     zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan seperti keyword yang ingin dicari"
                 }
-            });
+            };
+
+            // Configuration for admin/ (level 1)
+            if (user.id_level !== 1) {
+                var datalaporan = $('#table_perbaikan').DataTable({
+                    ...commonConfig,
+                    columnDefs: [{
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                        className: 'text-center',
+                    }, {
+                        targets: [0, 1, 2, 5, 6, 7, 8],
+                        orderable: false,
+                        searchable: true,
+                    }, {
+                        targets: [3, 4],
+                        searchable: true,
+                    }]
+                });
+            } 
+            // Configuration for other users
+            else {
+                var datalaporan = $('#table_perbaikan').DataTable({
+                    ...commonConfig,
+                    columnDefs: [{
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7],
+                        className: 'text-center',
+                    }, {
+                        targets: [0, 1, 4, 5, 6, 7],
+                        orderable: false,
+                        searchable: true,
+                    }, {
+                        targets: [2,3],
+                        searchable: true,
+                    }]
+                });
+            }
         });
     </script>
 @endpush
