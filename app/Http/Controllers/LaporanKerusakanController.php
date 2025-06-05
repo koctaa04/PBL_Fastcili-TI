@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Database\Seeders\pelaporLaporanSeeder;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\PelaporNotifikasi;
 
 class LaporanKerusakanController extends Controller
 {

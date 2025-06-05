@@ -13,6 +13,7 @@ use App\Http\Controllers\VerifikasiLaporanController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PenugasanTeknisiController;
 use App\Http\Controllers\WaspasController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -195,4 +196,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
 	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+
+    Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // Optional: page to view all notifications
 });
