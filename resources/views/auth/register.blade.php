@@ -145,27 +145,7 @@
                                         </span>
                                     @endif
                                 </div>
-                                <div class="input-group{{ $errors->has('id_level') ? ' has-danger' : '' }}">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-right-0">
-                                            <i class="nc-icon nc-badge text-dark"></i>
-                                        </span>
-                                    </div>
-                                    <select name="id_level" class="form-control border-left-0" required>
-                                        <option value="" disabled selected>Pilih Level</option>
-                                        @foreach ($levels as $level)
-                                            <option value="{{ $level->id_level }}"
-                                                {{ old('id_level') == $level->id_level ? 'selected' : '' }}>
-                                                {{ $level->nama_level }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @if ($errors->has('id_level'))
-                                        <span class="invalid-feedback" style="display: block;" role="alert">
-                                            <strong>{{ $errors->first('id_level') }}</strong>
-                                        </span>
-                                    @endif
-                                </div>
+                                
                                 <div class="input-group{{ $errors->has('password') ? ' has-danger' : '' }}">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text bg-white border-right-0">

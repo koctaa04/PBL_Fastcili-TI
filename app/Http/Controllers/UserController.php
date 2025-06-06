@@ -188,12 +188,25 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
+
+            // Jika ingin diaktifkan (akses = true)
+            if (!$user->akses) {
+                // Cek apakah level_kode ada 
+                if (empty($user->id_level)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'level user belum diatur. Atur level terlebih dahulu!'
+                    ], 400);
+                }
+            }
+
+            // Toggle akses
             $user->akses = !$user->akses;
             $user->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Status akses berhasil diubah',
+                'message' => 'Status akses berhasil diubah.',
                 'new_status' => $user->akses
             ]);
         } catch (\Exception $e) {
@@ -203,6 +216,7 @@ class UserController extends Controller
             ], 500);
         }
     }
+
 
     public function import()
     {

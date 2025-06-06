@@ -43,7 +43,7 @@
                                 <th width="10%">Profil</th>
                                 <th width="20%">Nama</th>
                                 <th width="25%">Email</th>
-                                <th width="20%">Nama Level</th>
+                                <th width="20%">Level User</th>
                                 <th width="10%">Akses</th>
                                 <th width="15%">Aksi</th>
                             </tr>
@@ -107,7 +107,10 @@
                     {
                         data: 'level.nama_level',
                         name: 'level.nama_level',
-                        className: 'text-center'
+                        className: 'text-center',
+                            render: function(data, type, row) {
+        return data ? data : '--';
+    }
                     },
                     {
                         data: 'akses',
@@ -190,7 +193,7 @@
                             }
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Error!',
+                                title: 'Gagal!',
                                 text: errorMsg
                             });
                         }

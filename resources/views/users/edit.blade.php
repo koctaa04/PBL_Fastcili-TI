@@ -9,8 +9,9 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nama Level</label>
+                    <label>Level User</label>
                     <select class="form-control" name="id_level" id="id_level" required>
+                        <option value="">--- Pilih Level ---</option>
                         @foreach ($level as $l)
                             <option value="{{ $l->id_level }}" @if ($l->id_level == $users->id_level) selected @endif>
                                 {{ $l->nama_level }}</option>
