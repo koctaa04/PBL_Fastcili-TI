@@ -103,7 +103,7 @@
                                 <p class="mb-2"><strong>Fasilitas:</strong>
                                     {{ $penugasan->laporan->fasilitas->nama_fasilitas }}</p>
                                 <p class="mb-2"><strong>Tanggal Lapor:</strong>
-                                    {{ \Carbon\Carbon::parse($penugasan->laporan->tanggal_lapor)->format('d M Y') }}</p>
+                                    {{ $penugasan->laporan->tanggal_lapor->translatedFormat('l, d F Y') }}</p>
                                 <p class="mb-2"><strong>Deskripsi:</strong>
                                     {{ $penugasan->laporan->pelaporLaporan->first()->deskripsi_tambahan ?? '-' }}
                                 </p>
@@ -112,7 +112,7 @@
                                 </p>
                                 <div class="d-flex justify-content-end mt-4">
                                     <button
-                                        onclick="modalAction('{{ route('teknisi.feedback', ['id' => $penugasan->id_penugasan]) }}')"
+                                        onclick="modalAction('{{ url('/perbaikan/edit/' . $penugasan->id_penugasan) }}')"
                                         class="btn btn-primary btn-sm me-2">
                                         Dokumentasi Perbaikan
                                     </button>
@@ -161,12 +161,12 @@
                                             </td>
                                             <td>
                                                 {{ $l->tanggal_selesai
-                                                    ? \Carbon\Carbon::parse($l->tanggal_selesai)->locale('id')->translatedFormat('l, d F Y')
+                                                    ? $l->tanggal_selesai->translatedFormat('l, d F Y')
                                                     : '-' }}
                                             </td>
                                             <td>
                                                 <button
-                                                    onclick="modalAction('{{ route('teknisi.detailRiwayat', ['id' => $l->id_penugasan]) }}')"
+                                                    onclick="modalAction('{{ url('/perbaikan/detail/'. $l->id_penugasan) }}')"
                                                     class="btn btn-warning btn-sm me-2">
                                                     Detail
                                                 </button>

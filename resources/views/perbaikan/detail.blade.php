@@ -57,7 +57,9 @@
                                     <label class="text-muted small mb-1">Tanggal Lapor</label>
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-alt mr-2 text-info"></i>
-                                        {{ $perbaikan->laporan->tanggal_lapor }}
+                                        {{ $perbaikan->laporan->tanggal_lapor
+                                            ? $perbaikan->laporan->tanggal_lapor->translatedFormat('l, d F Y')
+                                            : '-' }}
                                     </p>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -74,7 +76,7 @@
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-alt mr-2 text-info"></i>
                                         {{ $perbaikan->tenggat
-                                            ? \Carbon\Carbon::parse($perbaikan->tenggat)->locale('id')->translatedFormat('l, d F Y')
+                                            ? $perbaikan->tenggat->translatedFormat('l, d F Y')
                                             : '-' }}
                                     </p>
                                 </div>
@@ -85,7 +87,7 @@
             </div>
 
             <!-- Informasi Perbaikan Card -->
-            @if ($perbaikan->status_perbaikan == 'Selesai')
+            @if ($perbaikan->status_perbaikan == 'Selesai Dikerjakan')
                 <div class="card border-0">
                     <div class="card-header bg-light">
                         <h6 class="mb-0 font-weight-bold">
@@ -124,7 +126,9 @@
                                     <label class="text-muted small mb-1">Tanggal Selesai</label>
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-check mr-2 text-primary"></i>
-                                        {{ $perbaikan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
+                                        {{ $perbaikan->tanggal_selesai
+                                            ? $perbaikan->tanggal_selesai->translatedFormat('l, d F Y')
+                                            : '-' }}
                                     </p>
                                 </div>
                             </div>

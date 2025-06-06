@@ -22,6 +22,12 @@ class PenugasanTeknisi extends Model
         'komentar_sarpras'
     ];
 
+    protected $casts = [
+        'tenggat' => 'date', // atau 'datetime'
+        'tanggal_selesai' => 'date', // atau 'datetime'
+    ];
+
+
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');

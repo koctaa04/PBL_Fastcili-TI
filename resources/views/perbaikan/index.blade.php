@@ -20,7 +20,7 @@
                                 <th scope="col">Teknisi</th>
                                 <th scope="col">Tenggat</th>
                                 <th scope="col">Status</th>
-                                <th scope="col-">Catatan Teknisi</th>
+                                <th scope="col">Catatan Teknisi</th>
                                 <th scope="col">Dokumentasi Perbaikan</th>
                                 <th scope="col">Catatan Sarpras</th>
                                 <th scope="col">Aksi</th>
@@ -43,10 +43,14 @@
 
                                     {{-- Nama Teknisi --}}
                                     <td>{{ $laporan->laporan->penugasan->user->nama ?? '-' }}</td>
-                                    <td> {{ $laporan->tenggat
-                                        ? \Carbon\Carbon::parse($laporan->tenggat)->locale('id')->translatedFormat('l, d F Y')
-                                        : '-' }}
+
+                                    {{-- Tenggat Laporan --}}
+                                    <td>
+                                        {{ $laporan->tenggat
+                                            ? $laporan->tenggat->translatedFormat('l, d F Y')
+                                            : '-' }}
                                     </td>
+                                    
                                     <td>
                                         <span
                                             class="badge badge-pill {{ $laporan->status_perbaikan == 'Sedang dikerjakan' ? 'badge-warning' : 'badge-success' }}">
@@ -55,26 +59,26 @@
                                     </td>
 
                                     {{-- Catatan Teknisi --}}
-                                    <td>{{ Str::limit($laporan->catatan_teknisi, 20) ?? '-' }}</td>
+                                    <td>{{ Str::limit($laporan->catatan_teknisi, 30) ?? '-' }}</td>
 
                                     {{-- Dokumentasi --}}
                                     <td>
                                         @if ($laporan->dokumentasi)
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
-                                                alt="Foto Kerusakan" height="65">
+                                                alt="Dokumentasi" height="65">
                                         @else
                                             <span class="text-danger">(Belum ada dokumentasi)</span>
                                         @endif
                                     </td>
 
                                     {{-- Catatan Teknisi --}}
-                                    <td>{{ Str::limit($laporan->komentar_sarpras, 20) ?? '-' }}</td>
+                                    <td>{{ Str::limit($laporan->komentar_sarpras, 30) ?? '-' }}</td>
 
                                     {{-- Tombol Aksi --}}
                                     <td>
                                         <div class="d-flex">
                                             @php
-                                                $isEditable = $laporan->status_perbaikan != 'Selesai';
+                                                $isEditable = $laporan->status_perbaikan != 'Selesai Dikerjakan';
                                                 $isRejected = !is_null($laporan->komentar_sarpras);
                                                 $isReported = !is_null($laporan->dokumentasi);
 

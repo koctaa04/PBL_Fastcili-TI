@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         PelaporLaporan::observe(UpdateLaporanObserver::class);
         LaporanKerusakan::observe(LaporanKerusakanObserver::class);
         PenugasanTeknisi::observe(FeedbackTeknisiObserver::class);
+        config(['app.locale' => 'id']);
         Carbon::setLocale('id');
     }
 }

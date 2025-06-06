@@ -22,7 +22,7 @@
                                 <p class="mb-2"><strong>Fasilitas:</strong>
                                     {{ $status->laporan->fasilitas->nama_fasilitas }}</p>
                                 <p class="mb-2"><strong>Tanggal Lapor:</strong>
-                                    {{ \Carbon\Carbon::parse($status->created_at)->format('d M Y') }}</p>
+                                    {{ $status->created_at->translatedFormat('l, d F Y') }}</p>
                                 <p class="mb-2">
                                     <strong>Status:</strong>
                                     @php
