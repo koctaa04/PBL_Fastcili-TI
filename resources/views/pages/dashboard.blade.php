@@ -36,8 +36,8 @@
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Laporan Terverifikasi</p>
-                                    <p class="card-title">{{ $laporanTerverifikasi }}
+                                    <p class="card-category">Laporan Diajukan</p>
+                                    <p class="card-title">{{ $laporanDiajukan }}
                                     <p>
                                 </div>
                             </div>
@@ -56,8 +56,8 @@
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Laporan Aktif</p>
-                                    <p class="card-title">{{ $laporanAktif }}
+                                    <p class="card-category">Laporan Diproses</p>
+                                    <p class="card-title">{{ $laporanDiproses }}
                                     <p>
                                 </div>
                             </div>

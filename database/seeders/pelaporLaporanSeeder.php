@@ -15,107 +15,58 @@ class pelaporLaporanSeeder extends Seeder
     {
         PelaporLaporan::insert([
             [
-                'id_user' => 31,
-                'id_laporan' => 1, // laporan: "PC tidak bisa menyala"
-                'deskripsi_tambahan' => 'PC tidak bisa menyala',
+                'id_user' => 10,
+                'id_laporan' => 1, // Proyektor tidak bisa menyambung
+                'deskripsi_tambahan' => 'Sudah coba ganti kabel HDMI tapi tetap tidak muncul tampilan.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'id_user' => 32,
-                'id_laporan' => 2, // laporan: "Kipas mati total"
-                'deskripsi_tambahan' => 'Port kabel tidak berfungsi',
+                'id_user' => 11,
+                'id_laporan' => 2, // Lemari Arsip pintunya rusak
+                'deskripsi_tambahan' => 'Engsel pintu sudah longgar sejak minggu lalu.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'id_user' => 38,
-                'id_laporan' => 3,
-                'deskripsi_tambahan' => 'AC hanya mengeluarkan angin',
+                'id_user' => 10,
+                'id_laporan' => 3, // Printer tidak bisa mencetak
+                'deskripsi_tambahan' => 'Sudah diinstal ulang drivernya tapi tetap tidak bisa cetak.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'id_user' => 25,
-                'id_laporan' => 4,
-                'deskripsi_tambahan' => 'Papan Tulis Rusak',
+                'id_user' => 11,
+                'id_laporan' => 4, // Whiteboard retak
+                'deskripsi_tambahan' => 'Retakan menyebar dan bisa membahayakan jika jatuh.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'id_user' => 40,
-                'id_laporan' => 1,
-                'deskripsi_tambahan' => 'PC mengeluarkan bunyi beep saat dinyalakan',
+                'id_user' => 21,
+                'id_laporan' => 5, // AC mengeluarkan bunyi keras
+                'deskripsi_tambahan' => 'Bunyi sangat mengganggu saat perkuliahan.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'id_user' => 44,
-                'id_laporan' => 5,
-                'deskripsi_tambahan' => 'Proyektor tidak bisa menyambung',
+                'id_user' => 22,
+                'id_laporan' => 6, // Printer 3D nozzle tersumbat
+                'deskripsi_tambahan' => 'Sudah dibersihkan tapi nozzle tetap mampet.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'id_user' => 20,
-                'id_laporan' => 6,
-                'deskripsi_tambahan' => 'Kaki meja patah',
+                'id_user' => 23,
+                'id_laporan' => 7, // Kit Robotik tidak menyala
+                'deskripsi_tambahan' => 'Dugaan masalah di kabel powernya.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'id_user' => 31,
-                'id_laporan' => 7,
-                'deskripsi_tambahan' => 'Printer rusak dan berdengung',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_user' => 40,
-                'id_laporan' => 8,
-                'deskripsi_tambahan' => 'Kipas angin tidak menyala',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_user' => 28,
-                'id_laporan' => 4,
-                'deskripsi_tambahan' => 'Papan Tulis Rusak',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_user' => 49,
-                'id_laporan' => 8,
-                'deskripsi_tambahan' => 'Kipas angin tidak bisa dinyalakan',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_user' => 18,
-                'id_laporan' => 5,
-                'deskripsi_tambahan' => 'Proyektor tidak bisa hidup',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_user' => 41,
-                'id_laporan' => 5,
-                'deskripsi_tambahan' => 'Proyektor tidak bisa menyambung',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_user' => 36,
-                'id_laporan' => 7,
-                'deskripsi_tambahan' => 'Printer tidak bisa digunakan',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_user' => 18,
-                'id_laporan' => 8,
-                'deskripsi_tambahan' => 'Kipas angin tidak menyala',
+                'id_user' => 21,
+                'id_laporan' => 8, // Dispenser tidak keluar air panas
+                'deskripsi_tambahan' => 'Sudah coba isi ulang, tapi air tetap tidak panas.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

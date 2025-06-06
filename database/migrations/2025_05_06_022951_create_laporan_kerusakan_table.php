@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('deskripsi');
             $table->string('foto_kerusakan');
             $table->date('tanggal_lapor');
+            $table->date('tanggal_selesai')->nullable();
             $table->unsignedBigInteger('id_status');
             $table->timestamps();
 

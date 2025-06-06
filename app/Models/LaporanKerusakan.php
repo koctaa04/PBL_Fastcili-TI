@@ -17,6 +17,7 @@ class LaporanKerusakan extends Model
         'deskripsi',
         'foto_kerusakan',
         'tanggal_lapor',
+        'tanggal_selesai',
         'id_status',
         'keterangan',
     ];

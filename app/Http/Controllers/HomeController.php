@@ -36,8 +36,8 @@ class HomeController extends Controller
     {
         // Hitung jumlah laporan
         $jmlLaporan = LaporanKerusakan::count();
-        $laporanAktif = LaporanKerusakan::whereIn('id_status', [1, 2, 3])->count();
-        $laporanTerverifikasi = LaporanKerusakan::whereIn('id_status', [2])->count();
+        $laporanDiajukan = LaporanKerusakan::whereIn('id_status', [1])->count();
+        $laporanDiproses = LaporanKerusakan::whereIn('id_status', [2,3])->count();
         $laporanSelesai = LaporanKerusakan::whereIn('id_status', [4])->count();
 
         // Data grafik laporan perbulan
@@ -56,8 +56,8 @@ class HomeController extends Controller
         // Debug data yang dikirim ke view
         $debugData = [
             'jmlLaporan' => $jmlLaporan,
-            'laporanAktif' => $laporanAktif,
-            'laporanTerverifikasi' => $laporanTerverifikasi,
+            'laporanDiajukan' => $laporanDiajukan,
+            'laporanDiproses' => $laporanDiproses,
             'laporanSelesai' => $laporanSelesai,
             'laporanPerBulan' => $laporanPerBulan,
             'statusLaporan' => $statusLaporan,
