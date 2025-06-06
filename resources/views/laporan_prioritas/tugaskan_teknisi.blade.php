@@ -32,6 +32,11 @@
                                     </select>
                                     <small id="error-id_user" class="text-danger error-text"></small>
                                 </div>
+                                <div class="form-group">
+                                    <label for="tenggat" class="form-label text-muted small">Tenggat Waktu</label>
+                                    <input type="date" name="tenggat" id="tenggat" class="form-control" required>
+                                    <small id="error-tenggat" class="text-danger error-text"></small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,7 +116,8 @@
             processData: false,
             dataType: "json",
             beforeSend: function() {
-                $('#form_penugasan button[type=submit]').prop('disabled', true).text('Menyimpan...');
+                $('#form_penugasan button[type=submit]').prop('disabled', true).text(
+                'Menyimpan...');
             },
             success: function(response) {
                 $('#form_penugasan button[type=submit]').prop('disabled', false).text('Okay');
@@ -151,18 +157,22 @@
     .bg-gradient-primary {
         background: linear-gradient(135deg, #ff9900 0%, #ffae00 100%);
     }
+
     .card {
         transition: all 0.3s ease;
         border-radius: 0.5rem;
     }
+
     .card:hover {
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
+
     .modal-content {
         border-radius: 0.5rem;
         overflow: hidden;
     }
+
     .shadow-lg {
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
     }
 </style>

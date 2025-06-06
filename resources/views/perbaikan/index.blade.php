@@ -14,12 +14,13 @@
                             <tr>
                                 <th scope="col">No</th>
                                 @if (auth()->user()->id_level != 1)
-                                <th scope="col">Foto Kerusakan</th>
+                                    <th scope="col">Foto Kerusakan</th>
                                 @endif
                                 <th scope="col">Deskripsi</th>
                                 <th scope="col">Teknisi</th>
+                                <th scope="col">Tenggat</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Catatan Teknisi</th>
+                                <th scope="col-">Catatan Teknisi</th>
                                 <th scope="col">Dokumentasi Perbaikan</th>
                                 <th scope="col">Catatan Sarpras</th>
                                 <th scope="col">Aksi</th>
@@ -30,19 +31,22 @@
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
                                     @if (auth()->user()->id_level != 1)
-                                    {{-- Foto Kerusakan --}}
-                                    <td>
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
-                                            alt="Foto Kerusakan" height="65"
-                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
-                                    </td>
+                                        {{-- Foto Kerusakan --}}
+                                        <td>
+                                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                                                alt="Foto Kerusakan" height="65"
+                                                onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                        </td>
                                     @endif
                                     {{-- Deskripsi --}}
                                     <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
 
                                     {{-- Nama Teknisi --}}
                                     <td>{{ $laporan->laporan->penugasan->user->nama ?? '-' }}</td>
-
+                                    <td> {{ $laporan->tenggat
+                                        ? \Carbon\Carbon::parse($laporan->tenggat)->locale('id')->translatedFormat('l, d F Y')
+                                        : '-' }}
+                                    </td>
                                     <td>
                                         <span
                                             class="badge badge-pill {{ $laporan->status_perbaikan == 'Sedang dikerjakan' ? 'badge-warning' : 'badge-success' }}">
@@ -196,7 +200,7 @@
                         searchable: true,
                     }]
                 });
-            } 
+            }
             // Configuration for other users
             else {
                 var datalaporan = $('#table_perbaikan').DataTable({
@@ -209,7 +213,7 @@
                         orderable: false,
                         searchable: true,
                     }, {
-                        targets: [2,3],
+                        targets: [2, 3],
                         searchable: true,
                     }]
                 });

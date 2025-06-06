@@ -15,6 +15,7 @@ class PenugasanTeknisi extends Model
         'id_laporan',
         'id_user',
         'tanggal_selesai',
+        'tenggat',
         'status_perbaikan',
         'catatan_teknisi',
         'dokumentasi',

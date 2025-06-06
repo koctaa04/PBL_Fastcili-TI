@@ -368,28 +368,30 @@ class LaporanKerusakanController extends Controller
 
         return view('laporan_prioritas.verifikasi', compact('laporan'));
     }
-
     public function simpanPenugasan(Request $request)
     {
         $request->validate([
             'id_laporan' => 'required',
             'id_user' => 'required',
+            'tenggat' => 'required|date|after_or_equal:today',
         ]);
 
         PenugasanTeknisi::updateOrCreate(
             ['id_laporan' => $request->id_laporan],
             [
                 'id_user' => $request->id_user,
+                'tenggat' => $request->tenggat,
                 'status_perbaikan' => 'Sedang dikerjakan',
                 'tanggal_selesai' => null,
             ]
         );
 
         LaporanKerusakan::where('id_laporan', $request->id_laporan)
-            ->update(['id_status' => 3]); // Asumsikan 3 = 'Dalam Perbaikan'
+            ->update(['id_status' => 3]); // Dalam Perbaikan
 
         return response()->json(['success' => true, 'messages' => 'Teknisi berhasil ditugaskan']);
     }
+
 
     public function simpanVerifikasi(Request $request)
     {
@@ -421,20 +423,15 @@ class LaporanKerusakanController extends Controller
                 'status_perbaikan' => 'Selesai',
                 'komentar_sarpras' => null,
             ]);
-        } else {
-            $laporan->update([
-                // id status berubah menjadi diperbaiki lagi ketika Ditolak
-                'id_status' => 3,
-            ]);
 
+            $kriteria = KriteriaPenilaian::find($idLaporan);
+            $kriteria->delete();
+        } else {
             $penugasan->update([
                 'status_perbaikan' => 'Ditolak',
                 'komentar_sarpras' => $request->keterangan,
             ]);
         }
-
-        $kriteria = KriteriaPenilaian::find($idLaporan);
-        $kriteria->delete();
 
         return response()->json([
             'success' => true,

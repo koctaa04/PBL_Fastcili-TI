@@ -21,8 +21,7 @@
                         <div class="col-md-4 mb-3 mb-md-0">
                             <div class="text-center">
                                 <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $perbaikan->laporan->foto_kerusakan) }}"
-                                    alt="Foto Kerusakan" 
-                                    class="img-fluid rounded shadow-sm border"
+                                    alt="Foto Kerusakan" class="img-fluid rounded shadow-sm border"
                                     style="max-height: 250px; width: auto;"
                                     onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
                             </div>
@@ -35,7 +34,7 @@
                                     {{ $perbaikan->laporan->fasilitas->nama_fasilitas ?? '-' }}
                                 </p>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label class="text-muted small mb-1">Deskripsi Kerusakan</label>
                                 <div class="bg-light p-3 rounded">
@@ -44,15 +43,15 @@
                             </div>
 
                             <!-- Komentar Sarpras Section -->
-                            @if($perbaikan->komentar_sarpras)
-                            <div class="mb-3">
-                                <label class="text-muted small mb-1">Komentar Sarpras</label>
-                                <div class="bg-light p-3 rounded">
-                                    <p class="mb-0">{{ $perbaikan->komentar_sarpras }}</p>
+                            @if ($perbaikan->komentar_sarpras)
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">Komentar Sarpras</label>
+                                    <div class="bg-light p-3 rounded">
+                                        <p class="mb-0">{{ $perbaikan->komentar_sarpras }}</p>
+                                    </div>
                                 </div>
-                            </div>
                             @endif
-                            
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="text-muted small mb-1">Tanggal Lapor</label>
@@ -69,6 +68,17 @@
                                     </p>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small mb-1">Tenggat Perbaikan</label>
+                                    <p class="font-weight-bold">
+                                        <i class="fas fa-calendar-alt mr-2 text-info"></i>
+                                        {{ $perbaikan->tenggat
+                                            ? \Carbon\Carbon::parse($perbaikan->tenggat)->locale('id')->translatedFormat('l, d F Y')
+                                            : '-' }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -76,52 +86,51 @@
 
             <!-- Informasi Perbaikan Card -->
             @if ($perbaikan->status_perbaikan == 'Selesai')
-            <div class="card border-0">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0 font-weight-bold">
-                        <i class="fas fa-check-circle mr-2 text-success"></i>Informasi Perbaikan
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <div class="text-center">
-                                <img src="{{ asset('storage/uploads/dokumentasi/' . $perbaikan->dokumentasi) }}"
-                                    alt="Dokumentasi Perbaikan" 
-                                    class="img-fluid rounded shadow-sm border"
-                                    style="max-height: 250px; width: auto;">
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="mb-3">
-                                <label class="text-muted small mb-1">Status</label>
-                                <p>
-                                    <span class="badge badge-success px-3 py-2">
-                                        <i class="fas fa-check mr-1"></i>
-                                        {{ $perbaikan->status_perbaikan }}
-                                    </span>
-                                </p>
-                            </div>
-                            
-                            <!-- Catatan Teknisi Section -->
-                            <div class="mb-3">
-                                <label class="text-muted small mb-1">Catatan Teknisi</label>
-                                <div class="bg-light p-3 rounded">
-                                    <p class="mb-0">{{ $perbaikan->catatan_teknisi ?? '-' }}</p>
+                <div class="card border-0">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0 font-weight-bold">
+                            <i class="fas fa-check-circle mr-2 text-success"></i>Informasi Perbaikan
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="text-center">
+                                    <img src="{{ asset('storage/uploads/dokumentasi/' . $perbaikan->dokumentasi) }}"
+                                        alt="Dokumentasi Perbaikan" class="img-fluid rounded shadow-sm border"
+                                        style="max-height: 250px; width: auto;">
                                 </div>
                             </div>
-                            
-                            <div class="mb-3">
-                                <label class="text-muted small mb-1">Tanggal Selesai</label>
-                                <p class="font-weight-bold">
-                                    <i class="fas fa-calendar-check mr-2 text-primary"></i>
-                                    {{ $perbaikan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
-                                </p>
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">Status</label>
+                                    <p>
+                                        <span class="badge badge-success px-3 py-2">
+                                            <i class="fas fa-check mr-1"></i>
+                                            {{ $perbaikan->status_perbaikan }}
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <!-- Catatan Teknisi Section -->
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">Catatan Teknisi</label>
+                                    <div class="bg-light p-3 rounded">
+                                        <p class="mb-0">{{ $perbaikan->catatan_teknisi ?? '-' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">Tanggal Selesai</label>
+                                    <p class="font-weight-bold">
+                                        <i class="fas fa-calendar-check mr-2 text-primary"></i>
+                                        {{ $perbaikan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             @endif
         </div>
         <div class="modal-footer bg-light">
@@ -136,20 +145,25 @@
     .bg-gradient-primary {
         background: linear-gradient(135deg, #ff9900 0%, #ffae00 100%);
     }
+
     .card {
         transition: all 0.3s ease;
         border-radius: 0.5rem;
     }
+
     .card:hover {
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
+
     .modal-content {
         border-radius: 0.5rem;
         overflow: hidden;
     }
+
     .shadow-lg {
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
     }
+
     .badge-success {
         background-color: #28a745;
     }

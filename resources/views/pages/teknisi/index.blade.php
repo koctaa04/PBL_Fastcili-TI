@@ -159,10 +159,10 @@
                                             </td>
                                             <td>{{ $l->laporan->fasilitas->ruangan->gedung->nama_gedung }}
                                             </td>
-                                            <td>{{ $laporan->tanggal_lapor->locale('id')->translatedFormat('l, d F Y') }}
-                                            </td>
                                             <td>
-                                                {{ $laporan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
+                                                {{ $l->tanggal_selesai
+                                                    ? \Carbon\Carbon::parse($l->tanggal_selesai)->locale('id')->translatedFormat('l, d F Y')
+                                                    : '-' }}
                                             </td>
                                             <td>
                                                 <button

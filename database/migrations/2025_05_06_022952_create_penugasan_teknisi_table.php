@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id_penugasan');
             $table->unsignedBigInteger('id_laporan');
             $table->unsignedBigInteger('id_user');
+            $table->date('tenggat')->nullable();
             $table->date('tanggal_selesai')->nullable();
             $table->string('status_perbaikan');
             $table->text('catatan_teknisi')->nullable();
