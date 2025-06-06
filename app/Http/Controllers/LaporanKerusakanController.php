@@ -420,12 +420,11 @@ class LaporanKerusakanController extends Controller
             ]);
 
             $penugasan->update([
-                'status_perbaikan' => 'Selesai',
+                'status_perbaikan' => 'Selesai Dikerjakan',
                 'komentar_sarpras' => null,
             ]);
 
-            $kriteria = KriteriaPenilaian::find($idLaporan);
-            $kriteria->delete();
+            KriteriaPenilaian::where('id_laporan', $idLaporan)->delete();
         } else {
             $penugasan->update([
                 'status_perbaikan' => 'Ditolak',
