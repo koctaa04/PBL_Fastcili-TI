@@ -115,7 +115,7 @@
                                 <label class="text-muted small mb-1">Tanggal Selesai</label>
                                 <p class="font-weight-bold">
                                     <i class="fas fa-calendar-check mr-2 text-primary"></i>
-                                    {{ $perbaikan->tanggal_selesai ?? '-' }}
+                                    {{ $perbaikan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
                                 </p>
                             </div>
                         </div>

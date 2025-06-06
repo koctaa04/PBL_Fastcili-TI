@@ -106,9 +106,6 @@ class LaporanKerusakanController extends Controller
     public function store(Request $request)
     {
         $userId = auth()->id();
-
-
-
         // Jika dukungan laporan sudah ada
         if ($request->filled('dukungan_laporan')) {
             $laporanId = $request->dukungan_laporan;
@@ -150,10 +147,17 @@ class LaporanKerusakanController extends Controller
                 'message' => 'Dukungan terhadap laporan berhasil dikirim.'
             ]);
         } else {
+            $fasilitas = Fasilitas::findOrFail($request->id_fasilitas);
             // Validasi laporan baru
             $request->validate([
                 'id_fasilitas' => 'required|exists:fasilitas,id_fasilitas',
                 'deskripsi' => 'required|string|max:255',
+                'jumlah_kerusakan' => [
+                    'required',
+                    'numeric',
+                    'min:0',
+                    'max:' . $fasilitas->jumlah
+                ],
                 'foto_kerusakan' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
@@ -164,18 +168,20 @@ class LaporanKerusakanController extends Controller
 
 
             // Cek apakah user sudah pernah melaporkan laporan aktif ini
-            $sudahMelaporkan = PelaporLaporan::where('id_laporan', $existing->id_laporan)
-                ->where('id_user', $userId)
-                ->whereHas('laporan', function ($query) use ($request) {
-                    $query->where('id_status', '!=', 4);
-                }) // hanya laporan aktif yang dicek
-                ->exists();
+            if ($existing) {
+                $sudahMelaporkan = PelaporLaporan::where('id_laporan', $existing->id_laporan)
+                    ->where('id_user', $userId)
+                    ->whereHas('laporan', function ($query) {
+                        $query->where('id_status', '!=', 4);
+                    })
+                    ->exists();
 
-            if ($sudahMelaporkan) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Anda sudah pernah melaporkan kerusakan ini sebelumnya.'
-                ]);
+                if ($sudahMelaporkan) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Anda sudah pernah melaporkan kerusakan ini sebelumnya.'
+                    ]);
+                }
             }
 
             // Upload foto
@@ -186,6 +192,7 @@ class LaporanKerusakanController extends Controller
             $laporan = LaporanKerusakan::create([
                 'id_fasilitas' => $request->id_fasilitas,
                 'deskripsi' => $request->deskripsi,
+                'jumlah_kerusakan' => $request->jumlah_kerusakan,
                 'foto_kerusakan' => $filename,
                 'tanggal_lapor' => now(),
                 'id_status' => 1,
@@ -434,72 +441,6 @@ class LaporanKerusakanController extends Controller
             'messages' => 'Verifikasi berhasil diproses.',
         ]);
     }
-
-    // ---------------------------------------------------
-
-
-
-
-
-
-
-
-    // public function edit(string $id)
-    // {
-    //     $laporan = LaporanKerusakan::find($id);
-
-    //     return view('laporan.edit', ['laporan' => $laporan]);
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $laporan = LaporanKerusakan::findOrFail($id);
-
-    //     // Validasi data input
-    //     $rules = [
-    //         'deskripsi' => 'required|string|max:255',
-    //         'foto_kerusakan' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-    //     ];
-
-    //     $validator = Validator::make($request->all(), $rules);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Validasi gagal',
-    //             'msgField' => $validator->errors()
-    //         ]);
-    //     }
-
-    //     // Update deskripsi
-    //     $laporan->deskripsi = $request->deskripsi;
-    //     $laporan->id_status = 1;
-
-    //     // Cek apakah ada file baru yang diunggah
-    //     if ($request->hasFile('foto_kerusakan')) {
-    //         // Hapus file lama jika ada
-    //         if ($laporan->foto_kerusakan && Storage::exists('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan)) {
-    //             Storage::delete('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan);
-    //         }
-
-    //         // Simpan file baru
-    //         $file = $request->file('foto_kerusakan');
-    //         $filename = time() . '_' . $file->getClientOriginalName();
-    //         $file->storeAs('public/uploads/laporan_kerusakan', $filename);
-
-    //         $laporan->foto_kerusakan = $filename;
-    //     }
-
-
-    //     $laporan->save();
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'messages' => 'Data berhasil diperbarui'
-    //     ]);
-    // }
-
-
 
     public function createPelapor()
     {

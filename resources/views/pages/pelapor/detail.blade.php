@@ -22,7 +22,9 @@
                 </tr>
                 <tr>
                     <th class="text-right col-3">Tanggal Lapor :</th>
-                    <td class="col-9">{{ \Carbon\Carbon::parse($laporan->created_at)->format('d M Y') }}</td>
+                    <td class="col-9"> {{ $laporan->created_at->locale('id')->translatedFormat('l, d F Y') }}</td>
+
+
                 </tr>
                 <tr>
                     @php

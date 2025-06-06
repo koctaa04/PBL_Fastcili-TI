@@ -2,15 +2,16 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
+use App\Models\PelaporLaporan;
+use App\Models\LaporanKerusakan;
+use App\Models\PenugasanTeknisi;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use App\Models\PenugasanTeknisi;
-use App\Observers\PenugasanTeknisiObserver;
-use App\Models\PelaporLaporan;
 use App\Observers\UpdateLaporanObserver;
-use App\Models\LaporanKerusakan;
 use App\Observers\FeedbackTeknisiObserver;
 use App\Observers\LaporanKerusakanObserver;
+use App\Observers\PenugasanTeknisiObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,5 +33,6 @@ class AppServiceProvider extends ServiceProvider
         PelaporLaporan::observe(UpdateLaporanObserver::class);
         LaporanKerusakan::observe(LaporanKerusakanObserver::class);
         PenugasanTeknisi::observe(FeedbackTeknisiObserver::class);
+        Carbon::setLocale('id');
     }
 }

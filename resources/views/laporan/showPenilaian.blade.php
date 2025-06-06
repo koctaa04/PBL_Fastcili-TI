@@ -57,7 +57,8 @@
                                         <label class="text-muted small mb-1">Tanggal Lapor</label>
                                         <p class="font-weight-bold">
                                             <i class="fas fa-calendar-alt mr-2 text-secondary"></i>
-                                            {{ $laporan->tanggal_lapor }}
+                                            {{ $laporan->tanggal_lapor->locale('id')->translatedFormat('l, d F Y') }}
+
                                         </p>
                                     </div>
                                     <div class="col-md-6 mb-3">

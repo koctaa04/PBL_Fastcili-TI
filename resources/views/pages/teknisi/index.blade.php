@@ -37,7 +37,8 @@
                             <div class="col-8 col-md-10">
                                 <div class="numbers">
                                     <p class="card-category text-nowrap">Laporan Belum Ditugaskan</p>
-                                    <p class="card-title">{{ $laporanBlmPenugasan }}<p>
+                                    <p class="card-title">{{ $laporanBlmPenugasan }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
@@ -56,7 +57,8 @@
                             <div class="col-8 col-md-10">
                                 <div class="numbers">
                                     <p class="card-category text-nowrap">Laporan Sedang Diperbaiki</p>
-                                    <p class="card-title">{{ $laporanDikerjakan }}<p>
+                                    <p class="card-title">{{ $laporanDikerjakan }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +77,8 @@
                             <div class="col-8 col-md-10">
                                 <div class="numbers">
                                     <p class="card-category text-nowrap">Laporan Sudah Diperbaiki</p>
-                                    <p class="card-title">{{ $laporanSelesaiDikerjakan }}<p>
+                                    <p class="card-title">{{ $laporanSelesaiDikerjakan }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
@@ -156,10 +159,10 @@
                                             </td>
                                             <td>{{ $l->laporan->fasilitas->ruangan->gedung->nama_gedung }}
                                             </td>
-                                            <td>{{ \Carbon\Carbon::parse($l->laporan->tanggal_lapor)->format('d M Y') }}
+                                            <td>{{ $laporan->tanggal_lapor->locale('id')->translatedFormat('l, d F Y') }}
                                             </td>
                                             <td>
-                                                {{ $l->tanggal_selesai ? \Carbon\Carbon::parse($l->tanggal_selesai)->format('d M Y') : '-' }}
+                                                {{ $laporan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
                                             </td>
                                             <td>
                                                 <button
@@ -247,26 +250,26 @@
         });
 
         //graik penugasan per gedung
-            const ctx3 = document.getElementById('penugasanGedungChart');
-            new Chart(ctx3, {
-                type: 'bar',
-                data: {
-                    labels: {!! json_encode($penugasanPerGedung->keys()) !!},
-                    datasets: [{
-                        label: 'Jumlah Penugasan',
-                        data: {!! json_encode($penugasanPerGedung->values()) !!},
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+        const ctx3 = document.getElementById('penugasanGedungChart');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($penugasanPerGedung->keys()) !!},
+                datasets: [{
+                    label: 'Jumlah Penugasan',
+                    data: {!! json_encode($penugasanPerGedung->values()) !!},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            });
+            }
+        });
     </script>
 @endpush

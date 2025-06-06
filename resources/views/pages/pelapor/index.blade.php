@@ -109,7 +109,7 @@
                                             <th scope="row">{{ $lapor + 1 }}</th>
                                             <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
                                             <td>{{ $l->deskripsi_tambahan }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($l->created_at)->format('d M Y') }}</td>
+                                            <td>{{ $l->created_at->locale('id')->translatedFormat('l, d F Y') }}</td>
                                             <td>{{ $l->laporan->status->nama_status }}</td>
                                             <td>
                                                 <button

@@ -41,8 +41,15 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika diperlukan)</label>
+                                        <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika
+                                            diperlukan)</label>
                                         <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="jumlah_kerusakan">Jumlah fasilitas yang rusak</label>
+                                        <input type="number" name="jumlah_kerusakan" class="form-control" required>
+                                        <small class="text-muted d-block mt-1">*Jumlah fasiltas yang rusak tidak bisa lebih
+                                            dari jumlah fasilitas</small>
                                     </div>
 
                                     <div class="form-group">
@@ -97,7 +104,7 @@
                 </div>
             </div>
         </div>
-        @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
+        @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
             <div class="card p-4">
                 <div class="card-header">
                     <h3>Daftar Laporan Kerusakan</h3>
@@ -110,9 +117,9 @@
                                     <th width="5%">No</th>
                                     <th width="15%">Foto Kerusakan</th>
                                     <th width="10%">Fasilitas</th>
-                                    <th width="10%">Gedung</th>
-                                    <th width="15%">Ruangan</th>
+                                    <th width="15%">Tempat</th>
                                     <th width="10%">Pelapor</th>
+                                    <th width="6%">Jumlah kerusakan</th>
                                     <th width="15%">Deskripsi</th>
                                     <th width="7%">Status</th>
                                     <th width="7%">Tanggal Lapor</th>
@@ -129,9 +136,10 @@
                                                 style="height: 120px; object-fit: cover;">
                                         </td>
                                         <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
-                                        <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
-                                        <td>{{ $item->laporan->fasilitas->ruangan->nama_ruangan }}</td>
+                                        <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }} -
+                                            {{ $item->laporan->fasilitas->ruangan->nama_ruangan }}</td>
                                         <td>{{ $item->user->nama }}</td>
+                                        <td>{{ $item->laporan->jumlah_kerusakan }}</td>
                                         <td>{{ $item->deskripsi_tambahan ?? '-' }}</td>
                                         <td>
 
@@ -147,10 +155,12 @@
                                             <p class=" p-2 badge {{ $statusColor }}">
                                                 {{ $item->laporan->status->nama_status }}</p>
                                         </td>
-                                        <td>{{ $item->laporan->tanggal_lapor }}</td>
+                                        <td>{{ $item->laporan->tanggal_lapor->locale('id')->translatedFormat('l, d F Y') }}</td>
+
+
                                         <td>
-                                            <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $item->id }}"
-                                                data-nama="{{ $item->user->nama }}">
+                                            <button class="btn btn-danger btn-sm btn-delete"
+                                                data-id="{{ $item->id }}" data-nama="{{ $item->user->nama }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -167,6 +177,17 @@
 @endsection
 
 @push('scripts')
+    <script>
+        // Handle file input change
+        $('#foto_kerusakan').on('change', function() {
+            var fileName = $(this).val().split('\\').pop();
+            if (fileName) {
+                $('#file-label').html('<i class="fas fa-file-image mr-2"></i>' + fileName);
+            } else {
+                $('#file-label').html('<i class="fas fa-upload mr-2"></i>Pilih Foto Kerusakan');
+            }
+        });
+    </script>
     <script>
         var currentUserId = {{ auth()->id() }};
         $(document).ready(function() {

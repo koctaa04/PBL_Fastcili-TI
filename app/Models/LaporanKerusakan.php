@@ -12,10 +12,14 @@ class LaporanKerusakan extends Model
     protected $table = 'laporan_kerusakan';
     protected $primaryKey = 'id_laporan';
 
+    protected $casts = [
+        'tanggal_lapor' => 'datetime',
+    ];
     protected $fillable = [
         'id_fasilitas',
         'deskripsi',
         'foto_kerusakan',
+        'jumlah_kerusakan',
         'tanggal_lapor',
         'tanggal_selesai',
         'id_status',
