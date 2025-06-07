@@ -69,10 +69,10 @@
                                 <span class="d-lg-none d-md-block">{{ __('Notifications') }}</span>
                             </p>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                        <div class="dropdown-menu dropdown-menu-right" style="cursor: pointer" aria-labelledby="navbarDropdownMenuLink">
                             @forelse (Auth::user()->unreadNotifications as $notification)
                                 @if (auth()->user()->id_level == 3)
-                                    <a class="dropdown-item" href="{{ $notification->data['link'] ?? '#' }}"
+                                    <a class="dropdown-item" onclick="modalAction('{{ $notification->data['link'] ?? '#' }}')"
                                         onclick="markNotificationAsRead('{{ $notification->id }}')">
                                         <strong>{{ $notification->data['fasilitas'] ?? 'Tugas Baru' }}</strong>
                                         <br>
@@ -81,7 +81,7 @@
                                         <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                                     </a>
                                 @elseif (auth()->user()->id_level == 2)
-                                    <a class="dropdown-item" href="{{ $notification->data['link'] ?? '#' }}"
+                                    <a class="dropdown-item" onclick="modalAction('{{ $notification->data['link'] ?? '#' }}')"
                                         onclick="markNotificationAsRead('{{ $notification->id }}')">
                                         <strong>{{ $notification->data['tipe'] ?? 'tidak ada penugasan' }}</strong>
                                         <br>
@@ -90,7 +90,7 @@
                                         <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                                     </a>
                                 @elseif (in_array(auth()->user()->id_level, [4, 5, 6]))
-                                    <a class="dropdown-item" href="{{ $notification->data['link'] ?? '#' }}"
+                                    <a class="dropdown-item" onclick="modalAction('{{ $notification->data['link'] ?? '#' }}')"
                                         onclick="markNotificationAsRead('{{ $notification->id }}')">
                                         <strong>{{ $notification->data['fasilitas'] ?? 'tidak ada fasilitas' }}</strong>
                                         <br>
