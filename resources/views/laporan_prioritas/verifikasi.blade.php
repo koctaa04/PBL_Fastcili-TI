@@ -1,6 +1,6 @@
 <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content border-0 shadow modal-scrollable">
-        <form id="formVerifikasi" method="POST" action="{{ url('/verifikasi-perbaikan') }}">
+        <form id="formVerifikasi" method="POST" action="{{ url('/verifikasi-perbaikan') }}" data-status-ntf="{{ $laporan->status->id_status }}">
             @csrf
             <input type="hidden" name="id_laporan" value="{{ $laporan->id_laporan }}">
             <input type="hidden" name="id_penugasan" value="{{ $laporan->penugasan->id_penugasan ?? '' }}">
@@ -59,7 +59,7 @@
                                     <div class="col-md-6">
                                         <div class="documentation-preview text-center">
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->dokumentasi) }}"
-                                                 onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
+                                                 onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                                  alt="Belum ada dokumentasi diberikan" 
                                                  class="img-fluid rounded shadow-sm border"
                                                  style="max-height: 200px; width: auto;">
@@ -82,7 +82,7 @@
                             <div class="card-body p-0">
                                 <div class="text-center">
                                     <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->dokumentasi) }}"
-                                         onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
+                                         onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                          alt="Dokumentasi Perbaikan" 
                                          class="img-fluid w-100">
                                 </div>
@@ -91,32 +91,42 @@
                     </div>
                 </div>
                 
-                <!-- Notes Section -->
-                <div class="card border-0">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">Catatan Verifikasi</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group mb-0">
-                            <label for="keterangan" class="text-muted small">Berikan catatan jika menolak verifikasi</label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" 
-                                      placeholder="Masukkan alasan penolakan (jika diperlukan)"></textarea>
+                @if ($laporan->status->id_status != 4)
+                    <!-- Notes Section -->
+                    <div class="card border-0">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 font-weight-bold">Catatan Verifikasi</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group mb-0">
+                                <label for="keterangan" class="text-muted small">Berikan catatan jika menolak verifikasi</label>
+                                <textarea name="keterangan" id="keterangan" class="form-control" rows="3" 
+                                        placeholder="Masukkan alasan penolakan (jika diperlukan)"></textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
 
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times mr-1"></i> Tutup
-                </button>
-                <button type="submit" name="verifikasi" value="tolak" class="btn btn-danger">
-                    <i class="fas fa-times-circle mr-1"></i> Tolak
-                </button>
-                <button type="submit" name="verifikasi" value="setuju" class="btn btn-success">
-                    <i class="fas fa-check-circle mr-1"></i> Setuju (Selesai)
-                </button>
-            </div>
+            @if ($laporan->status->id_status == 4)
+                <div class="modal-footer bg-light">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-save mr-1"></i> Menuju Halaman Prioritas
+                    </button>
+                </div>
+            @else
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Tutup
+                    </button>
+                    <button type="submit" name="verifikasi" value="tolak" class="btn btn-danger">
+                        <i class="fas fa-times-circle mr-1"></i> Tolak
+                    </button>
+                    <button type="submit" name="verifikasi" value="setuju" class="btn btn-success">
+                        <i class="fas fa-check-circle mr-1"></i> Setuju (Selesai)
+                    </button>
+                </div>
+            @endif
         </form>
     </div>
 </div>
@@ -160,6 +170,27 @@
     });
 
     $(document).on('submit', '#formVerifikasi', function(e) {
+        const statusNtf = $(this).data('status-ntf');
+
+            // Jika trendingNo == '-', jangan submit, arahkan saja ke prioritas.index
+            if (statusNtf === 4) {
+                e.preventDefault();
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Laporan sudah diverifikasi dan dinyatakan selesai.",
+                    text: "Anda akan diarahkan ke halaman Prioritas.",
+                    confirmButtonText: "OK",
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('prioritas.index') }}";
+                    }
+                });
+
+                return; // Stop form submission
+            }
+
         e.preventDefault();
 
         const formData = new FormData(this);
