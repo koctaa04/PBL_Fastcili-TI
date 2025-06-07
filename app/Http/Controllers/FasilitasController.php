@@ -6,6 +6,7 @@ use App\Models\Gedung;
 use App\Models\Ruangan;
 use App\Models\Fasilitas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -240,6 +241,9 @@ class FasilitasController extends Controller
 
             $errors = [];
             $berhasil = 0;
+            $kodeFasilitasInFile = [];
+
+            // ----------- STEP 1: VALIDASI LENGKAP DULU (NO DB SAVE) -----------
 
             foreach ($data as $index => $row) {
                 if ($index === 0) continue; // Skip header
@@ -248,11 +252,12 @@ class FasilitasController extends Controller
                 $id_ruangan = trim($row[0] ?? '');
                 $nama_fasilitas = trim($row[1] ?? '');
                 $jumlah = $row[2] ?? null;
+                $kode_fasilitas = trim($row[3] ?? '');
 
                 $rowErrors = [];
 
-                if ($id_ruangan === '' || $nama_fasilitas === '' || $jumlah === null || $jumlah === '') {
-                    $rowErrors[] = "Kolom tidak boleh kosong.";
+                if ($id_ruangan === '' || $nama_fasilitas === '' || $jumlah === null || $jumlah === '' || $kode_fasilitas === '') {
+                    $rowErrors[] = "Kolom tidak boleh kosong (termasuk kode_fasilitas).";
                 }
 
                 if (!is_numeric($id_ruangan) || !Ruangan::find($id_ruangan)) {
@@ -263,43 +268,72 @@ class FasilitasController extends Controller
                     $rowErrors[] = "Jumlah harus berupa angka lebih dari 0.";
                 }
 
+                if ($kode_fasilitas !== '') {
+                    if (in_array($kode_fasilitas, $kodeFasilitasInFile)) {
+                        $rowErrors[] = "Kode Fasilitas '{$kode_fasilitas}' duplikat di dalam file Excel.";
+                    } else {
+                        $kodeFasilitasInFile[] = $kode_fasilitas;
+                    }
+
+                    $existingKode = Fasilitas::where('kode_fasilitas', $kode_fasilitas)->first();
+                    if ($existingKode) {
+                        if (!($existingKode->id_ruangan == $id_ruangan && $existingKode->nama_fasilitas == $nama_fasilitas)) {
+                            $rowErrors[] = "Kode Fasilitas '{$kode_fasilitas}' sudah digunakan.";
+                        }
+                    }
+                }
+
                 if ($rowErrors) {
                     $errors[] = "Baris ke-{$barisExcel}: " . implode(' ', $rowErrors);
-                    continue;
                 }
-
-                // Cek apakah fasilitas dengan nama dan ruangan sudah ada
-                $fasilitas = Fasilitas::where('id_ruangan', $id_ruangan)
-                    ->where('nama_fasilitas', $nama_fasilitas)
-                    ->first();
-
-                if ($fasilitas) {
-                    // Update jumlah
-                    $fasilitas->jumlah += (int)$jumlah;
-                    $fasilitas->updated_at = now();
-                    $fasilitas->save();
-                } else {
-                    // Buat baru
-                    Fasilitas::create([
-                        'id_ruangan' => $id_ruangan,
-                        'nama_fasilitas' => $nama_fasilitas,
-                        'jumlah' => (int)$jumlah,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
-                }
-
-                $berhasil++;
             }
 
+            // Kalau ada error → batalkan import
             if ($errors) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Terdapat kesalahan pada data Excel.',
+                    'message' => 'Terdapat kesalahan pada data Excel. Tidak ada data yang disimpan.',
                     'errors' => $errors,
                     'msgField' => ['file_fasilitas' => $errors]
                 ], 422);
             }
+
+            // ----------- STEP 2: JALANKAN TRANSACTION UNTUK PROSES IMPORT -----------
+
+            DB::transaction(function () use ($data, &$berhasil) {
+                foreach ($data as $index => $row) {
+                    if ($index === 0) continue; // Skip header
+
+                    $id_ruangan = trim($row[0] ?? '');
+                    $nama_fasilitas = trim($row[1] ?? '');
+                    $jumlah = $row[2] ?? null;
+                    $kode_fasilitas = trim($row[3] ?? '');
+
+                    $fasilitas = Fasilitas::where('id_ruangan', $id_ruangan)
+                        ->where('nama_fasilitas', $nama_fasilitas)
+                        ->first();
+
+                    if ($fasilitas) {
+                        $fasilitas->jumlah += (int)$jumlah;
+                        if ($fasilitas->kode_fasilitas === null || $fasilitas->kode_fasilitas === '') {
+                            $fasilitas->kode_fasilitas = $kode_fasilitas;
+                        }
+                        $fasilitas->updated_at = now();
+                        $fasilitas->save();
+                    } else {
+                        Fasilitas::create([
+                            'id_ruangan' => $id_ruangan,
+                            'nama_fasilitas' => $nama_fasilitas,
+                            'jumlah' => (int)$jumlah,
+                            'kode_fasilitas' => $kode_fasilitas,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+                    }
+
+                    $berhasil++;
+                }
+            });
 
             return response()->json([
                 'status' => true,
@@ -314,8 +348,6 @@ class FasilitasController extends Controller
             ], 500);
         }
     }
-
-
 
     protected function convertErrorsToFields(array $errors)
     {
