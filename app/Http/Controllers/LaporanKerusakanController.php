@@ -29,8 +29,9 @@ class LaporanKerusakanController extends Controller
             'laporan.status',
             'user'
         ])->get();
+        $laporanAuth = PelaporLaporan::where('id_user', Auth::id())->get();
         $gedung = Gedung::all();
-        return view('laporan.index', compact('gedung', 'laporan'));
+        return view('laporan.index', compact('gedung', 'laporan', 'laporanAuth'));
     }
 
     public function getRuangan($idGedung)
@@ -293,24 +294,76 @@ class LaporanKerusakanController extends Controller
 
     public function showPenilaian(string $id)
     {
-        $data = PelaporLaporan::select('id_laporan', DB::raw('count(*) as total'))
-            ->groupBy('id_laporan')
-            ->orderByDesc('total')
-            ->whereHas('laporan', function ($laporan) {
-                $laporan->where('id_status', 1);
+        // Langkah 1: Ambil bobot
+        $bobot = [
+            'MHS' => 1,
+            'TDK' => 2,
+            'DSN' => 3,
+            'ADM' => 3
+        ];
+
+        // Langkah 2: Ambil semua pelapor
+        $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
+            ->whereHas('laporan', function ($query) {
+                $query->where('id_status', 1);
             })
             ->get();
 
-        $trendingRanks = [];
-        foreach ($data as $index => $item) {
-            $trendingRanks[$item->id_laporan] = $index + 1;
+        // Langkah 3: Hitung skor per laporan
+        $skorPerLaporan = [];
+        foreach ($pelapor as $item) {
+            $idLaporan = $item->id_laporan;
+            $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
+            $skor = $bobot[$kodeLevel] ?? 0;
+
+            if (!isset($skorPerLaporan[$idLaporan])) {
+                $skorPerLaporan[$idLaporan] = [
+                    'skor' => 0,
+                    'total_pelapor' => 0,
+                    'created_at' => $item->laporan->created_at ?? now()
+                ];
+            }
+
+            $skorPerLaporan[$idLaporan]['skor'] += $skor;
+            $skorPerLaporan[$idLaporan]['total_pelapor']++;
         }
 
+        // Langkah 4: Konversi ke collection
+        $data = collect($skorPerLaporan)
+            ->map(function ($item, $idLaporan) {
+                $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
+                if (!$laporan) return null;
+
+                return [
+                    'laporan' => $laporan,
+                    'skor' => $item['skor'],
+                    'total_pelapor' => $item['total_pelapor'],
+                    'created_at' => $item['created_at']
+                ];
+            })
+            ->filter()
+            ->values();
+
+        // Langkah 5: Sorting sama seperti trending()
+        $sortedData = $data->sortBy([
+            fn($a, $b) => $b['skor'] <=> $a['skor'],
+            fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
+            fn($a, $b) => $a['created_at'] <=> $b['created_at']
+        ])->values();
+
+        // Langkah 6: Beri ranking
+        $trendingRanks = [];
+        foreach ($sortedData as $index => $item) {
+            $trendingRanks[$item['laporan']->id_laporan] = $index + 1;
+        }
+
+        // Langkah 7: Ambil laporan yang akan ditampilkan
         $laporan = LaporanKerusakan::with([
             'fasilitas',
             'pelaporLaporan'
         ])->findOrFail($id);
 
+        // Langkah 8: Ambil ranking untuk laporan ini
         $trendingNo = $trendingRanks[$laporan->id_laporan] ?? '-';
 
         return view('laporan.showPenilaian', compact('laporan', 'trendingNo'));
@@ -417,6 +470,7 @@ class LaporanKerusakanController extends Controller
         if ($request->verifikasi === 'setuju') {
             $laporan->update([
                 'id_status' => 4, // Selesai
+                'tanggal_selesai' => now(), // Selesai
             ]);
 
             $penugasan->update([
@@ -575,7 +629,9 @@ class LaporanKerusakanController extends Controller
 
     public function rate(string $id)
     {
-        $laporan =  PelaporLaporan::where('id_user', $id)->first();
+        $laporan = PelaporLaporan::with(['laporan.penugasan.user'])
+            ->where('id_laporan', $id)
+            ->first();
 
         return view('pages.pelapor.rating', ['laporan' => $laporan]);
     }
@@ -587,14 +643,17 @@ class LaporanKerusakanController extends Controller
             'feedback_pengguna' => 'required|string|max:500',
         ]);
 
-        $laporan = PelaporLaporan::where('id_user', $id)->first();
+        $laporan = PelaporLaporan::where('id_laporan', $id);
         if (!$laporan) {
             return response()->json(['success' => false, 'message' => 'Laporan tidak ditemukan.']);
         }
 
-        $laporan->rating_pengguna = $request->rating_pengguna;
-        $laporan->feedback_pengguna = $request->feedback_pengguna;
-        $laporan->save();
+        // $laporan->rating_pengguna = $request->rating_pengguna;
+        // $laporan->feedback_pengguna = $request->feedback_pengguna;
+        $laporan->update([
+            'rating_pengguna' => $request->rating_pengguna,
+            'feedback_pengguna' => $request->feedback_pengguna
+        ]);
 
         return response()->json([
             'success' => true,

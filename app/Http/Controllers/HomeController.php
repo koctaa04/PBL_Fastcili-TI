@@ -134,11 +134,13 @@ class HomeController extends Controller
 
     public function pelapor()
     {
-        $laporan = PelaporLaporan::where('id_user', Auth::id())->get();
-        $status = PelaporLaporan::where('id_user', Auth::id())
+        $laporanAuth = PelaporLaporan::where('id_user', Auth::id())->get();
+        $statusList = PelaporLaporan::where('id_user', Auth::id())
+            ->whereNull('rating_pengguna')
             ->orderBy('created_at', 'desc')
-            ->first();
-        return view('pages.pelapor.index', compact('laporan', 'status'));
+            ->get();
+
+        return view('pages.pelapor.index', compact('laporanAuth', 'statusList'));
     }
 
     public function teknisi()
