@@ -31,7 +31,7 @@
                         <p>{{ __('Dashboard') }}</p>
                     </a>
                 @else
-                    <a href="{{ route('pelapor', 'dashboard') }}">
+                    <a href="{{ route('pelapor') }}">
                         <i class="nc-icon nc-sun-fog-29"></i>
                         <p>{{ __('Dashboard') }}</p>
                     </a>
@@ -118,20 +118,20 @@
                         <ul class="nav">
                             <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
                                 <a href="{{ route('perbaikan.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('L') }}</span>
+                                    <span class="sidebar-mini-icon">{{ __('LK') }}</span>
                                     <span class="sidebar-normal">{{ __(' Laporan Kerusakan ') }}</span>
                                 </a>
                             </li>
                             @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
                                 <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
                                     <a href="{{ route('trending.index') }}">
-                                        <span class="sidebar-mini-icon">{{ __('V') }}</span>
+                                        <span class="sidebar-mini-icon">{{ __('LT') }}</span>
                                         <span class="sidebar-normal">{{ __(' Laporan Trending ') }}</span>
                                     </a>
                                 </li>
                                 <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">
                                     <a href="{{ route('prioritas.index') }}">
-                                        <span class="sidebar-mini-icon">{{ __('P') }}</span>
+                                        <span class="sidebar-mini-icon">{{ __('PP') }}</span>
                                         <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
                                     </a>
                                 </li>
@@ -155,7 +155,7 @@
                         <ul class="nav">
                             <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
                                 <a href="{{ route('perbaikan_teknisi.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('P') }}</span>
+                                    <span class="sidebar-mini-icon">{{ __('DP') }}</span>
                                     <span class="sidebar-normal">{{ __(' Daftar Perbaikan ') }}</span>
                                 </a>
                             </li>

@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-gradient-primary text-white">
             <h5 class="modal-title font-weight-bold">
@@ -23,7 +23,7 @@
                                 <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $perbaikan->laporan->foto_kerusakan) }}"
                                     alt="Foto Kerusakan" class="img-fluid rounded shadow-sm border"
                                     style="max-height: 250px; width: auto;"
-                                    onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                    onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -123,7 +123,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="text-muted small mb-1">Tanggal Selesai</label>
+                                    <label class="text-muted small mb-1">Selesai Diperbaiki</label>
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-check mr-2 text-primary"></i>
                                         {{ $perbaikan->tanggal_selesai
@@ -147,7 +147,7 @@
 
 <style>
     .bg-gradient-primary {
-        background: linear-gradient(135deg, #ff9900 0%, #ffae00 100%);
+        background: linear-gradient(135deg, #007bff 0%, #00b4ff 100%);
     }
 
     .card {

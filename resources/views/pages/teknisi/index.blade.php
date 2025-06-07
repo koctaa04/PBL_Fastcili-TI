@@ -93,7 +93,7 @@
                     <div class="row g-0">
                         <div class="col-md-4 d-flex align-items-center justify-content-center p-3 rounded-start">
                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $penugasan->laporan->foto_kerusakan) }}"
-                                onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
+                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                 alt="Foto Kerusakan" class="img-fluid rounded">
                         </div>
                         <div class="col-md-8">
@@ -145,7 +145,7 @@
                                         <th scope="col">Nama Fasilitas</th>
                                         <th scope="col">Ruangan</th>
                                         <th scope="col">Gedung</th>
-                                        <th scope="col">Tanggal lapor</th>
+                                        <th scope="col">Tanggal Lapor</th>
                                         <th scope="col">Tanggal Selesai</th>
                                         <th scope="col">Aksi</th>
                                     </tr>
@@ -158,6 +158,11 @@
                                             <td>{{ $l->laporan->fasilitas->ruangan->nama_ruangan }}
                                             </td>
                                             <td>{{ $l->laporan->fasilitas->ruangan->gedung->nama_gedung }}
+                                            </td>
+                                            <td>
+                                                {{ $l->laporan->tanggal_lapor
+                                                    ? $l->laporan->tanggal_lapor->translatedFormat('l, d F Y')
+                                                    : '-' }}
                                             </td>
                                             <td>
                                                 {{ $l->tanggal_selesai
@@ -205,7 +210,7 @@
         </div>
     </div>
 
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 

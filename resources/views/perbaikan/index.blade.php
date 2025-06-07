@@ -35,7 +35,7 @@
                                         <td>
                                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
                                                 alt="Foto Kerusakan" height="65"
-                                                onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
                                         </td>
                                     @endif
                                     {{-- Deskripsi --}}
@@ -53,7 +53,9 @@
                                     
                                     <td>
                                         <span
-                                            class="badge badge-pill {{ $laporan->status_perbaikan == 'Sedang dikerjakan' ? 'badge-warning' : 'badge-success' }}">
+                                            class="badge badge-pill
+                                                {{ $laporan->status_perbaikan == 'Selesai Dikerjakan' ? 'badge-success' :
+                                                   ($laporan->status_perbaikan == 'Ditolak' ? 'badge-danger' : 'badge-warning') }}">
                                             {{ $laporan->status_perbaikan }}
                                         </span>
                                     </td>
@@ -110,7 +112,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 

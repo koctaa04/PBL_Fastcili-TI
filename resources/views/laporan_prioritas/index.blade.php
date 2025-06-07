@@ -61,6 +61,7 @@
                             <div class="flex-grow-1 d-flex">
                                 <div class="mr-3" style="width: 220px;">
                                     <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $r['foto_kerusakan']) }}"
+                                        onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"    
                                         alt="Foto Kerusakan"
                                         class="img-fluid rounded"
                                         style="height: 140px; width: 100%; object-fit: cover;">
@@ -118,53 +119,58 @@
 
 <!-- WASPAS Calculation Modal -->
 <div class="modal fade" id="waspasModal" tabindex="-1" role="dialog" aria-labelledby="waspasModalLabel" aria-hidden="true" data-backdrop="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="waspasModalLabel">Proses Perhitungan WASPAS</h5>
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title font-weight-bold" id="waspasModalLabel">
+                    <i class="fas fa-calculator mr-2"></i>Proses Perhitungan WASPAS
+                </h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="calculation-steps">
                     <!-- Step 1: Criteria and Weights -->
-                    <div class="step mb-4">
-                        <h5><span class="badge badge-warning">1</span><b> Kriteria dan Bobot</b></h5>
+                    <div class="step mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-warning mr-2" style="font-size: 1rem; padding: 0.5rem 0.75rem;">1</span>
+                            <h5 class="m-0 font-weight-bold text-dark">Kriteria dan Bobot</h5>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover table-row-bordered text-center">
-                                <thead class="thead-light">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
                                     <tr>
-                                        <th>Kriteria</th>
-                                        <th>Bobot</th>
-                                        <th>Tipe</th>
+                                        <th class="text-center font-weight-bold">Kriteria</th>
+                                        <th class="text-center font-weight-bold">Bobot</th>
+                                        <th class="text-center font-weight-bold">Tipe</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>Tingkat Kerusakan</td>
-                                        <td>0.30</td>
-                                        <td>Benefit</td>
+                                        <td class="text-center">0.30</td>
+                                        <td class="text-center"><span class="badge badge-success">Benefit</span></td>
                                     </tr>
                                     <tr>
                                         <td>Frekuensi Digunakan</td>
-                                        <td>0.10</td>
-                                        <td>Benefit</td>
+                                        <td class="text-center">0.10</td>
+                                        <td class="text-center"><span class="badge badge-success">Benefit</span></td>
                                     </tr>
                                     <tr>
                                         <td>Dampak</td>
-                                        <td>0.05</td>
-                                        <td>Benefit</td>
+                                        <td class="text-center">0.05</td>
+                                        <td class="text-center"><span class="badge badge-success">Benefit</span></td>
                                     </tr>
                                     <tr>
                                         <td>Estimasi Biaya</td>
-                                        <td>0.35</td>
-                                        <td>Cost</td>
+                                        <td class="text-center">0.35</td>
+                                        <td class="text-center"><span class="badge badge-danger">Cost</span></td>
                                     </tr>
                                     <tr>
                                         <td>Potensi Bahaya</td>
-                                        <td>0.20</td>
-                                        <td>Benefit</td>
+                                        <td class="text-center">0.20</td>
+                                        <td class="text-center"><span class="badge badge-success">Benefit</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -172,29 +178,32 @@
                     </div>
 
                     <!-- Step 2: Original Data -->
-                    <div class="step mb-4">
-                        <h5><span class="badge badge-warning">2</span><b> Data Awal</b></h5>
+                    <div class="step mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-warning mr-2" style="font-size: 1rem; padding: 0.5rem 0.75rem;">2</span>
+                            <h5 class="m-0 font-weight-bold text-dark">Data Awal</h5>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover table-row-bordered text-center">
-                                <thead class="thead-light">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
                                     <tr>
-                                        <th>Laporan</th>
-                                        <th>Tingkat Kerusakan</th>
-                                        <th>Frekuensi</th>
-                                        <th>Dampak</th>
-                                        <th>Estimasi Biaya</th>
-                                        <th>Potensi Bahaya</th>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">Tingkat Kerusakan</th>
+                                        <th class="text-center font-weight-bold">Frekuensi</th>
+                                        <th class="text-center font-weight-bold">Dampak</th>
+                                        <th class="text-center font-weight-bold">Estimasi Biaya</th>
+                                        <th class="text-center font-weight-bold">Potensi Bahaya</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($ranked as $r)
                                     <tr>
                                         <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
-                                        <td>{{ $r['tingkat_kerusakan'] ?? '-' }}</td>
-                                        <td>{{ $r['frekuensi_digunakan'] ?? '-' }}</td>
-                                        <td>{{ $r['dampak'] ?? '-' }}</td>
-                                        <td>{{ $r['estimasi_biaya'] ?? '-' }}</td>
-                                        <td>{{ $r['potensi_bahaya'] ?? '-' }}</td>
+                                        <td class="text-center">{{ $r['tingkat_kerusakan'] ?? '-' }}</td>
+                                        <td class="text-center">{{ $r['frekuensi_digunakan'] ?? '-' }}</td>
+                                        <td class="text-center">{{ $r['dampak'] ?? '-' }}</td>
+                                        <td class="text-center">{{ $r['estimasi_biaya'] ?? '-' }}</td>
+                                        <td class="text-center">{{ $r['potensi_bahaya'] ?? '-' }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -203,31 +212,41 @@
                     </div>
 
                     <!-- Step 3: Normalization -->
-                    <div class="step mb-4">
-                        <h5><span class="badge badge-warning">3</span><b> Normalisasi Matriks</b></h5>
-                        <p>Untuk kriteria benefit: <code>X_ij = nilai_awal / max(nilai_kriteria)</code></p>
-                        <p>Untuk kriteria cost: <code>X_ij = min(nilai_kriteria) / nilai_awal</code></p>
+                    <div class="step mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-warning mr-2" style="font-size: 1rem; padding: 0.5rem 0.75rem;">3</span>
+                            <h5 class="m-0 font-weight-bold text-dark">Normalisasi Matriks</h5>
+                        </div>
+                        <div class="alert alert-info mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <div>
+                                    <p class="mb-1">Untuk kriteria benefit: <code>X_ij = nilai_awal / max(nilai_kriteria)</code></p>
+                                    <p class="mb-0">Untuk kriteria cost: <code>X_ij = min(nilai_kriteria) / nilai_awal</code></p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover table-row-bordered text-center">
-                                <thead class="thead-light">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
                                     <tr>
-                                        <th>Laporan</th>
-                                        <th>Tingkat Kerusakan</th>
-                                        <th>Frekuensi</th>
-                                        <th>Dampak</th>
-                                        <th>Estimasi Biaya</th>
-                                        <th>Potensi Bahaya</th>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">Tingkat Kerusakan</th>
+                                        <th class="text-center font-weight-bold">Frekuensi</th>
+                                        <th class="text-center font-weight-bold">Dampak</th>
+                                        <th class="text-center font-weight-bold">Estimasi Biaya</th>
+                                        <th class="text-center font-weight-bold">Potensi Bahaya</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($ranked as $r)
                                     <tr>
                                         <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
-                                        <td>{{ number_format($r['tingkat_kerusakan'] / max(array_column($ranked, 'tingkat_kerusakan')), 4) }}</td>
-                                        <td>{{ number_format($r['frekuensi_digunakan'] / max(array_column($ranked, 'frekuensi_digunakan')), 4) }}</td>
-                                        <td>{{ number_format($r['dampak'] / max(array_column($ranked, 'dampak')), 4) }}</td>
-                                        <td>{{ number_format(min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'], 4) }}</td>
-                                        <td>{{ number_format($r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya')), 4) }}</td>
+                                        <td class="text-center">{{ number_format($r['tingkat_kerusakan'] / max(array_column($ranked, 'tingkat_kerusakan')), 4) }}</td>
+                                        <td class="text-center">{{ number_format($r['frekuensi_digunakan'] / max(array_column($ranked, 'frekuensi_digunakan')), 4) }}</td>
+                                        <td class="text-center">{{ number_format($r['dampak'] / max(array_column($ranked, 'dampak')), 4) }}</td>
+                                        <td class="text-center">{{ number_format(min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'], 4) }}</td>
+                                        <td class="text-center">{{ number_format($r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya')), 4) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -236,16 +255,26 @@
                     </div>
 
                     <!-- Step 4: WSM Calculation -->
-                    <div class="step mb-4">
-                        <h5><span class="badge badge-warning">4</span><b> Hitung WSM (Weighted Sum Model)</b></h5>
-                        <p><code>WSM = Σ(X_ij * bobot_kriteria)</code></p>
+                    <div class="step mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-warning mr-2" style="font-size: 1rem; padding: 0.5rem 0.75rem;">4</span>
+                            <h5 class="m-0 font-weight-bold text-dark">Hitung WSM (Weighted Sum Model)</h5>
+                        </div>
+                        <div class="alert alert-info mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <div>
+                                    <p class="mb-0"><code>WSM = Σ(X_ij × bobot_kriteria)</code></p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover table-row-bordered text-center">
-                                <thead class="thead-light">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
                                     <tr>
-                                        <th>Laporan</th>
-                                        <th>Perhitungan WSM</th>
-                                        <th>Hasil WSM</th>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">Perhitungan WSM</th>
+                                        <th class="text-center font-weight-bold">Hasil WSM</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -270,7 +299,7 @@
                                             ({{ number_format($normalizedEB, 4) }}×0.35) + 
                                             ({{ number_format($normalizedPB, 4) }}×0.2)
                                         </td>
-                                        <td>{{ number_format($wsm, 4) }}</td>
+                                        <td class="text-center font-weight-bold">{{ number_format($wsm, 4) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -279,16 +308,26 @@
                     </div>
 
                     <!-- Step 5: WPM Calculation -->
-                    <div class="step mb-4">
-                        <h5><span class="badge badge-warning">5</span><b> Hitung WPM (Weighted Product Model)</b></h5>
-                        <p><code>WPM = Π(X_ij ^ bobot_kriteria)</code></p>
+                    <div class="step mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-warning mr-2" style="font-size: 1rem; padding: 0.5rem 0.75rem;">5</span>
+                            <h5 class="m-0 font-weight-bold text-dark">Hitung WPM (Weighted Product Model)</h5>
+                        </div>
+                        <div class="alert alert-info mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <div>
+                                    <p class="mb-0"><code>WPM = Π(X_ij ^ bobot_kriteria)</code></p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover table-row-bordered text-center">
-                                <thead class="thead-light">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
                                     <tr>
-                                        <th>Laporan</th>
-                                        <th>Perhitungan WPM</th>
-                                        <th>Hasil WPM</th>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">Perhitungan WPM</th>
+                                        <th class="text-center font-weight-bold">Hasil WPM</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -307,13 +346,13 @@
                                     <tr>
                                         <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
                                         <td>
-                                            ({{ number_format($normalizedTK, 4) }}^0.3) × 
-                                            ({{ number_format($normalizedFD, 4) }}^0.1) × 
-                                            ({{ number_format($normalizedD, 4) }}^0.05) × 
-                                            ({{ number_format($normalizedEB, 4) }}^0.35) × 
-                                            ({{ number_format($normalizedPB, 4) }}^0.2)
+                                            ({{ number_format($normalizedTK, 4) }}<sup>0.3</sup>) × 
+                                            ({{ number_format($normalizedFD, 4) }}<sup>0.1</sup>) × 
+                                            ({{ number_format($normalizedD, 4) }}<sup>0.05</sup>) × 
+                                            ({{ number_format($normalizedEB, 4) }}<sup>0.35</sup>) × 
+                                            ({{ number_format($normalizedPB, 4) }}<sup>0.2</sup>)
                                         </td>
-                                        <td>{{ number_format($wpm, 4) }}</td>
+                                        <td class="text-center font-weight-bold">{{ number_format($wpm, 4) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -322,17 +361,27 @@
                     </div>
 
                     <!-- Step 6: WASPAS Calculation -->
-                    <div class="step mb-4">
-                        <h5><span class="badge badge-warning">6</span><b> Hitung Nilai WASPAS (Q)</b></h5>
-                        <p><code>Q = 0.5 * WSM + 0.5 * WPM</code></p>
+                    <div class="step mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-warning mr-2" style="font-size: 1rem; padding: 0.5rem 0.75rem;">6</span>
+                            <h5 class="m-0 font-weight-bold text-dark">Hitung Nilai WASPAS (Q)</h5>
+                        </div>
+                        <div class="alert alert-info mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <div>
+                                    <p class="mb-0"><code>Q = 0.5 × WSM + 0.5 × WPM</code></p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover table-row-bordered text-center">
-                                <thead class="thead-light">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
                                     <tr>
-                                        <th>Laporan</th>
-                                        <th>WSM</th>
-                                        <th>WPM</th>
-                                        <th>Q = 0.5×WSM + 0.5×WPM</th>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">WSM</th>
+                                        <th class="text-center font-weight-bold">WPM</th>
+                                        <th class="text-center font-weight-bold">Q = 0.5×WSM + 0.5×WPM</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -354,9 +403,9 @@
                                     @endphp
                                     <tr>
                                         <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
-                                        <td>{{ number_format($wsm, 4) }}</td>
-                                        <td>{{ number_format($wpm, 4) }}</td>
-                                        <td>{{ number_format($q, 4) }}</td>
+                                        <td class="text-center">{{ number_format($wsm, 4) }}</td>
+                                        <td class="text-center">{{ number_format($wpm, 4) }}</td>
+                                        <td class="text-center font-weight-bold text-primary">{{ number_format($q, 4) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -365,23 +414,26 @@
                     </div>
 
                     <!-- Step 7: Final Ranking -->
-                    <div class="step mb-4">
-                        <h5><span class="badge badge-warning">7</span><b> Hasil Perankingan</b></h5>
+                    <div class="step">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-warning mr-2" style="font-size: 1rem; padding: 0.5rem 0.75rem;">7</span>
+                            <h5 class="m-0 font-weight-bold text-dark">Hasil Perankingan</h5>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover table-row-bordered text-center">
-                                <thead class="thead-light">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
                                     <tr>
-                                        <th>Rank</th>
-                                        <th>Deskripsi Laporan</th>
-                                        <th>Nilai WASPAS (Q)</th>
+                                        <th class="text-center font-weight-bold">Rank</th>
+                                        <th class="text-center font-weight-bold">Deskripsi Laporan</th>
+                                        <th class="text-center font-weight-bold">Nilai WASPAS (Q)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($ranked as $r)
                                     <tr>
-                                        <td>#{{ $r['rank'] }}</td>
+                                        <td class="text-center font-weight-bold">#{{ $r['rank'] }}</td>
                                         <td>{{ Str::limit($r['deskripsi'], 50) }}</td>
-                                        <td>{{ number_format($r['Q'], 4) }}</td>
+                                        <td class="text-center font-weight-bold text-primary">{{ number_format($r['Q'], 4) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -390,15 +442,17 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Tutup
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Existing Modal -->
-<div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false" 
     aria-hidden="true"></div>
 @endsection
 
@@ -479,29 +533,40 @@
         overflow: hidden;
     }
 
-    /* Calculation steps styling */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #01bb1d 0%, #66ff00 100%);
+    }
+    .bg-light-blue {
+        background-color: #e3f2fd;
+    }
+    .modal-xl {
+        max-width: 1200px;
+    }
     .calculation-steps .step {
-        padding: 15px;
-        border-left: 4px solid #007bff;
-        background-color: #f8f9fa;
-        margin-bottom: 15px;
-        border-radius: 4px;
+        border-left: 4px solid #28a745;
+        padding-left: 15px;
+        margin-bottom: 30px;
     }
-
-    .calculation-steps h5 {
-        /* color: #007bff; */
-        margin-bottom: 10px;
+    .table {
+        font-size: 0.9rem;
     }
-
-    .calculation-steps h5 .badge {
-        margin-right: 10px;
+    .table th {
+        vertical-align: middle;
     }
-
-    .calculation-steps code {
-        background-color: #e9ecef;
-        padding: 2px 5px;
-        border-radius: 3px;
-        color: #d63384;
+    .badge-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .shadow-lg {
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+    }
+    .modal-content {
+        border-radius: 0.5rem;
+    }
+    .alert-info {
+        background-color: #e7f8ff;
+        border-color: #b8e7ff;
+        color: #006c9e;
     }
 </style>
 @endpush

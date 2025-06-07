@@ -8,7 +8,7 @@
         </div>
         <div class="modal-body text-center">
             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
-                onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';" alt="Foto Kerusakan"
+                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';" alt="Foto Kerusakan"
                 style="max-width: 300px; height: auto;" class="img-fluid rounded mb-3">
 
             <table class="table table-sm table-bordered table-striped text-left">
@@ -44,13 +44,13 @@
                 <tr>
                     <th class="text-right col-3">Tanggal Lapor :</th>
                     <td class="col-9">
-                        {{ $laporan->created_at->locale('id')->translatedFormat('l, d F Y') }}
+                        {{ $laporan->created_at->translatedFormat('l, d F Y') }}
                     </td>
                 </tr>
                 <tr>
                     <th class="text-right col-3">Tanggal Selesai :</th>
                     <td class="col-9">
-                        {{ $laporan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
+                        {{ $laporan->tanggal_selesai->translatedFormat('l, d F Y') ?? '-' }}
                     </td>
                 </tr>
                 <tr>
