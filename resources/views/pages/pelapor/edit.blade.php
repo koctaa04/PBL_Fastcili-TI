@@ -49,8 +49,9 @@
                             icon: "success",
                             title: "Berhasil!",
                             text: response.message,
+                        }).then(() => {
+                            window.location.href = "{{ url('/pelapor') }}";
                         });
-                        location.reload();
                     } else {
                         Swal.fire({
                             icon: "error",
