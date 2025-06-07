@@ -51,7 +51,7 @@ class TeknisiNotifikasi extends Notification
             'fasilitas' => $this->penugasan->laporan->fasilitas->nama_fasilitas, // Assuming 'judul' is a field in PenugasanTeknisi
             'deskripsi' => $this->penugasan->laporan->deskripsi, // Assuming 'deskripsi' is a field
             'assigned_by' => auth()->check() ? auth()->user()->name : 'System', // Who assigned it
-            'link' => route('perbaikan.index'), // Example: link to the task details
+            'link' => url('/perbaikan/detail/' . $this->penugasan->id_penugasan), // Example: link to the task details
         ];
     }
 
@@ -64,8 +64,8 @@ class TeknisiNotifikasi extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('You have been assigned a new task: ' . $this->penugasan->laporan->fasilitas->nama_fasilitas)
-                    ->action('View Task', route('perbaikan.index'))
-                    ->line('Thank you for using our application!');
+            ->line('You have been assigned a new task: ' . $this->penugasan->laporan->fasilitas->nama_fasilitas)
+            ->action('View Task', route('perbaikan.index'))
+            ->line('Thank you for using our application!');
     }
 }

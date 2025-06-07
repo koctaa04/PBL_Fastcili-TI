@@ -31,7 +31,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -41,7 +41,7 @@
         $(document).ready(function() {
             dataLevel = $('#table_level').DataTable({
                 processing: true,
-                serverSide: false, // karena kita menggunakan server-side processing sederhana
+                serverSide: true, 
                 ajax: {
                     url: window.location.href,
                     data: function(d) {

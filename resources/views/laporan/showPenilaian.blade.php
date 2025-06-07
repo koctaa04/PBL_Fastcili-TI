@@ -1,6 +1,6 @@
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content border-0 shadow-lg">
-        <form id="form_penilaian" action="{{ route('laporan.simpanPenilaian', ['id' => $laporan->id_laporan]) }}" method="POST">
+        <form id="form_penilaian" action="{{ route('laporan.simpanPenilaian', ['id' => $laporan->id_laporan]) }}" method="POST" data-trending-no="{{ $trendingNo }}">
             @csrf
             <div class="modal-header bg-gradient-info text-white">
                 <h5 class="modal-title font-weight-bold">
@@ -18,9 +18,11 @@
                         <h6 class="mb-0 font-weight-bold">
                             <i class="fas fa-info-circle mr-2 text-danger"></i>Detail Laporan
                         </h6>
-                        <span class="badge badge-warning px-3 py-1">
-                            Trending No: {{ $trendingNo }}
-                        </span>
+                        <a href="{{ route('trending.index') }}">
+                            <span class="badge badge-warning px-3 py-1">
+                                Trending No: {{ $trendingNo }}
+                            </span>
+                        </a>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -85,6 +87,7 @@
                     </div>
                 </div>
 
+                @if ($trendingNo != '-')
                 <!-- Form Penilaian Card -->
                 <div class="card border-0">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -202,16 +205,25 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
 
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times mr-1"></i> Tutup
-                </button>
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-save mr-1"></i> Simpan Penilaian
-                </button>
-            </div>
+            @if ($trendingNo == '-')
+                <div class="modal-footer bg-light">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-save mr-1"></i> Menuju Halaman Prioritas
+                    </button>
+                </div>
+            @else
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Tutup
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-save mr-1"></i> Simpan Penilaian
+                    </button>
+                </div>
+            @endif
         </form>
     </div>
 </div>
@@ -220,6 +232,27 @@
     $(document).ready(function() {
         // Handle form submission
         $(document).on('submit', '#form_penilaian', function(e) {
+            const trendingNo = $(this).data('trending-no');
+
+            // Jika trendingNo == '-', jangan submit, arahkan saja ke prioritas.index
+            if (trendingNo === '-') {
+                e.preventDefault();
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Laporan sudah diberi nilai",
+                    text: "Anda akan diarahkan ke halaman Prioritas.",
+                    confirmButtonText: "OK",
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('prioritas.index') }}";
+                    }
+                });
+
+                return; // Stop form submission
+            }
+            
             e.preventDefault();
 
             $('.error-text').text('');

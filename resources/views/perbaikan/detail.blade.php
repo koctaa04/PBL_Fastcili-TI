@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-gradient-primary text-white">
             <h5 class="modal-title font-weight-bold">
@@ -23,7 +23,7 @@
                                 <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $perbaikan->laporan->foto_kerusakan) }}"
                                     alt="Foto Kerusakan" class="img-fluid rounded shadow-sm border"
                                     style="max-height: 250px; width: auto;"
-                                    onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
+                                    onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -57,7 +57,9 @@
                                     <label class="text-muted small mb-1">Tanggal Lapor</label>
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-alt mr-2 text-info"></i>
-                                        {{ $perbaikan->laporan->tanggal_lapor }}
+                                        {{ $perbaikan->laporan->tanggal_lapor
+                                            ? $perbaikan->laporan->tanggal_lapor->translatedFormat('l, d F Y')
+                                            : '-' }}
                                     </p>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -74,7 +76,7 @@
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-alt mr-2 text-info"></i>
                                         {{ $perbaikan->tenggat
-                                            ? \Carbon\Carbon::parse($perbaikan->tenggat)->locale('id')->translatedFormat('l, d F Y')
+                                            ? $perbaikan->tenggat->translatedFormat('l, d F Y')
                                             : '-' }}
                                     </p>
                                 </div>
@@ -85,7 +87,7 @@
             </div>
 
             <!-- Informasi Perbaikan Card -->
-            @if ($perbaikan->status_perbaikan == 'Selesai')
+            @if ($perbaikan->status_perbaikan == 'Selesai Dikerjakan')
                 <div class="card border-0">
                     <div class="card-header bg-light">
                         <h6 class="mb-0 font-weight-bold">
@@ -121,10 +123,12 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="text-muted small mb-1">Tanggal Selesai</label>
+                                    <label class="text-muted small mb-1">Selesai Diperbaiki</label>
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-check mr-2 text-primary"></i>
-                                        {{ $perbaikan->tanggal_selesai->locale('id')->translatedFormat('l, d F Y') ?? '-' }}
+                                        {{ $perbaikan->tanggal_selesai
+                                            ? $perbaikan->tanggal_selesai->translatedFormat('l, d F Y')
+                                            : '-' }}
                                     </p>
                                 </div>
                             </div>
@@ -143,7 +147,7 @@
 
 <style>
     .bg-gradient-primary {
-        background: linear-gradient(135deg, #ff9900 0%, #ffae00 100%);
+        background: linear-gradient(135deg, #007bff 0%, #00b4ff 100%);
     }
 
     .card {

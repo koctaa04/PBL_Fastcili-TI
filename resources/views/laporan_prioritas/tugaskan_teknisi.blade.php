@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content border-0 shadow-lg">
         <form id="form_penugasan" method="POST" action="{{ url('/penugasan-teknisi') }}">
             @csrf
@@ -155,7 +155,7 @@
 
 <style>
     .bg-gradient-primary {
-        background: linear-gradient(135deg, #ff9900 0%, #ffae00 100%);
+        background: linear-gradient(135deg, #ff9900 0%, #ffbb00 100%);
     }
 
     .card {

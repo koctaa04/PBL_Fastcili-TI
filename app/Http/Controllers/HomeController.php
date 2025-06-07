@@ -134,11 +134,13 @@ class HomeController extends Controller
 
     public function pelapor()
     {
-        $laporan = PelaporLaporan::where('id_user', Auth::id())->get();
-        $status = PelaporLaporan::where('id_user', Auth::id())
+        $laporanAuth = PelaporLaporan::where('id_user', Auth::id())->get();
+        $statusList = PelaporLaporan::where('id_user', Auth::id())
+            ->whereNull('rating_pengguna')
             ->orderBy('created_at', 'desc')
-            ->first();
-        return view('pages.pelapor.index', compact('laporan', 'status'));
+            ->get();
+
+        return view('pages.pelapor.index', compact('laporanAuth', 'statusList'));
     }
 
     public function teknisi()
@@ -151,7 +153,7 @@ class HomeController extends Controller
 
         //Hitung untuk card
         $jmlPenugasan = PenugasanTeknisi::count();
-        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'sedang dikerjakan')->count();
+        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Sedang dikerjakan')->count();
         $laporanSelesaiDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Selesai Dikerjakan')->count();
         $laporanBlmPenugasan = LaporanKerusakan::whereIn('id_status', [1, 2])->count();
 

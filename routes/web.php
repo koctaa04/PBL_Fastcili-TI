@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\GedungController;
@@ -31,10 +32,9 @@ use App\Http\Controllers\NotificationController;
  *  Welcome Page
  *  ---------------------------- */
 Route::get('/', function () {
-	if (Auth::check()) {
-		return redirect()->route('home');
+	if (!Auth::check()) {
+		return view('welcome');
 	}
-	return view('welcome');
 });
 
 Auth::routes();
@@ -47,7 +47,10 @@ Route::get('password/reset/{token}', 'App\Http\Controllers\Auth\ResetPasswordCon
 Route::post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.update');
 
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('/home', [HomeController::class, 'index'])->name('home');
+	Route::middleware(['authorize:1,2'])->group(function () {
+		Route::get('/home', [HomeController::class, 'index'])->name('home');
+	});
+
 
 	/** -----------------------------
 	 *  Profile & User Management
@@ -169,7 +172,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 	});
 
-	Route::middleware(['authorize:1,3,4'])->group(function () {
+	Route::middleware(['authorize:1,5,4'])->group(function () {
 		Route::get('/pelapor', [HomeController::class, 'pelapor'])->name('pelapor');
 		Route::get('/pelapor/create', [LaporanKerusakanController::class, 'createPelapor'])->name('pelapor.create');
 		Route::post('/', [LaporanKerusakanController::class, 'storePelapor'])->name('pelapor.store');
@@ -197,7 +200,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
 
-    Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // Optional: page to view all notifications
+	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+	Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+	Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // Optional: page to view all notifications
 });

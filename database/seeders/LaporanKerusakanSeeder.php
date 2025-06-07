@@ -31,7 +31,7 @@ class LaporanKerusakanSeeder extends Seeder
                 'jumlah_kerusakan' => 1,
                 'tanggal_lapor' => $lapor2 = Carbon::parse('2025-03-15'),
                 'tanggal_selesai' => $lapor2->copy()->addDays(5),
-                'id_status' => 3
+                'id_status' => 1
             ],
             [
                 'id_fasilitas' => 3,
@@ -58,7 +58,7 @@ class LaporanKerusakanSeeder extends Seeder
                 'jumlah_kerusakan' => 1,
                 'tanggal_lapor' => $lapor5 = Carbon::parse('2025-03-25'),
                 'tanggal_selesai' => $lapor5->copy()->addDays(6),
-                'id_status' => 3
+                'id_status' => 1
             ],
             [
                 'id_fasilitas' => 17,

@@ -29,7 +29,7 @@ class FeedbackTeknisiObserver
                     'tipe' => $penugasanTeknisi->laporan->fasilitas->nama_fasilitas . 
                                 ' Telah dikerjakan oleh ' . ($penugasanTeknisi->user->nama ?? 'Teknisi'),
                     'pesan' => 'Catatan: ' . $penugasanTeknisi->catatan_teknisi,
-                    'link' => route('perbaikan.index', $penugasanTeknisi->id_laporan),
+                    'link' => url('/laporan/verifikasi/'. $penugasanTeknisi->id_laporan),
                 ]));
             }
         }

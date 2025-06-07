@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-dialog">
+<div class="modal-dialog modal-dialog modal-dialog-centered">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">Detail Data Gedung</h5>
@@ -29,7 +29,7 @@
             {{-- Tombol menuju halaman ruangan dengan filter --}}
             <a href="{{ route('ruangan.index', ['id_gedung' => $gedung->id_gedung]) }}"
                 class="btn btn-info btn-block mt-3">
-                <i class="fas fa-door-open mr-1"></i> Lihat ruangan di gedung {{ $gedung->nama_gedung }}
+                <i class="fas fa-door-open mr-1"></i> Lihat ruangan di gedung {{ Str::limit($gedung->nama_gedung, 30) }}
             </a>
         </div>
         <div class="modal-footer mt-4">
