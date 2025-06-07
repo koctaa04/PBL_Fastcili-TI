@@ -441,11 +441,14 @@ class LaporanKerusakanController extends Controller
 
     public function createPelapor()
     {
-        $fasilitas = Fasilitas::all();
-        $statusList = StatusLaporan::all();
-        $gedungList = Gedung::all();
+         $laporan = PelaporLaporan::with([
+            'laporan.fasilitas.ruangan.gedung',
+            'laporan.status',
+            'user'
+        ])->get();
+        $gedung = Gedung::all();
 
-        return view('pages.pelapor.create', compact('fasilitas', 'statusList', 'gedungList'));
+        return view('pages.pelapor.create', compact('laporan', 'gedung'));
     }
 
     public function storePelapor(Request $request)
