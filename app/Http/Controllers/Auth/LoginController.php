@@ -104,9 +104,9 @@ class LoginController extends Controller
         // return redirect()->intended($this->redirectPath());
         if (in_array($user->id_level, [1, 2])) {
             return redirect()->route('home');
-        } else if (in_array($user->id_level, [1, 4, 5, 6])) {
+        } else if (in_array($user->id_level, [4, 5, 6])) {
             return redirect()->route('pelapor');
-        } else if (in_array($user->id_level, [1, 3])) {
+        } else if (in_array($user->id_level, [3])) {
             return redirect()->route('teknisi');
         }
     }

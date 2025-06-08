@@ -65,7 +65,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -297,8 +297,8 @@
                         response.data.forEach((ruangan) => {
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                                    <div class="card ruangan-card" style="cursor: pointer;" onclick="window.location.href = '{{ url('/fasilitas?id_ruangan=${ruangan.id_ruangan}') }}'">
-                                        <div class="ruangan-card-body">
+                                    <div class="card ruangan-card">
+                                        <div class="ruangan-card-body" style="cursor: pointer;" onclick="window.location.href = '{{ url('/fasilitas?id_ruangan=${ruangan.id_ruangan}') }}'">
                                             <h5 class="ruangan-card-title">${ruangan.nama_ruangan}</h5>
                                             <p class="ruangan-card-text"><strong>Kode:</strong> <span class="ruangan-kode">${ruangan.kode_ruangan || '-'}</span></p>
                                             <p class="ruangan-card-text"><strong>Gedung:</strong> <span class="ruangan-gedung">${ruangan.gedung?.nama_gedung || 'Tidak ada gedung'}</span></p>

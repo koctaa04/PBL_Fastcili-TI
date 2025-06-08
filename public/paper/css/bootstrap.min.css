@@ -4896,6 +4896,13 @@ button.close {
 .modal-open .modal {
     overflow-x: hidden;
     overflow-y: auto;
+
+    /* Scroll tetap bisa, scrollbar disembunyikan */
+    -ms-overflow-style: none;  /* IE dan Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+.modal-open .modal::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
 }
 .modal-dialog {
     position: relative;

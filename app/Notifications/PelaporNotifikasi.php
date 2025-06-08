@@ -44,7 +44,7 @@ class PelaporNotifikasi extends Notification
             'fasilitas' => $this->laporan->laporan->fasilitas->nama_fasilitas, // Assuming 'judul' is a field in PenugasanTeknisi
             'status' => $this->laporan->laporan->status->nama_status, // Assuming 'deskripsi' is a field
             'assigned_by' => auth()->check() ? auth()->user()->name : 'System', // Who assigned it
-            'link' => route('perbaikan.index'), // Example: link to the task details
+            'link' => url('/detail/' . $this->laporan->id_laporan) // Example: link to the task details
         ];
     }
 }
