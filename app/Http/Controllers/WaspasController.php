@@ -22,12 +22,21 @@ class WaspasController extends Controller
     {
         $data = DB::table('laporan_kerusakan as l')
             ->join('kriteria_penilaian as k', 'l.id_laporan', '=', 'k.id_laporan')
+            ->leftJoin('penugasan_teknisi as p', 'l.id_laporan', '=', 'p.id_laporan')
+            ->leftJoin('users as u', 'u.id_user', '=', 'p.id_user')
+            ->join('fasilitas as f', 'f.id_fasilitas', '=', 'l.id_fasilitas')
+            ->join('ruangan as r', 'r.id_ruangan', '=', 'f.id_ruangan')
+            ->join('gedung as g', 'g.id_gedung', '=', 'r.id_gedung')
             ->join('status_laporan as s', 'l.id_status', '=', 's.id_status') // JOIN status
             ->whereIn('l.id_status', [2, 3])
             ->select(
                 'l.id_laporan',
                 'l.deskripsi',         // ambil deskripsi laporan
-                'l.foto_kerusakan',       // ambil foto
+                'l.foto_kerusakan',
+                'u.nama as nama_teknisi',
+                'f.nama_fasilitas',
+                'r.nama_ruangan',
+                'g.nama_gedung',
                 's.nama_status',       // ambil nama status dari join status_laporan
                 'k.tingkat_kerusakan',
                 'k.frekuensi_digunakan',
@@ -95,6 +104,10 @@ class WaspasController extends Controller
                 'foto_kerusakan' => $original['foto_kerusakan'],
                 'deskripsi' => $original['deskripsi'] ?? null,
                 'status' => $original['nama_status'] ?? null,
+                'fasilitas' => $original['nama_fasilitas'] ?? null,
+                'ruangan' => $original['nama_ruangan'] ?? null,
+                'gedung' => $original['nama_gedung'] ?? null,
+                'teknisi' => $original['nama_teknisi'] ?? null,
                 'Q' => round($Q, 4),
                 'tingkat_kerusakan' => $original['tingkat_kerusakan'] ?? null, // Nilai asli dari kriteria
                 'frekuensi_digunakan' => $original['frekuensi_digunakan'] ?? null,
