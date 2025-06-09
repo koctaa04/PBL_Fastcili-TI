@@ -74,18 +74,13 @@
                                     </div>
 
                                     <div class="d-flex justify-content-end mt-4 gap-2 flex-wrap">
-                                        @if ($status->laporan->id_status == 5)
-                                            <a href="{{ route('pelapor.edit', ['id' => $status->id]) }}"
-                                                class="btn btn-warning btn-sm rounded-pill px-3">
-                                                <i class="bi bi-pencil-square me-1"></i> Edit
-                                            </a>
-                                        @elseif ($status->laporan->id_status == 4)
+                                        @if ($status->laporan->id_status == 4)
                                             <button
                                                 onclick="modalAction('{{ route('pelapor.rate', ['id' => $status->id_laporan]) }}')"
-                                                class="btn btn-primary btn-sm rounded-pill px-3">
-                                                <i class="bi bi-star-fill me-1"></i> Beri Nilai
+                                                class="btn btn-success btn-md rounded-pill px-3">
+                                                <i class="bi bi-star-fill me-1"></i>Beri Rating & Ulasan
                                             </button>
-                                        @elseif ($status->laporan->id_status == 1 || $status->laporan->id_status == 5)
+                                        @elseif ($status->laporan->id_status == 1)
                                             <form class="form-delete d-inline-block"
                                                 action="{{ route('pelapor.delete', ['id' => $status->id]) }}"
                                                 method="POST">

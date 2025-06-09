@@ -103,7 +103,7 @@
             </li>
             
             {{-- Laporan --}}
-            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6 )
+            @if (auth()->user()->id_level != 3 )
                 <li
                     class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'prioritas' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#laporan">
@@ -142,7 +142,7 @@
             @endif
             
             {{-- Teknisi --}}
-            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 3)
+            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 3)
                 <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#teknisi">
                         <i class="nc-icon nc-settings"></i>

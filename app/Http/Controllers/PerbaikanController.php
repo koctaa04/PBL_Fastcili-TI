@@ -11,7 +11,7 @@ class PerbaikanController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->id_user === 1) {
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
             $laporan = PenugasanTeknisi::all();
         } else {
             $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
