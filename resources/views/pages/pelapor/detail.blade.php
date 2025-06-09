@@ -102,12 +102,14 @@
                                 <tr>
                                     <th class="text-right text-muted">Rating:</th>
                                     <td class="text-danger">
-                                        @if ($laporan->rating_pengguna)
+                                        @if ($laporan->laporan->status->nama_status != 'Selesai')
+                                            Laporan belum selesai sehingga tidak bisa di-rating
+                                        @elseif ($laporan->laporan->status->nama_status == 'Selesai' && $laporan->rating_pengguna)
                                             @for ($i = 0; $i < $laporan->rating_pengguna; $i++)
                                                 <span style="color: gold; font-size: 1.2rem;">&#9733;</span>
                                             @endfor
                                             ({{ $laporan->rating_pengguna }}/5)
-                                        @else
+                                        @elseif ($laporan->laporan->status->nama_status == 'Selesai')
                                             Belum di-rating
                                         @endif
                                     </td>
@@ -115,7 +117,9 @@
                                 <tr>
                                     <th class="text-right text-muted">Ulasan:</th>
                                     <td class="text-danger">
-                                        @if ($laporan->feedback_pengguna)
+                                        @if ($laporan->laporan->status->nama_status != 'Selesai')
+                                            Laporan belum selesai sehingga tidak bisa diulas
+                                        @elseif ($laporan->laporan->status->nama_status == 'Selesai' && $laporan->feedback_pengguna)
                                             <div class="bg-light p-3 rounded">
                                                 <p class="mb-0">{{ $laporan->feedback_pengguna }}</p>
                                             </div>

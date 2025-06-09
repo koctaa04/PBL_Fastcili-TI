@@ -29,86 +29,87 @@
         <div class="card-body p-0">
             <div id="priority-container">
                 @foreach ($ranked as $r)
-                @php
-                    $penugasan = $r['penugasan'];
-                    $statusPerbaikan = $penugasan->status_perbaikan ?? null;
-                    $rank = $r['rank'];
-                    
-                    $borderColor = match($rank) {
-                        1 => 'border-left: 4px solid #dc3545;',
-                        2 => 'border-left: 4px solid #fd7e14;',
-                        3 => 'border-left: 4px solid #ffc107;',
-                        default => 'border-left: 4px solid #e9ecef;'
-                    };
-                    
-                    $statusColor = match($statusPerbaikan ?? 'Belum Dikerjakan') {
-                        'Belum Dikerjakan' => 'badge-secondary',
-                        'Dalam Pengerjaan' => 'badge-primary',
-                        'Selesai Dikerjakan' => 'badge-info',
-                        'Selesai' => 'badge-success',
-                        default => 'badge-secondary'
-                    };
-                @endphp
-                <div class="card priority-card mb-3" style="{{ $borderColor }}">
-                    <div class="card-body p-2 p-md-3">
-                        <div class="d-flex flex-column flex-md-row">
-                            <div class="rank-display d-flex flex-row flex-md-column align-items-center justify-content-center mr-0 mr-md-3 mb-2 mb-md-0 p-2" style="min-width: 60px;">
-                                <span class="rank-number font-weight-bold">#{{ $rank }}</span>
-                                <div class="priority-indicator mt-0 mt-md-1 ml-2 ml-md-0">
-                                    @if($rank <= 3)
-                                        <i class="fas fa-exclamation-circle text-danger"></i>
-                                    @else
-                                        <i class="fas fa-arrow-up text-primary"></i>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 d-flex flex-column">
-                                <div class="d-flex flex-column flex-md-row">
-                                    <div class="mr-0 mr-md-3 mb-3 mb-md-0 w-100" style="max-width: 220px;">
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $r['foto_kerusakan']) }}"
-                                            onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"    
-                                            alt="Foto Kerusakan"
-                                            class="img-fluid rounded w-100"
-                                            style="height: 140px; object-fit: cover;">
+                    @php
+                        $penugasan = $r['penugasan'];
+                        $statusPerbaikan = $penugasan->status_perbaikan ?? null;
+                        $rank = $r['rank'];
+                        
+                        $borderColor = match($rank) {
+                            1 => 'border-left: 4px solid #dc3545;',
+                            2 => 'border-left: 4px solid #fd7e14;',
+                            3 => 'border-left: 4px solid #ffc107;',
+                            default => 'border-left: 4px solid #e9ecef;'
+                        };
+                        
+                        $statusColor = match($statusPerbaikan ?? 'Belum Dikerjakan') {
+                            'Belum Dikerjakan' => 'badge-secondary',
+                            'Sedang Dikerjakan' => 'badge-warning',
+                            'Selesai Dikerjakan' => 'badge-info',
+                            'Selesai' => 'badge-success',
+                            default => 'badge-secondary'
+                        };
+                    @endphp
+                    <div class="card priority-card mb-3" style="{{ $borderColor }}">
+                        <div class="card-body p-2 p-md-3">
+                            <div class="d-flex flex-column flex-md-row">
+                                <div class="rank-display d-flex flex-row flex-md-column align-items-center justify-content-center mr-0 mr-md-3 mb-2 mb-md-0 p-2" style="min-width: 60px;">
+                                    <span class="rank-number font-weight-bold">#{{ $rank }}</span>
+                                    <div class="priority-indicator mt-0 mt-md-1 ml-2 ml-md-0">
+                                        @if($rank <= 3)
+                                            <i class="fas fa-exclamation-circle text-danger"></i>
+                                        @else
+                                            <i class="fas fa-arrow-up text-primary"></i>
+                                        @endif
                                     </div>
-                                    <div class="flex-grow-1 d-flex flex-column">
-                                        <div class="mb-3">
-                                            <p class="card-text">{{ $r['deskripsi'] ?? '-' }}</p>
+                                </div>
+                                <div class="flex-grow-1 d-flex flex-column">
+                                    <div class="d-flex flex-column flex-md-row">
+                                        <div class="mr-0 mr-md-3 mb-3 mb-md-0 w-100" style="max-width: 220px;">
+                                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $r['foto_kerusakan']) }}"
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"    
+                                                alt="Foto Kerusakan"
+                                                class="img-fluid rounded w-100"
+                                                style="height: 140px; object-fit: cover;">
                                         </div>
-                                        <div class="d-flex flex-wrap align-items-center mb-2">
-                                            <span class="badge badge-pill badge-dark px-2 px-md-3 py-2 mr-2 mb-2">
-                                                <i class="fas fa-calculator mr-1"></i> Nilai WASPAS: {{ number_format($r['Q'], 4) }}
-                                            </span>
-                                            <span class="badge badge-pill {{ $statusColor }} px-2 px-md-3 py-2 mr-2 mb-2">
-                                                <i class="fas fa-info-circle mr-1"></i> {{ $statusPerbaikan ?? 'Belum Dikerjakan' }}
-                                            </span>
-                                            @if($penugasan && $penugasan->komentar_sarpras)
-                                            <span class="badge badge-pill badge-light border px-2 px-md-3 py-2 mb-2">
-                                                <i class="fas fa-clipboard mr-1"></i> Catatan: {{ Str::limit($penugasan->komentar_sarpras, 20) }}
-                                            </span>
-                                            @endif
-                                        </div>
-                                        <div class="mt-auto">
-                                            <div class="d-flex justify-content-end">
-                                                @if(!$penugasan)
-                                                    <button onclick="modalAction('{{ url('/laporan/penugasan/' . $r['id_laporan']) }}')"
-                                                        class="btn btn-danger btn-sm btn-md-lg px-3 px-md-4 py-2">
-                                                        <i class="fas fa-user-tie mr-1"></i> Tugaskan Teknisi
-                                                    </button>
-                                                @elseif($r['status'] == 'Selesai')
-                                                    <span class="btn btn-success btn-sm btn-md-lg px-3 px-md-4 py-2 disabled">
-                                                        <i class="fas fa-check-circle mr-1"></i> Sudah Selesai
-                                                    </span>
-                                                @elseif($statusPerbaikan === 'Selesai Dikerjakan')
-                                                    <button onclick="modalAction('{{ url('/laporan/verifikasi/' . $r['id_laporan']) }}')"
-                                                            class="btn btn-info btn-sm btn-md-lg px-3 px-md-4 py-2">
-                                                        <i class="fas fa-check-double mr-1"></i> Verifikasi
-                                                    </button>
-                                                @else
-                                                    <span class="btn btn-secondary btn-sm btn-md-lg px-3 px-md-4 py-2 disabled">
-                                                        <i class="fas fa-clock mr-1"></i> Menunggu perbaikan
-                                                    </span>
+                                        <div class="flex-grow-1 d-flex flex-column">
+                                            <div class="mb-3">
+                                                <p class="card-text">{{ $r['deskripsi'] ?? '-' }}</p>
+                                            </div>
+                                            <div class="d-flex flex-wrap align-items-center mb-2">
+                                                <span class="badge badge-pill badge-dark px-2 px-md-3 py-2 mr-2 mb-2">
+                                                    <i class="fas fa-calculator mr-1"></i> Nilai WASPAS: {{ number_format($r['Q'], 4) }}
+                                                </span>
+                                                <span class="badge badge-pill {{ $statusColor }} px-2 px-md-3 py-2 mr-2 mb-2">
+                                                    <i class="fas fa-info-circle mr-1"></i> {{ $statusPerbaikan ?? 'Belum Dikerjakan' }}
+                                                </span>
+                                                @if($penugasan && $penugasan->komentar_sarpras)
+                                                <span class="badge badge-pill badge-light border px-2 px-md-3 py-2 mb-2">
+                                                    <i class="fas fa-clipboard mr-1"></i> Catatan: {{ Str::limit($penugasan->komentar_sarpras, 20) }}
+                                                </span>
                                                 @endif
+                                            </div>
+                                            <div class="mt-auto">
+                                                <div class="d-flex justify-content-end">
+                                                    @if(!$penugasan)
+                                                        <button onclick="modalAction('{{ url('/laporan/penugasan/' . $r['id_laporan']) }}')"
+                                                            class="btn btn-danger btn-sm btn-md-lg px-3 px-md-4 py-2">
+                                                            <i class="fas fa-user-tie mr-1"></i> Tugaskan Teknisi
+                                                        </button>
+                                                    @elseif($r['status'] == 'Selesai')
+                                                        <span class="btn btn-success btn-sm btn-md-lg px-3 px-md-4 py-2 disabled">
+                                                            <i class="fas fa-check-circle mr-1"></i> Sudah Selesai
+                                                        </span>
+                                                    @elseif($statusPerbaikan === 'Selesai Dikerjakan')
+                                                        <button onclick="modalAction('{{ url('/laporan/verifikasi/' . $r['id_laporan']) }}')"
+                                                                class="btn btn-info btn-sm btn-md-lg px-3 px-md-4 py-2">
+                                                            <i class="fas fa-check-double mr-1"></i> Verifikasi
+                                                        </button>
+                                                    @else
+                                                        <span class="btn btn-secondary btn-sm btn-md-lg px-3 px-md-4 py-2 disabled">
+                                                            <i class="fas fa-clock mr-1"></i> Menunggu perbaikan
+                                                        </span>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -116,7 +117,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
                 @endforeach
             </div>
         </div>

@@ -153,7 +153,7 @@ class HomeController extends Controller
 
         //Hitung untuk card
         $jmlPenugasan = PenugasanTeknisi::count();
-        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Sedang dikerjakan')->count();
+        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Sedang Dikerjakan')->count();
         $laporanSelesaiDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Selesai Dikerjakan')->count();
         $laporanBlmPenugasan = LaporanKerusakan::whereIn('id_status', [1, 2])->count();
 

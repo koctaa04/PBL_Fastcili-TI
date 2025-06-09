@@ -434,7 +434,7 @@ class LaporanKerusakanController extends Controller
             [
                 'id_user' => $request->id_user,
                 'tenggat' => $request->tenggat,
-                'status_perbaikan' => 'Sedang dikerjakan',
+                'status_perbaikan' => 'Sedang Dikerjakan',
                 'tanggal_selesai' => null,
             ]
         );
