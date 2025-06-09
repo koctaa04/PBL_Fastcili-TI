@@ -98,8 +98,13 @@
                     <div class="row g-0 align-items-center">
                         <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $penugasan->laporan->foto_kerusakan) }}"
+
                                 onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
                                 alt="Foto Kerusakan" class="img-fluid rounded shadow-sm">
+
+                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
+                                alt="Foto Kerusakan" class="img-fluid rounded">
+
                         </div>
                         <div class="col-md-8">
                             <div class="card-body p-4">
@@ -109,20 +114,30 @@
                                 <p class="mb-2"><strong>Lokasi:</strong>
                                     {{ $penugasan->laporan->fasilitas->ruangan->nama_ruangan }}, {{ $penugasan->laporan->fasilitas->ruangan->gedung->nama_gedung }}</p>
                                 <p class="mb-2"><strong>Tanggal Lapor:</strong>
+
                                      {{ $penugasan->laporan->tanggal_lapor ? \Carbon\Carbon::parse($penugasan->laporan->tanggal_lapor)
                                         ->locale('id')->translatedFormat('l, d F Y') : '-' }}
                                 <p class="mb-2"><strong>Tenggat:</strong>
                                     {{ $penugasan->tenggat ? \Carbon\Carbon::parse($penugasan->tenggat)
                                         ->locale('id')->translatedFormat('l, d F Y') : '-' }}
+                                    {{ $penugasan->laporan->tanggal_lapor->translatedFormat('l, d F Y') }}</p>
+                                <p class="mb-2"><strong>Deskripsi:</strong>
+                                    {{ $penugasan->laporan->pelaporLaporan->first()->deskripsi_tambahan ?? '-' }}
                                 </p>
                                 <p class="mb-2"><strong>Deskripsi:</strong>
                                     {{ $penugasan->laporan->pelaporLaporan->first()->deskripsi_tambahan ?? 'Tidak ada deskripsi tambahan.' }}
                                 </p>
                                 <div class="d-flex justify-content-end mt-4">
                                     <button
+
                                         onclick="modalAction('{{ route('teknisi.feedback', ['id' => $penugasan->id_penugasan]) }}')"
                                         class="btn btn-primary btn-round btn-sm">
                                         <i class="nc-icon nc-settings-gear-65"></i> Dokumentasi Perbaikan
+
+                                        onclick="modalAction('{{ url('/perbaikan/edit/' . $penugasan->id_penugasan) }}')"
+                                        class="btn btn-primary btn-sm me-2">
+                                        Dokumentasi Perbaikan
+
                                     </button>
                                 </div>
                             </div>
@@ -175,15 +190,31 @@
                                                     : '-' }}
                                             </td>
                                             <td>
+
                                                 {{ $l->laporan->tanggal_selesai
                                                     ? \Carbon\Carbon::parse($l->laporan->tanggal_selesai)->locale('id')->translatedFormat('l, d F Y')
+
+                                                {{ $l->laporan->tanggal_lapor
+                                                    ? $l->laporan->tanggal_lapor->translatedFormat('l, d F Y')
+                                                    : '-' }}
+                                            </td>
+                                            <td>
+                                                {{ $l->tanggal_selesai
+                                                    ? $l->tanggal_selesai->translatedFormat('l, d F Y')
+
                                                     : '-' }}
                                             </td>
                                             <td>
                                                 <button
+
                                                     onclick="modalAction('{{ route('teknisi.detailRiwayat', ['id' => $l->id_penugasan]) }}')"
                                                     class="btn btn-info btn-sm btn-round">
                                                     <i class="nc-icon nc-zoom-split"></i> Detail
+
+                                                    onclick="modalAction('{{ url('/perbaikan/detail/'. $l->id_penugasan) }}')"
+                                                    class="btn btn-warning btn-sm me-2">
+                                                    Detail
+
                                                 </button>
                                             </td>
                                         </tr>
@@ -223,8 +254,12 @@
         </div>
     </div>
 
+
     {{-- Modal --}}
     <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
+
         aria-hidden="true"></div>
 @endsection
 

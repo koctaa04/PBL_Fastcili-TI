@@ -20,7 +20,6 @@
                 <div class="row pr-auto">
                     <div class="col-md-12">
                         <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Cari Data Gedung:</label>
                             <div class="col-10">
                                 <input type="text" class="form-control" id="search" placeholder="Cari gedung...">
                                 <small class="form-text text-muted text-small">Cari berdasarkan nama, kode, atau deskripsi gedung</small>
@@ -46,7 +45,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -286,15 +285,15 @@
                             // Determine image source
                             const fotoGedung = gedung.foto_gedung ?
                                 "{{ asset('storage/uploads/foto_gedung') }}/" + gedung.foto_gedung :
-                                "{{ asset('gedung_default.jpg') }}";
+                                "{{ asset('foto_kerusakan.jpg') }}";
 
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                                    <div class="card gedung-card" style="cursor: pointer;" onclick="modalAction('{{ url('/gedung/detail') }}/${gedung.id_gedung}')" >
-                                        <div class="gedung-card-img-container">
+                                    <div class="card gedung-card">
+                                        <div class="gedung-card-img-container" style="cursor: pointer;" onclick="modalAction('{{ url('/gedung/detail') }}/${gedung.id_gedung}')">
                                             <img src="${fotoGedung}" alt="Foto Gedung ${gedung.nama_gedung}" class="gedung-card-img">
                                         </div>
-                                        <div class="gedung-card-body">
+                                        <div class="gedung-card-body" style="cursor: pointer;" onclick="modalAction('{{ url('/gedung/detail') }}/${gedung.id_gedung}')">
                                             <h5 class="gedung-card-title">${gedung.nama_gedung}</h5>
                                             <p class="gedung-card-text"><strong>Kode:</strong> <span class="gedung-kode">${gedung.kode_gedung || '-'}</span></p>
                                             <p class="gedung-card-text gedung-deskripsi">${gedung.deskripsi || 'Tidak ada deskripsi'}</p>

@@ -53,7 +53,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 

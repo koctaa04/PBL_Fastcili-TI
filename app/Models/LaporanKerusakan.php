@@ -14,6 +14,7 @@ class LaporanKerusakan extends Model
 
     protected $casts = [
         'tanggal_lapor' => 'datetime',
+        'tanggal_selesai' => 'datetime',
     ];
     protected $fillable = [
         'id_fasilitas',

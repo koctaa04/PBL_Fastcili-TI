@@ -230,14 +230,12 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi data import gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-            return redirect()->back()->withErrors($validator)->withInput();
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi file gagal',
+                'errors' => $validator->errors(),
+                'msgField' => ['file_user' => $validator->errors()->get('file_user')]
+            ], 422);
         }
 
         try {
@@ -248,70 +246,97 @@ class UserController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
             $data = $sheet->toArray();
 
-            $insert = [];
             $errors = [];
+            $insert = [];
+            $emailInFile = [];
 
+            // Step 1: Validasi semua data dulu
             foreach ($data as $index => $row) {
                 if ($index === 0) continue; // Skip header
+                $barisExcel = $index + 1;
 
-                // Validasi data
-                if (!Level::find($row[0])) {
-                    $errors[] = "Level ID {$row[0]} tidak ditemukan";
+                $id_level = trim($row[0] ?? '');
+                $email = trim($row[1] ?? '');
+                $nama = trim($row[2] ?? '');
+                $password_plain = trim($row[3] ?? '');
+
+                $rowErrors = [];
+
+                // Validasi kosong
+                if ($id_level === '' || $email === '' || $nama === '' || $password_plain === '') {
+                    $rowErrors[] = "Kolom tidak boleh kosong.";
+                }
+
+                // Validasi Level
+                if (!is_numeric($id_level) || !Level::find($id_level)) {
+                    $rowErrors[] = "Level ID {$id_level} tidak ditemukan.";
+                }
+
+                // Validasi Email format
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $rowErrors[] = "Format email '{$email}' tidak valid.";
+                }
+
+                // Cek duplikat email di file itu sendiri
+                if (in_array($email, $emailInFile)) {
+                    $rowErrors[] = "Email '{$email}' duplikat di dalam file.";
+                } else {
+                    $emailInFile[] = $email;
+                }
+
+                // Cek email sudah ada di DB
+                if (User::where('email', $email)->exists()) {
+                    $rowErrors[] = "Email '{$email}' sudah terdaftar.";
+                }
+
+                if ($rowErrors) {
+                    $errors[] = "Baris ke-{$barisExcel}: " . implode(' ', $rowErrors);
                     continue;
                 }
 
-                if (User::where('email', $row[1])->exists()) {
-                    $errors[] = "Email {$row[1]} sudah terdaftar";
-                    continue;
-                }
-
+                // Simpan data yang valid untuk insert nanti
                 $insert[] = [
-                    'id_level' => $row[0],
-                    'email' => $row[1],
-                    'nama' => $row[2],
-                    'password' => Hash::make($row[3]),
+                    'id_level' => $id_level,
+                    'email' => $email,
+                    'nama' => $nama,
+                    'password' => Hash::make($password_plain),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
             }
 
+            // Kalau ada error → batalkan semua
             if (!empty($errors)) {
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Terdapat error validasi data',
-                        'msgField' => $this->convertErrorsToFields($errors), // tambahan agar bisa ditampilkan di bawah input
-                        'errors' => $errors // semua pesan error ditampilkan
-                    ], 422);
-                }
-
-                return redirect()->back()->with('error', implode('<br>', $errors));
-            }
-
-
-            if (!empty($insert)) {
-                User::insert($insert);
-            }
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data user berhasil diimport',
-                    'count' => count($insert)
-                ]);
-            }
-            return redirect()->route('users.index')->with('success', 'Data user berhasil diimport (' . count($insert) . ' data)');
-        } catch (\Exception $e) {
-            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                    'error' => $e->getMessage()
-                ], 500);
+                    'message' => 'Terdapat kesalahan pada data Excel. Tidak ada data yang disimpan.',
+                    'errors' => $errors,
+                    'msgField' => ['file_user' => $errors]
+                ], 422);
             }
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            // Step 2: Jalankan Transaction
+            DB::transaction(function () use ($insert) {
+                if (!empty($insert)) {
+                    User::insert($insert);
+                }
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data User berhasil diimport.',
+                'count' => count($insert)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat proses import: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
+
+
     protected function convertErrorsToFields(array $errors)
     {
         $result = [];

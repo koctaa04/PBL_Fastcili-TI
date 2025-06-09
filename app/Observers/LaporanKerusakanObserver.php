@@ -18,10 +18,10 @@ class LaporanKerusakanObserver
         $sarprasUsers = User::where('id_level', 2)->get();
         foreach ($sarprasUsers as $user) {
             $user->notify(new SarprasNotifikasi([
-                'tipe' => 'laporan baru: ' . ($laporan->fasilitas->nama_fasilitas ?? 'Fasilitas') . 
-                            ' ruang ' . ($laporan->fasilitas->ruangan->nama_ruangan),
+                'tipe' => 'Laporan Baru: ' . ($laporan->fasilitas->nama_fasilitas ?? 'Fasilitas') .
+                    ' di ' . ($laporan->fasilitas->ruangan->nama_ruangan),
                 'pesan' => 'Pesan:  ' . ($laporan->deskripsi),
-                'link' => route('perbaikan.index', $laporan->id_laporan),
+                'link' => url('/lapor_kerusakan/penilaian/'. $laporan->id_laporan),
             ]));
         }
     }

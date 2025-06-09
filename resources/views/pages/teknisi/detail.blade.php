@@ -26,6 +26,88 @@
                                 </button>
                             </div>
                         </div>
+        <div class="modal-body text-center">
+            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';" alt="Foto Kerusakan"
+                style="max-width: 300px; height: auto;" class="img-fluid rounded mb-3">
+
+            <table class="table table-sm table-bordered table-striped text-left">
+                <tr>
+                    <th class="text-right col-3">Fasilitas :</th>
+                    <td class="col-9">{{ $laporan->laporan->fasilitas->nama_fasilitas }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Gedung :</th>
+                    <td class="col-9">{{ $laporan->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Fasilitas :</th>
+                    <td class="col-9">{{ $laporan->laporan->fasilitas->ruangan->nama_ruangan }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Deskripsi :</th>
+                    <td class="col-9">
+                        @if ($laporan->laporan && $laporan->laporan->laporanPelapor && $laporan->laporan->laporanPelapor->count())
+                            <ul class="mb-0">
+                                <li>{{ $laporan->laporan->deskripsi }}</li>
+                                @foreach ($laporan->laporan->laporanPelapor as $pelapor)
+                                    @if ($pelapor->id_laporan == $laporan->laporan->id)
+                                        <li>{{ $pelapor->deskripsi_tambahan }}</li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        @else
+                            {{ $laporan->laporan->deskripsi }}
+                        @endif
+                    </td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Tanggal Lapor :</th>
+                    <td class="col-9">
+                        {{ $laporan->created_at->translatedFormat('l, d F Y') }}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Tanggal Selesai :</th>
+                    <td class="col-9">
+                        {{ $laporan->tanggal_selesai->translatedFormat('l, d F Y') ?? '-' }}
+                    </td>
+                </tr>
+                <tr>
+                    @php
+                        $statusColor = match ($laporan->laporan->id_status) {
+                            1 => 'bg-secondary',
+                            2 => 'bg-primary',
+                            3 => 'bg-info',
+                            4 => 'bg-success text-white',
+                            5 => 'bg-danger text-white',
+                            default => 'bg-dark',
+                        };
+                    @endphp
+                    <th class="text-right col-3">Status :</th>
+                    <td class="col-9">
+                        <span class="badge {{ $statusColor }}">{{ $laporan->laporan->status->nama_status }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Teknisi :</th>
+                    <td class="col-9">{{ $laporan->user->nama ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Catatan Teknisi :</th>
+                    <td class="col-9">{{ $laporan->catatan_teknisi ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Catatan Sarpras :</th>
+                    <td class="col-9">{{ $laporan->komentar_sarpras ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Rating :</th>
+                    <td class="col-9">
+                        @php
+                            $ratings = $laporan->laporan->laporanPelapor;
+                            $avgRating = $ratings ? $ratings->avg('rating_pengguna') : null;
+                        @endphp
 
                         <div class="card-body">
                             <div class="row">

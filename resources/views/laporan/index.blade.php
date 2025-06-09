@@ -129,9 +129,10 @@
                             <tbody>
                                 @foreach ($laporan as $i => $item)
                                     <tr>
-                                        <td>{{ $i + 1 }}</td>
+                                        <td></td>
                                         <td>
                                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                                 alt="Foto Kerusakan" class="card-img-top img-fluid"
                                                 style="height: 120px; object-fit: cover;">
                                         </td>
@@ -155,7 +156,7 @@
                                             <p class=" p-2 badge {{ $statusColor }}">
                                                 {{ $item->laporan->status->nama_status }}</p>
                                         </td>
-                                        <td>{{ $item->laporan->tanggal_lapor->locale('id')->translatedFormat('l, d F Y') }}</td>
+                                        <td>{{ $item->laporan->tanggal_lapor->translatedFormat('l, d F Y') }}</td>
 
 
                                         <td>
@@ -164,7 +165,59 @@
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
-
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="card shadow-lg border-0 rounded-4 mt-5">
+                <div class="card-header bg-warning text-white rounded-top-4">
+                    <h3 class="mb-3">Riwayat Laporan</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-striped table-bordered" id="table_level">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="text-center">#</th>
+                                    <th scope="col">Nama Fasilitas</th>
+                                    <th scope="col">Deskripsi</th>
+                                    <th scope="col">Tanggal Lapor</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($laporanAuth as $lapor => $l)
+                                    <tr>
+                                        <th scope="row" class="text-center">{{ $lapor + 1 }}</th>
+                                        <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
+                                        <td>{{ $l->deskripsi_tambahan }}</td>
+                                        <td>{{ $l->created_at->translatedFormat('l, d F Y') }}</td>
+                                        <td>
+                                            @php
+                                                $statusColor = match ($l->laporan->id_status) {
+                                                    1 => 'bg-secondary text-white',
+                                                    2 => 'bg-info text-white',
+                                                    3 => 'bg-warning text-white',
+                                                    4 => 'bg-success text-white',
+                                                    default => 'bg-dark',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $statusColor }} px-3 py-2">
+                                                {{ $l->laporan->status->nama_status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button
+                                                onclick="modalAction('{{ route('pelapor.detail', ['id' => $l->id]) }}')"
+                                                class="btn btn-sm btn-info text-white">
+                                                Detail
+                                            </button>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -174,10 +227,17 @@
             </div>
         @endif
     </div>
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
+    aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
     <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
         // Handle file input change
         $('#foto_kerusakan').on('change', function() {
             var fileName = $(this).val().split('\\').pop();
@@ -397,6 +457,13 @@
                 language: {
                     emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan yang tersedia",
                     zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan seperti keyword yang ingin dicari"
+                },
+                rowCallback: function(row, data, index) {
+                    // Ganti isi kolom "No" (kolom ke-0)
+                    var info = this.api().page.info();
+                    var page = info.page;
+                    var length = info.length;
+                    $('td:eq(0)', row).html(index + 1 + page * length);
                 }
             });
         });

@@ -183,10 +183,17 @@
             </div>
         </div>
     </div>
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
+        aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
     <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
         $(document).ready(function() {
             //grafik laporan per bulan
             const ctx1 = document.getElementById('laporanPerBulan').getContext('2d');
