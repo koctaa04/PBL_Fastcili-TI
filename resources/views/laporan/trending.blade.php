@@ -6,21 +6,23 @@
 @section('content')
 <div class="content">
     <h3 class="mb-4">Laporan Kerusakan Trending</h3>
-    <div class="card px-4">
-        <div class="card-header d-flex justify-content-between align-items-center pb-5 pt-5">
-            <div class="d-flex align-items-center">
-                <div style="width: 580px;">
+    <div class="card px-2 px-md-4">
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center pb-3 pb-md-3 pt-3 pt-md-5">
+            <div class="d-flex align-items-center mb-3 mb-md-0 w-100">
+                <div class="w-100" style="max-width: 580px;">
                     <input type="text" class="form-control rounded-pill" id="search"
                         placeholder="Cari Laporan..." value="{{ $search }}">
                     <small class="form-text text-muted text-small">Cari berdasarkan fasilitas atau deskripsi laporan</small>
                 </div>
             </div>
-            <span class="badge badge-warning px-3 py-2">
-                <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Skor Laporan
-            </span>
-            <span class="badge badge-pill badge-danger px-3 py-2">
-                <i class="fas fa-fire mr-1"></i> Top 10 Laporan
-            </span>
+            <div class="d-flex flex-wrap gap-2 w-100 w-md-auto justify-content-start justify-content-md-end">
+                <span class="badge badge-pill badge-danger px-2 px-md-3 py-2 mr-3 mb-3">
+                    <i class="fas fa-fire mr-1"></i> Top 10 Laporan
+                </span>
+                <span class="badge badge-warning px-2 px-md-3 py-2 mb-3">
+                    <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Skor Laporan
+                </span>
+            </div>
         </div>
         <div class="card-body p-0">
             <div id="trending-container">
@@ -35,11 +37,11 @@
                 };
                 @endphp
                 <div class="card trending-card mb-3" style="{{ $borderColor }}">
-                    <div class="card-body p-3">
-                        <div class="d-flex">
-                            <div class="rank-display d-flex flex-column align-items-center justify-content-center mr-3" style="width: 60px;">
+                    <div class="card-body p-2 p-md-3">
+                        <div class="d-flex flex-column flex-md-row">
+                            <div class="rank-display d-flex flex-row flex-md-column align-items-center justify-content-center mr-0 mr-md-3 mb-2 mb-md-0 p-2" style="width: auto; min-width: 60px;">
                                 <span class="rank-number font-weight-bold">#{{ $rank }}</span>
-                                <div class="trend-indicator mt-1">
+                                <div class="trend-indicator mt-0 mt-md-1 ml-2 ml-md-0">
                                     @if($rank <= 3)
                                         <i class="fas fa-fire text-danger"></i>
                                         @else
@@ -47,32 +49,34 @@
                                         @endif
                                 </div>
                             </div>
-                            <div class="flex-grow-1 d-flex">
-                                <div class="mr-3">
-                                    <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan['laporan']->foto_kerusakan) }}"
-                                        alt="Foto Kerusakan"
-                                        class="img-fluid rounded"
-                                        style="height: 180px; width: 250px; object-fit: cover;">
-                                </div>
-                                <div class="flex-grow-1 d-flex flex-column">
-                                    <div>
-                                        <h4 class="card-title font-weight-bold mb-2">{{ $laporan['laporan']->fasilitas->nama_fasilitas ?? '-' }}</h4>
-                                        <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">{{ $laporan['laporan']->deskripsi ?? '-' }}</p>
+                            <div class="flex-grow-1 d-flex flex-column">
+                                <div class="d-flex flex-column flex-md-row">
+                                    <div class="mr-0 mr-md-3 mb-3 mb-md-0 w-100" style="max-width: 250px;">
+                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan['laporan']->foto_kerusakan) }}"
+                                            alt="Foto Kerusakan"
+                                            class="img-fluid rounded w-100"
+                                            style="height: 180px; object-fit: cover;">
                                     </div>
-                                    <div class="mt-auto">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <span class="badge badge-pill badge-primary px-3 py-2 mr-2">
-                                                    <i class="fas fa-users mr-1"></i> Pelapor: {{ $laporan['total_pelapor'] }}
-                                                </span>
-                                                <span class="badge badge-pill badge-warning px-3 py-2">
-                                                    <i class="fas fa-star mr-1"></i> Skor: {{ $laporan['skor'] }}
-                                                </span>
+                                    <div class="flex-grow-1 d-flex flex-column">
+                                        <div>
+                                            <h4 class="card-title font-weight-bold mb-2">{{ $laporan['laporan']->fasilitas->nama_fasilitas ?? '-' }}</h4>
+                                            <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">{{ $laporan['laporan']->deskripsi ?? '-' }}</p>
+                                        </div>
+                                        <div class="mt-auto">
+                                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                                                <div class="mb-2 mb-md-0 d-flex flex-wrap gap-2">
+                                                    <span class="badge badge-pill badge-primary px-2 px-md-3 py-2 mr-3">
+                                                        <i class="fas fa-users mr-1"></i> Pelapor: {{ $laporan['total_pelapor'] }}
+                                                    </span>
+                                                    <span class="badge badge-pill badge-warning px-2 px-md-3 py-2">
+                                                        <i class="fas fa-star mr-1"></i> Skor: {{ $laporan['skor'] }}
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-danger btn-sm btn-md-lg"
+                                                    onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan['laporan']->id_laporan) }}')">
+                                                    <i class="fas fa-star mr-1"></i> Beri Nilai
+                                                </button>
                                             </div>
-                                            <button class="btn btn-danger btn-lg"
-                                                onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan['laporan']->id_laporan) }}')">
-                                                <i class="fas fa-star mr-1"></i> Beri Nilai
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -108,7 +112,6 @@
     .rank-display {
         background-color: #f8f9fa;
         border-radius: 6px;
-        padding: 10px;
     }
 
     .rank-number {
@@ -119,14 +122,52 @@
     .badge {
         font-size: 0.85rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        white-space: nowrap;
     }
 
     #trending-container {
-        padding: 0 10px;
+        padding: 0 5px;
     }
 
     .card-title {
         font-size: 1.1rem;
+    }
+    
+    .btn-md-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .btn-md-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.25rem;
+        }
+        
+        #trending-container {
+            padding: 0 10px;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .card-header {
+            padding: 1rem;
+        }
+        
+        .trending-card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .rank-display {
+            flex-direction: row !important;
+            width: 100% !important;
+            justify-content: flex-start !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        .rank-number {
+            margin-right: 1rem;
+        }
     }
 </style>
 @endpush
