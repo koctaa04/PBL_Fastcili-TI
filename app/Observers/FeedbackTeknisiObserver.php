@@ -26,10 +26,16 @@ class FeedbackTeknisiObserver
 
             foreach ($sarprasUsers as $user) {
                 $user->notify(new SarprasNotifikasi([
+
+                    'tipe' => 'Laporan '.$penugasanTeknisi->laporan->fasilitas->nama_fasilitas,
+                    'pesan' => $penugasanTeknisi->user->nama . '',
+                    'link' => route('perbaikan.index', $penugasanTeknisi->id_laporan),
+
                     'tipe' => $penugasanTeknisi->laporan->fasilitas->nama_fasilitas . 
                                 ' Telah dikerjakan oleh ' . ($penugasanTeknisi->user->nama ?? 'Teknisi'),
                     'pesan' => 'Catatan: ' . $penugasanTeknisi->catatan_teknisi,
                     'link' => url('/laporan/verifikasi/'. $penugasanTeknisi->id_laporan),
+
                 ]));
             }
         }

@@ -8,71 +8,81 @@
         <div class="card p-4 shadow-sm">
             <form action="{{ route('laporan.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
                 <div class="row">
-                    <!-- Kolom Kiri: Gedung & Form Laporan Baru -->
+                    <!-- Kiri: Pilih Gedung & Ruangan -->
                     <div class="col-md-4">
-                        <h5 class="mb-3">1. Lokasi</h5>
-
-                        <div class="form-group mb-3">
+                        <div class="form-group">
                             <label for="id_gedung">Pilih Gedung</label>
                             <select name="id_gedung" id="id_gedung" class="form-control" required>
                                 <option value="">-- Pilih Gedung --</option>
-                                @foreach ($gedungList as $g)
+                                @foreach ($gedung as $g)
                                     <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="form-group mb-3" id="ruangan-group" style="display: none;">
+                        <div class="form-group" id="ruangan-group" style="display: none;">
                             <label for="id_ruangan">Pilih Ruangan</label>
                             <select name="id_ruangan" id="id_ruangan" class="form-control" required>
                                 <option value="">-- Pilih Ruangan --</option>
                             </select>
                         </div>
 
+                        <!-- Form Laporan Baru (muncul saat klik 'Bukan salah satu') -->
                         <div id="form-laporan-baru" style="display: none;" class="mt-4">
-                            <h6>2. Buat Laporan Baru</h6>
-
-                            <div class="form-group mb-3">
+                            <div class="form-group">
                                 <label for="id_fasilitas">Fasilitas</label>
-                                <select name="id_fasilitas" id="id_fasilitas" class="form-control" required></select>
+                                <select name="id_fasilitas" id="id_fasilitas" class="form-control"
+                                    required></select>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="deskripsi">Deskripsi Kerusakan</label>
-                                <textarea name="deskripsi" id="deskripsi" class="form-control" rows="3" required></textarea>
+                            <div class="form-group">
+                                <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika
+                                    diperlukan)</label>
+                                <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="jumlah_kerusakan">Jumlah fasilitas yang rusak</label>
+                                <input type="number" name="jumlah_kerusakan" class="form-control" required>
+                                <small class="text-muted d-block mt-1">*Jumlah fasiltas yang rusak tidak bisa lebih
+                                    dari jumlah fasilitas</small>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="foto_kerusakan">Foto Kerusakan</label>
-                                <input type="file" name="foto_kerusakan" id="foto_kerusakan" class="form-control"
-                                    required>
+                            <div class="form-group">
+                                <!-- Custom File Input -->
+                                <label for="foto_kerusakan" class="d-block mb-2">Foto Kerusakan</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="foto_kerusakan"
+                                        id="foto_kerusakan" accept="image/*" required>
+                                    <label class="custom-file-label bg-warning text-dark text-center w-100"
+                                        for="foto_kerusakan" id="file-label">
+                                        <i class="fas fa-upload mr-2"></i>Pilih foto kerusakan
+                                    </label>
+                                </div>
+                                <small class="text-muted d-block mt-1">Format: JPG, PNG, JPEG (Maks. 2MB)</small>
+                                <small class="text-danger" id="error-foto_kerusakan"></small>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Kolom Kanan: Dukungan Laporan -->
+                    <!-- Kanan: Card Laporan Sudah Ada -->
                     <div class="col-md-8">
                         <div id="laporan-terlapor-container" style="display: none;" class="mt-2">
-                            <h5>Laporan Terdeteksi</h5>
-
+                            <label>Laporan yang Sudah Ada:</label>
                             <div class="mb-3">
                                 <button type="button" id="bukan-laporan" class="btn btn-warning">
                                     Bukan salah satu laporan di bawah?
                                 </button>
                             </div>
-
-                            <div id="laporan-terlapor-list" class="row g-3"></div>
+                            <div id="laporan-terlapor-list" class="row"></div>
                         </div>
 
+                        <!-- Jika memilih dukung laporan -->
                         <div id="form-dukungan" style="display: none;" class="mt-4">
                             <input type="hidden" name="dukungan_laporan" id="dukungan_laporan">
-
-                            <div class="form-group mb-3">
-                                <label for="tambahan_deskripsi">Tambahkan Deskripsi (opsional)</label>
-                                <textarea name="tambahan_deskripsi" id="tambahan_deskripsi" class="form-control" rows="3"
-                                    placeholder="Tambahkan alasan Anda mendukung laporan ini..."></textarea>
+                            <div class="form-group">
+                                <label>Tambahkan deskripsi (opsional)</label>
+                                <textarea name="tambahan_deskripsi" class="form-control" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -81,9 +91,8 @@
                 <!-- Tombol Submit -->
                 <div class="row mt-4">
                     <div class="col-md-12 text-end">
-                        <button type="submit" id="btn-submit" class="btn btn-success" disabled>
-                            Kirim Laporan
-                        </button>
+                        <button type="submit" id="btn-submit" class="btn btn-success" disabled>Kirim
+                            Laporan</button>
                     </div>
                 </div>
             </form>
@@ -94,7 +103,7 @@
 
 @push('scripts')
     <script>
-        var currentUserId = {{ auth()->id() }};
+         var currentUserId = {{ auth()->id() }};
         $(document).ready(function() {
             // Fungsi: Menampilkan form dukungan laporan
             function showFormDukungan() {
@@ -146,7 +155,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                window.location.href = "{{ url('/pelapor') }}";
+                                window.location.href = "{{ url('/lapor_kerusakan') }}";
                             });
                         } else {
                             Swal.fire({
@@ -241,6 +250,7 @@
                 $('#form-laporan-baru').hide();
 
                 showFormDukungan();
+                updateSubmitButtonState();
             });
 
             // Klik tombol: Buat laporan baru
@@ -260,8 +270,9 @@
                 let enable = false;
 
                 if (isDukung) {
-                    const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
-                    enable = tambahanDeskripsi.length > 0;
+                    // const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
+                    // enable = tambahanDeskripsi.length > 0;
+                    enable = true;
                 }
 
                 if (isLaporanBaru) {
