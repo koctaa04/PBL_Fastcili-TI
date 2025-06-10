@@ -37,6 +37,22 @@ class PerbaikanController extends Controller
 
     public function update(Request $request, $id)
     {
+        $penugasan = PenugasanTeknisi::where('id_penugasan', $id)->first();
+
+        if (!$penugasan) {
+            return response()->json([
+                'success' => false,
+                'messages' => 'Penugasan tidak ditemukan.',
+            ]);
+        }
+
+        if (now()->greaterThan($penugasan->tenggat)) {
+            return response()->json([
+                'success' => false,
+                'messages' => 'Tenggat waktu telah lewat. Anda tidak dapat mengunggah dokumentasi.',
+            ]);
+        }
+
         $perbaikan = PenugasanTeknisi::findOrFail($id);
 
         $rules = [

@@ -36,6 +36,10 @@ Route::get('/', function () {
 	}
 });
 
+Route::get('/panduan', function () {
+	return view('panduan');
+});
+
 Auth::routes();
 
 
@@ -195,7 +199,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/teknisi', [HomeController::class, 'teknisi'])->name('teknisi');
 		Route::get('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedback'])->name('teknisi.feedback');
 		Route::put('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedbackTeknisi'])->name('teknisi.feedbacksimpan');
-		Route::get('/detail-riwayat/{id}', [PenugasanTeknisiController::class, 'detailRiwayat'])->name('teknisi.detailRiwayat');
+		// Route::get('/detail-riwayat/{id}', [PenugasanTeknisiController::class, 'detailRiwayat'])->name('teknisi.detailRiwayat');
 	});
 
 	Route::middleware(['authorize:1,2'])->group(function () {
@@ -206,6 +210,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
 		Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 		Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+    Route::get('/laporan/ganti-teknisi/{id}', [LaporanKerusakanController::class, 'formGantiTeknisi']);
+	  Route::post('/ganti-teknisi', [LaporanKerusakanController::class, 'gantiTeknisi']);
 	});
 
 	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');

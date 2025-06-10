@@ -52,9 +52,14 @@ class User extends Authenticatable
     }
 
     public function laporanDilaporkan()
-{
-    return $this->hasMany(PelaporLaporan::class, 'id_user');
-}
+    {
+        return $this->hasMany(PelaporLaporan::class, 'id_user');
+    }
+
+    public function credit_score()
+    {
+        return $this->hasOne(CreditScoreTeknisi::class);
+    }
 
 
     /**

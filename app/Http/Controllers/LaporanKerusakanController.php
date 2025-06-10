@@ -446,6 +446,35 @@ class LaporanKerusakanController extends Controller
         }
     }
 
+    public function formGantiTeknisi($id)
+    {
+        $laporan = LaporanKerusakan::with('fasilitas')->findOrFail($id);
+        $teknisi = User::where('id_level', '3')->get();
+
+        return view('laporan_prioritas.ganti_teknisi', compact('laporan', 'teknisi'));
+    }
+    public function gantiTeknisi(Request $request)
+    {
+        $request->validate([
+            'id_penugasan' => 'required|exists:penugasan_teknisi,id_penugasan',
+            'id_laporan'   => 'required|exists:laporan_kerusakan,id_laporan',
+            'id_user'      => 'required|exists:users,id_user',
+            'tenggat'      => 'required|date|after_or_equal:today',
+        ]);
+
+        $penugasan = PenugasanTeknisi::findOrFail($request->id_penugasan);
+        $penugasan->id_user = $request->id_user;
+        $penugasan->tenggat = $request->tenggat;
+        $penugasan->updated_at = now();
+        $penugasan->save();
+
+        return response()->json([
+            'success' => true,
+            'messages' => 'Teknisi berhasil diganti.',
+        ]);
+    }
+
+
     public function verifikasiPerbaikan($id)
     {
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
@@ -529,12 +558,15 @@ class LaporanKerusakanController extends Controller
 
     public function createPelapor()
     {
-        if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
-            $fasilitas = Fasilitas::all();
-            $statusList = StatusLaporan::all();
-            $gedungList = Gedung::all();
+       if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
+          $laporan = PelaporLaporan::with([
+              'laporan.fasilitas.ruangan.gedung',
+              'laporan.status',
+              'user'
+          ])->get();
+          $gedung = Gedung::all();
 
-            return view('pages.pelapor.create', compact('fasilitas', 'statusList', 'gedungList'));
+          return view('pages.pelapor.create', compact('laporan', 'gedung'));
         } else {
             return back();
         }

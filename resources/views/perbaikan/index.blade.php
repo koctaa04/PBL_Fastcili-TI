@@ -49,11 +49,9 @@
 
                                     {{-- Tenggat Laporan --}}
                                     <td>
-                                        {{ $laporan->tenggat
-                                            ? $laporan->tenggat->translatedFormat('l, d F Y')
-                                            : '-' }}
+                                        {{ $laporan->tenggat ? $laporan->tenggat->translatedFormat('l, d F Y') : '-' }}
                                     </td>
-                                    
+
                                     <td>
                                         <span
                                         @if ($laporan->laporan->id_status == 4)
@@ -91,6 +89,7 @@
                                     <td>
                                         <div class="d-flex">
                                             @php
+                                                $isLate = \Carbon\Carbon::now()->greaterThan($laporan->tenggat);
                                                 $isEditable = $laporan->status_perbaikan != 'Selesai Dikerjakan';
                                                 $isRejected = !is_null($laporan->komentar_sarpras);
                                                 $isReported = !is_null($laporan->dokumentasi);
@@ -99,11 +98,16 @@
                                                 $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
                                             @endphp
 
+
                                             @if (auth()->user()->id_level == 3)
-                                                @if ($isEditable)
+                                                @if ($isEditable && !$isLate)
                                                     <button onclick="modalAction('{{ $laporanUrl }}')"
                                                         class="btn btn-sm btn-danger mr-2">
                                                         {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                                    </button>
+                                                @elseif ($isLate && $isEditable)
+                                                    <button class="btn btn-sm btn-secondary mr-2" disabled>
+                                                        Tenggat Terlewat
                                                     </button>
                                                 @endif
                                             @endif
