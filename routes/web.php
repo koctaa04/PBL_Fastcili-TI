@@ -10,7 +10,6 @@ use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\LaporanKerusakanController;
-use App\Http\Controllers\VerifikasiLaporanController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PenugasanTeknisiController;
 use App\Http\Controllers\WaspasController;
@@ -63,31 +62,33 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/password', [ProfileController::class, 'updatepassword'])->name('profile.password');
 	});
 
-	/** -----------------------------
-	 *  Kelola Level
-	 *  ---------------------------- */
-	Route::prefix('level')->group(function () {
-		Route::get('/', [LevelController::class, 'index'])->name('level.index');
-		Route::get('/create', [LevelController::class, 'create']);
-		Route::post('/', [LevelController::class, 'store'])->name('level.store');
-		Route::get('/edit/{id}', [LevelController::class, 'edit']);
-		Route::put('/update/{id}', [LevelController::class, 'update']);
-		Route::delete('/delete/{id}', [LevelController::class, 'destroy']);
-	});
+	Route::middleware(['authorize:1'])->group(function () {
+		/** -----------------------------
+		 *  Kelola Level
+		 *  ---------------------------- */
+		Route::prefix('level')->group(function () {
+			Route::get('/', [LevelController::class, 'index'])->name('level.index');
+			Route::get('/create', [LevelController::class, 'create']);
+			Route::post('/', [LevelController::class, 'store'])->name('level.store');
+			Route::get('/edit/{id}', [LevelController::class, 'edit']);
+			Route::put('/update/{id}', [LevelController::class, 'update']);
+			Route::delete('/delete/{id}', [LevelController::class, 'destroy']);
+		});
 
-	/** -----------------------------
-	 *  Kelola Pengguna
-	 *  ---------------------------- */
-	Route::prefix('users')->group(function () {
-		Route::get('/', [UserController::class, 'index'])->name('users.index');
-		Route::get('/create', [UserController::class, 'create']);
-		Route::post('/', [UserController::class, 'store'])->name('users.store');
-		Route::get('/edit/{id}', [UserController::class, 'edit']);
-		Route::put('/update/{id}', [UserController::class, 'update']);
-		Route::delete('/delete/{id}', [UserController::class, 'destroy']);
-		Route::get('/import', [UserController::class, 'import'])->name('users.import');
-		Route::post('/import_ajax', [UserController::class, 'import_ajax'])->name('users.import.ajax');
-		Route::post('/toggle-access/{id}', [UserController::class, 'toggleAccess']);
+		/** -----------------------------
+		 *  Kelola Pengguna
+		 *  ---------------------------- */
+		Route::prefix('users')->group(function () {
+			Route::get('/', [UserController::class, 'index'])->name('users.index');
+			Route::get('/create', [UserController::class, 'create']);
+			Route::post('/', [UserController::class, 'store'])->name('users.store');
+			Route::get('/edit/{id}', [UserController::class, 'edit']);
+			Route::put('/update/{id}', [UserController::class, 'update']);
+			Route::delete('/delete/{id}', [UserController::class, 'destroy']);
+			Route::get('/import', [UserController::class, 'import'])->name('users.import');
+			Route::post('/import_ajax', [UserController::class, 'import_ajax'])->name('users.import.ajax');
+			Route::post('/toggle-access/{id}', [UserController::class, 'toggleAccess']);
+		});
 	});
 
 	/** -----------------------------
@@ -134,17 +135,18 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/import_ajax', [FasilitasController::class, 'import_ajax'])->name('users.import.ajax');
 	});
 
-
-	/** -----------------------------
-	 *  Laporan Kerusakan
-	 *  ---------------------------- */
-	Route::prefix('lapor_kerusakan')->group(function () {
-		Route::get('/', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
-		Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
-		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('laporan.destroy');
-		Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
-		Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
-		Route::post('/simpan-penilaian/{id}', [LaporanKerusakanController::class, 'simpanPenilaian'])->name('laporan.simpanPenilaian');
+	Route::middleware(['authorize:1,2,4,5,6'])->group(function () {
+		/** -----------------------------
+		 *  Laporan Kerusakan
+		 *  ---------------------------- */
+		Route::prefix('lapor_kerusakan')->group(function () {
+			Route::get('/', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
+			Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
+			Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('laporan.destroy');
+			Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
+			Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
+			Route::post('/simpan-penilaian/{id}', [LaporanKerusakanController::class, 'simpanPenilaian'])->name('laporan.simpanPenilaian');
+		});
 	});
 
 
@@ -156,23 +158,26 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/get-fasilitas-belum-lapor/{idRuangan}', [LaporanKerusakanController::class, 'getFasilitasBelumLapor']);
 
 
-
-	/** -----------------------------
-	 *  WASPAS
-	 *  ---------------------------- */
-	Route::get('/prioritas', [WaspasController::class, 'index'])->name('prioritas.index');
-
-	/** -----------------------------
-	 *  Perbaikan (Untuk Teknisi)
-	 *  ---------------------------- */
-	Route::prefix('perbaikan')->group(function () {
-		Route::get('/', [PerbaikanController::class, 'index'])->name('perbaikan_teknisi.index');
-		Route::get('/edit/{id}', [PerbaikanController::class, 'edit']);
-		Route::put('/update/{id}', [PerbaikanController::class, 'update']);
-		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
+	Route::middleware(['authorize:1,2'])->group(function () {
+		/** -----------------------------
+		 *  WASPAS
+		 *  ---------------------------- */
+		Route::get('/prioritas', [WaspasController::class, 'index'])->name('prioritas.index');
 	});
 
-	Route::middleware(['authorize:1,5,4'])->group(function () {
+	Route::middleware(['authorize:1,2,3'])->group(function () {
+		/** -----------------------------
+		 *  Perbaikan (Untuk Teknisi)
+		 *  ---------------------------- */
+		Route::prefix('perbaikan')->group(function () {
+			Route::get('/', [PerbaikanController::class, 'index'])->name('perbaikan_teknisi.index');
+			Route::get('/edit/{id}', [PerbaikanController::class, 'edit']);
+			Route::put('/update/{id}', [PerbaikanController::class, 'update']);
+			Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
+		});
+	});
+
+	Route::middleware(['authorize:1,4,5,6'])->group(function () {
 		Route::get('/pelapor', [HomeController::class, 'pelapor'])->name('pelapor');
 		Route::get('/pelapor/create', [LaporanKerusakanController::class, 'createPelapor'])->name('pelapor.create');
 		Route::post('/', [LaporanKerusakanController::class, 'storePelapor'])->name('pelapor.store');
@@ -192,13 +197,16 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedbackTeknisi'])->name('teknisi.feedbacksimpan');
 		Route::get('/detail-riwayat/{id}', [PenugasanTeknisiController::class, 'detailRiwayat'])->name('teknisi.detailRiwayat');
 	});
-	/** -----------------------------
-	 *  Verifikasi laporan perbaikan dan Penugasan Teknisi
-	 *  ---------------------------- */
-	Route::get('/laporan/penugasan/{id}', [LaporanKerusakanController::class, 'tugaskanTeknisi']);
-	Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
-	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
-	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+
+	Route::middleware(['authorize:1,2'])->group(function () {
+		/** -----------------------------
+		 *  Verifikasi laporan perbaikan dan Penugasan Teknisi
+		 *  ---------------------------- */
+		Route::get('/laporan/penugasan/{id}', [LaporanKerusakanController::class, 'tugaskanTeknisi']);
+		Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
+		Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
+		Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+	});
 
 	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 	Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');

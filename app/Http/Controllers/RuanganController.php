@@ -50,14 +50,17 @@ class RuanganController extends Controller
 
     public function create()
     {
-        $gedung = Gedung::all();
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $gedung = Gedung::all();
 
-        return view('ruangan.create', ['gedung' => $gedung]);
+            return view('ruangan.create', ['gedung' => $gedung]);
+        } else {
+            return back();
+        }
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $rules = [
             'id_gedung' => 'required|exists:gedung,id_gedung',
             'kode_ruangan' => 'required|string|max:20|unique:ruangan,kode_ruangan',
@@ -93,10 +96,14 @@ class RuanganController extends Controller
 
     public function edit(string $id)
     {
-        $ruangan = Ruangan::find($id);
-        $gedung = Gedung::all();
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $ruangan = Ruangan::find($id);
+            $gedung = Gedung::all();
 
-        return view('ruangan.edit', ['ruangan' => $ruangan, 'gedung' => $gedung]);
+            return view('ruangan.edit', ['ruangan' => $ruangan, 'gedung' => $gedung]);
+        } else {
+            return back();
+        }
     }
 
     public function update(Request $request, $id)
@@ -141,27 +148,35 @@ class RuanganController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $data = Ruangan::find($id);
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $data = Ruangan::find($id);
 
-        if ($data) {
-            $data->delete($request->all());
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menghapus data!'
-            ]);
+            if ($data) {
+                $data->delete($request->all());
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Berhasil menghapus data!'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan!'
+                ]);
+            }
+
+            redirect('/');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan!'
-            ]);
+            return back();
         }
-
-        redirect('/');
     }
 
     public function import()
     {
-        return view('ruangan.import');
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            return view('ruangan.import');
+        } else {
+            return back();
+        }
     }
 
     public function import_ajax(Request $request)
@@ -252,9 +267,6 @@ class RuanganController extends Controller
             ], 500);
         }
     }
-
-
-
 
     protected function convertErrorsToFields($errors)
     {

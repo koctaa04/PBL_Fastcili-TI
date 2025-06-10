@@ -71,38 +71,41 @@ class LaporanKerusakanController extends Controller
 
     public function destroy($id)
     {
-        $pelapor = pelaporLaporan::find($id);
+        if (auth()->user()->id_level != 3) {
+            $pelapor = pelaporLaporan::find($id);
 
-        if (!$pelapor) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
-        }
-
-        $laporan_id = $pelapor->id_laporan;
-
-        // Hitung jumlah pelapor untuk laporan ini
-        $jumlahPelapor = pelaporLaporan::where('id_laporan', $laporan_id)->count();
-
-        // Hapus pelapor ini
-        $pelapor->delete();
-
-        // Jika pelapor tinggal 1, hapus juga laporan utama
-        if ($jumlahPelapor == 1) {
-            $laporanUtama = laporanKerusakan::find($laporan_id);
-            if ($laporanUtama) {
-                // Jika ada relasi lain yang perlu dihapus juga, tambahkan di sini
-                $laporanUtama->delete();
+            if (!$pelapor) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
             }
+
+            $laporan_id = $pelapor->id_laporan;
+
+            // Hitung jumlah pelapor untuk laporan ini
+            $jumlahPelapor = pelaporLaporan::where('id_laporan', $laporan_id)->count();
+
+            // Hapus pelapor ini
+            $pelapor->delete();
+
+            // Jika pelapor tinggal 1, hapus juga laporan utama
+            if ($jumlahPelapor == 1) {
+                $laporanUtama = laporanKerusakan::find($laporan_id);
+                if ($laporanUtama) {
+                    // Jika ada relasi lain yang perlu dihapus juga, tambahkan di sini
+                    $laporanUtama->delete();
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus'
+            ]);
+        } else {
+            return back();
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berhasil dihapus'
-        ]);
     }
-
 
     public function store(Request $request)
     {
@@ -223,158 +226,174 @@ class LaporanKerusakanController extends Controller
 
     public function trending(Request $request)
     {
-        $bobot = [
-            'MHS' => 1,
-            'TDK' => 2,
-            'DSN' => 3,
-            'ADM' => 3
-        ];
+        if (auth()->user()->id_level != 3) {
+            $bobot = [
+                'MHS' => 1,
+                'TDK' => 2,
+                'DSN' => 3,
+                'ADM' => 3
+            ];
 
-        $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
-            ->whereHas('laporan', function ($query) {
-                $query->where('id_status', 1);
-            })
-            ->get();
-
-        $skorPerLaporan = [];
-        foreach ($pelapor as $item) {
-            $idLaporan = $item->id_laporan;
-            $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
-            $skor = $bobot[$kodeLevel] ?? 0;
-
-            if (!isset($skorPerLaporan[$idLaporan])) {
-                $skorPerLaporan[$idLaporan] = [
-                    'skor' => 0,
-                    'total_pelapor' => 0,
-                    'created_at' => $item->laporan->created_at ?? now() // Get the report creation date
-                ];
+            if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+                $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
+                    ->whereHas('laporan', function ($query) {
+                        $query->where('id_status', 1);
+                    })
+                    ->get();
+            } else {
+                $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
+                    ->whereHas('laporan', function ($query) {
+                        $query->where('id_status', '!=', 4);
+                    })
+                    ->get();
             }
 
-            $skorPerLaporan[$idLaporan]['skor'] += $skor;
-            $skorPerLaporan[$idLaporan]['total_pelapor']++;
+            $skorPerLaporan = [];
+            foreach ($pelapor as $item) {
+                $idLaporan = $item->id_laporan;
+                $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
+                $skor = $bobot[$kodeLevel] ?? 0;
+
+                if (!isset($skorPerLaporan[$idLaporan])) {
+                    $skorPerLaporan[$idLaporan] = [
+                        'skor' => 0,
+                        'total_pelapor' => 0,
+                        'created_at' => $item->laporan->created_at ?? now() // Get the report creation date
+                    ];
+                }
+
+                $skorPerLaporan[$idLaporan]['skor'] += $skor;
+                $skorPerLaporan[$idLaporan]['total_pelapor']++;
+            }
+
+            $data = collect($skorPerLaporan)
+                ->map(function ($item, $idLaporan) {
+                    $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
+                    if (!$laporan) return null;
+
+                    return [
+                        'laporan' => $laporan,
+                        'skor' => $item['skor'],
+                        'total_pelapor' => $item['total_pelapor'],
+                        'created_at' => $item['created_at'] // Include created_at in the final data
+                    ];
+                })
+                ->filter()
+                ->values();
+
+            // Search
+            if ($request->has('search') && !empty($request->search)) {
+                $searchTerm = strtolower($request->search);
+                $data = $data->filter(function ($item) use ($searchTerm) {
+                    return str_contains(strtolower($item['laporan']->fasilitas->nama_fasilitas ?? ''), $searchTerm) ||
+                        str_contains(strtolower($item['laporan']->deskripsi ?? ''), $searchTerm);
+                })->values();
+            }
+
+            // Multi-level sorting
+            $sortedData = $data->sortBy([
+                // Primary sort: skor (descending)
+                fn($a, $b) => $b['skor'] <=> $a['skor'],
+                // Secondary sort: total_pelapor (descending) if skor is equal
+                fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
+                // Tertiary sort: created_at (ascending - older reports first) if both skor and total_pelapor are equal
+                fn($a, $b) => $a['created_at'] <=> $b['created_at']
+            ])->values();
+
+            // Beri ranking dan ambil top 10
+            $rankedData = $sortedData->take(10)->map(function ($item, $index) {
+                $item['rank'] = $index + 1;
+                return $item;
+            });
+
+            return view('laporan.trending', [
+                'data' => $rankedData,
+                'search' => $request->input('search', '')
+            ]);
+        } else {
+            return back();
         }
-
-        $data = collect($skorPerLaporan)
-            ->map(function ($item, $idLaporan) {
-                $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
-                if (!$laporan) return null;
-
-                return [
-                    'laporan' => $laporan,
-                    'skor' => $item['skor'],
-                    'total_pelapor' => $item['total_pelapor'],
-                    'created_at' => $item['created_at'] // Include created_at in the final data
-                ];
-            })
-            ->filter()
-            ->values();
-
-        // Search
-        if ($request->has('search') && !empty($request->search)) {
-            $searchTerm = strtolower($request->search);
-            $data = $data->filter(function ($item) use ($searchTerm) {
-                return str_contains(strtolower($item['laporan']->fasilitas->nama_fasilitas ?? ''), $searchTerm) ||
-                    str_contains(strtolower($item['laporan']->deskripsi ?? ''), $searchTerm);
-            })->values();
-        }
-
-        // Multi-level sorting
-        $sortedData = $data->sortBy([
-            // Primary sort: skor (descending)
-            fn($a, $b) => $b['skor'] <=> $a['skor'],
-            // Secondary sort: total_pelapor (descending) if skor is equal
-            fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
-            // Tertiary sort: created_at (ascending - older reports first) if both skor and total_pelapor are equal
-            fn($a, $b) => $a['created_at'] <=> $b['created_at']
-        ])->values();
-
-        // Beri ranking dan ambil top 10
-        $rankedData = $sortedData->take(10)->map(function ($item, $index) {
-            $item['rank'] = $index + 1;
-            return $item;
-        });
-
-        return view('laporan.trending', [
-            'data' => $rankedData,
-            'search' => $request->input('search', '')
-        ]);
     }
 
     public function showPenilaian(string $id)
     {
-        // Langkah 1: Ambil bobot
-        $bobot = [
-            'MHS' => 1,
-            'TDK' => 2,
-            'DSN' => 3,
-            'ADM' => 3
-        ];
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            // Langkah 1: Ambil bobot
+            $bobot = [
+                'MHS' => 1,
+                'TDK' => 2,
+                'DSN' => 3,
+                'ADM' => 3
+            ];
 
-        // Langkah 2: Ambil semua pelapor
-        $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
-            ->whereHas('laporan', function ($query) {
-                $query->where('id_status', 1);
-            })
-            ->get();
+            // Langkah 2: Ambil semua pelapor
+            $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
+                ->whereHas('laporan', function ($query) {
+                    $query->where('id_status', 1);
+                })
+                ->get();
 
-        // Langkah 3: Hitung skor per laporan
-        $skorPerLaporan = [];
-        foreach ($pelapor as $item) {
-            $idLaporan = $item->id_laporan;
-            $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
-            $skor = $bobot[$kodeLevel] ?? 0;
+            // Langkah 3: Hitung skor per laporan
+            $skorPerLaporan = [];
+            foreach ($pelapor as $item) {
+                $idLaporan = $item->id_laporan;
+                $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
+                $skor = $bobot[$kodeLevel] ?? 0;
 
-            if (!isset($skorPerLaporan[$idLaporan])) {
-                $skorPerLaporan[$idLaporan] = [
-                    'skor' => 0,
-                    'total_pelapor' => 0,
-                    'created_at' => $item->laporan->created_at ?? now()
-                ];
+                if (!isset($skorPerLaporan[$idLaporan])) {
+                    $skorPerLaporan[$idLaporan] = [
+                        'skor' => 0,
+                        'total_pelapor' => 0,
+                        'created_at' => $item->laporan->created_at ?? now()
+                    ];
+                }
+
+                $skorPerLaporan[$idLaporan]['skor'] += $skor;
+                $skorPerLaporan[$idLaporan]['total_pelapor']++;
             }
 
-            $skorPerLaporan[$idLaporan]['skor'] += $skor;
-            $skorPerLaporan[$idLaporan]['total_pelapor']++;
+            // Langkah 4: Konversi ke collection
+            $data = collect($skorPerLaporan)
+                ->map(function ($item, $idLaporan) {
+                    $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
+                    if (!$laporan) return null;
+
+                    return [
+                        'laporan' => $laporan,
+                        'skor' => $item['skor'],
+                        'total_pelapor' => $item['total_pelapor'],
+                        'created_at' => $item['created_at']
+                    ];
+                })
+                ->filter()
+                ->values();
+
+            // Langkah 5: Sorting sama seperti trending()
+            $sortedData = $data->sortBy([
+                fn($a, $b) => $b['skor'] <=> $a['skor'],
+                fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
+                fn($a, $b) => $a['created_at'] <=> $b['created_at']
+            ])->values();
+
+            // Langkah 6: Beri ranking
+            $trendingRanks = [];
+            foreach ($sortedData as $index => $item) {
+                $trendingRanks[$item['laporan']->id_laporan] = $index + 1;
+            }
+
+            // Langkah 7: Ambil laporan yang akan ditampilkan
+            $laporan = LaporanKerusakan::with([
+                'fasilitas',
+                'pelaporLaporan'
+            ])->findOrFail($id);
+
+            // Langkah 8: Ambil ranking untuk laporan ini
+            $trendingNo = $trendingRanks[$laporan->id_laporan] ?? '-';
+
+            return view('laporan.showPenilaian', compact('laporan', 'trendingNo'));
+        } else {
+            return back();
         }
-
-        // Langkah 4: Konversi ke collection
-        $data = collect($skorPerLaporan)
-            ->map(function ($item, $idLaporan) {
-                $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
-                if (!$laporan) return null;
-
-                return [
-                    'laporan' => $laporan,
-                    'skor' => $item['skor'],
-                    'total_pelapor' => $item['total_pelapor'],
-                    'created_at' => $item['created_at']
-                ];
-            })
-            ->filter()
-            ->values();
-
-        // Langkah 5: Sorting sama seperti trending()
-        $sortedData = $data->sortBy([
-            fn($a, $b) => $b['skor'] <=> $a['skor'],
-            fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
-            fn($a, $b) => $a['created_at'] <=> $b['created_at']
-        ])->values();
-
-        // Langkah 6: Beri ranking
-        $trendingRanks = [];
-        foreach ($sortedData as $index => $item) {
-            $trendingRanks[$item['laporan']->id_laporan] = $index + 1;
-        }
-
-        // Langkah 7: Ambil laporan yang akan ditampilkan
-        $laporan = LaporanKerusakan::with([
-            'fasilitas',
-            'pelaporLaporan'
-        ])->findOrFail($id);
-
-        // Langkah 8: Ambil ranking untuk laporan ini
-        $trendingNo = $trendingRanks[$laporan->id_laporan] ?? '-';
-
-        return view('laporan.showPenilaian', compact('laporan', 'trendingNo'));
     }
 
     public function simpanPenilaian(Request $request, $id)
@@ -417,17 +436,25 @@ class LaporanKerusakanController extends Controller
 
     public function tugaskanTeknisi($id)
     {
-        $laporan = LaporanKerusakan::with('fasilitas')->findOrFail($id);
-        $teknisi = User::where('id_level', '3')->get();
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $laporan = LaporanKerusakan::with('fasilitas')->findOrFail($id);
+            $teknisi = User::where('id_level', '3')->get();
 
-        return view('laporan_prioritas.tugaskan_teknisi', compact('laporan', 'teknisi'));
+            return view('laporan_prioritas.tugaskan_teknisi', compact('laporan', 'teknisi'));
+        } else {
+            return back();
+        }
     }
 
     public function verifikasiPerbaikan($id)
     {
-        $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
 
-        return view('laporan_prioritas.verifikasi', compact('laporan'));
+            return view('laporan_prioritas.verifikasi', compact('laporan'));
+        } else {
+            return back();
+        }
     }
     public function simpanPenugasan(Request $request)
     {
@@ -502,11 +529,15 @@ class LaporanKerusakanController extends Controller
 
     public function createPelapor()
     {
-        $fasilitas = Fasilitas::all();
-        $statusList = StatusLaporan::all();
-        $gedungList = Gedung::all();
+        if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
+            $fasilitas = Fasilitas::all();
+            $statusList = StatusLaporan::all();
+            $gedungList = Gedung::all();
 
-        return view('pages.pelapor.create', compact('fasilitas', 'statusList', 'gedungList'));
+            return view('pages.pelapor.create', compact('fasilitas', 'statusList', 'gedungList'));
+        } else {
+            return back();
+        }
     }
 
     public function storePelapor(Request $request)
@@ -572,9 +603,13 @@ class LaporanKerusakanController extends Controller
 
     public function editPelapor(string $id)
     {
-        $laporan = LaporanKerusakan::find($id);
+        if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
+            $laporan = LaporanKerusakan::find($id);
 
-        return view('pages.pelapor.edit', ['laporan' => $laporan]);
+            return view('pages.pelapor.edit', ['laporan' => $laporan]);
+        } else {
+            return back();
+        }
     }
 
     public function updatePelapor(Request $request, $id)
@@ -637,11 +672,15 @@ class LaporanKerusakanController extends Controller
 
     public function rate(string $id)
     {
-        $laporan = PelaporLaporan::with(['laporan.penugasan.user'])
-            ->where('id_laporan', $id)
-            ->first();
+        if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
+            $laporan = PelaporLaporan::with(['laporan.penugasan.user'])
+                ->where('id_laporan', $id)
+                ->first();
 
-        return view('pages.pelapor.rating', ['laporan' => $laporan]);
+            return view('pages.pelapor.rating', ['laporan' => $laporan]);
+        } else {
+            return back();
+        }
     }
 
     public function rating(Request $request, $id)
@@ -681,8 +720,12 @@ class LaporanKerusakanController extends Controller
 
     public function detail(string $id)
     {
-        $laporan = PelaporLaporan::find($id);
+        if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
+            $laporan = PelaporLaporan::find($id);
 
-        return view('pages.pelapor.detail', ['laporan' => $laporan]);
+            return view('pages.pelapor.detail', ['laporan' => $laporan]);
+        } else {
+            return back();
+        }
     }
 }

@@ -26,9 +26,13 @@ class PerbaikanController extends Controller
 
     public function edit($id)
     {
-        $perbaikan = PenugasanTeknisi::with('laporan.fasilitas')->findOrFail($id);
-        // dd($perbaikan);
-        return view('perbaikan.edit', ['laporan_kerusakan' => $perbaikan]);
+        if (auth()->user()->id_level == 3) {
+            $perbaikan = PenugasanTeknisi::with('laporan.fasilitas')->findOrFail($id);
+            
+            return view('perbaikan.edit', ['laporan_kerusakan' => $perbaikan]);
+        } else {
+            return back();
+        }
     }
 
     public function update(Request $request, $id)
@@ -83,43 +87,47 @@ class PerbaikanController extends Controller
 
     public function detail($id)
     {
-        $perbaikan = PenugasanTeknisi::with(['laporan.fasilitas', 'user', 'laporan.pelaporLaporan'])
-            ->findOrFail($id);
-
-        $laporan = $perbaikan->laporan;
-
-        // Ambil semua PelaporLaporan terkait laporan ini
-        $pelaporLaporan = $laporan->pelaporLaporan;
-
-        // Hitung jumlah pendukung (total PelaporLaporan)
-        $jumlahPendukung = $pelaporLaporan->count();
-
-        // Ambil rating yang tidak null
-        $ratings = $pelaporLaporan->whereNotNull('rating_pengguna')->pluck('rating_pengguna');
-
-        // Hitung jumlah yang sudah memberikan rating
-        $jumlahRatingDiberikan = $ratings->count();
-
-        // Hitung total nilai rating
-        $totalRating = $ratings->sum();
-
-        // Hitung rating akhir skala 0-5
-        $totalPossibleScore = 5 * $jumlahPendukung;
-        $ratingAkhir = $totalPossibleScore > 0 ? ($totalRating / $totalPossibleScore) * 5 : 0;
-
-        // Ambil maksimal 5 feedback_pengguna pertama yang tidak null
-        $ulasan = $pelaporLaporan
-            ->whereNotNull('feedback_pengguna')
-            ->pluck('feedback_pengguna')
-            ->take(10);
-
-        // Kirim ke view
-        return view('perbaikan.detail', compact(
-            'perbaikan',
-            'jumlahPendukung',
-            'jumlahRatingDiberikan',
-            'ratingAkhir',
-            'ulasan'
-        ));
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 3) {
+            $perbaikan = PenugasanTeknisi::with(['laporan.fasilitas', 'user', 'laporan.pelaporLaporan'])
+                ->findOrFail($id);
+    
+            $laporan = $perbaikan->laporan;
+    
+            // Ambil semua PelaporLaporan terkait laporan ini
+            $pelaporLaporan = $laporan->pelaporLaporan;
+    
+            // Hitung jumlah pendukung (total PelaporLaporan)
+            $jumlahPendukung = $pelaporLaporan->count();
+    
+            // Ambil rating yang tidak null
+            $ratings = $pelaporLaporan->whereNotNull('rating_pengguna')->pluck('rating_pengguna');
+    
+            // Hitung jumlah yang sudah memberikan rating
+            $jumlahRatingDiberikan = $ratings->count();
+    
+            // Hitung total nilai rating
+            $totalRating = $ratings->sum();
+    
+            // Hitung rating akhir skala 0-5
+            $totalPossibleScore = 5 * $jumlahPendukung;
+            $ratingAkhir = $totalPossibleScore > 0 ? ($totalRating / $totalPossibleScore) * 5 : 0;
+    
+            // Ambil maksimal 5 feedback_pengguna pertama yang tidak null
+            $ulasan = $pelaporLaporan
+                ->whereNotNull('feedback_pengguna')
+                ->pluck('feedback_pengguna')
+                ->take(10);
+    
+            // Kirim ke view
+            return view('perbaikan.detail', compact(
+                'perbaikan',
+                'jumlahPendukung',
+                'jumlahRatingDiberikan',
+                'ratingAkhir',
+                'ulasan'
+            ));
+        } else {
+            return back();
+        }
     }
 }
