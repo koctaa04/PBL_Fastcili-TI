@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PelaporLaporan;
 use Illuminate\Http\Request;
 use App\Models\PenugasanTeknisi;
 use Illuminate\Support\Facades\Storage;
@@ -82,9 +83,43 @@ class PerbaikanController extends Controller
 
     public function detail($id)
     {
-        $perbaikan = PenugasanTeknisi::with(['laporan.fasilitas', 'user'])
+        $perbaikan = PenugasanTeknisi::with(['laporan.fasilitas', 'user', 'laporan.pelaporLaporan'])
             ->findOrFail($id);
 
-        return view('perbaikan.detail', compact('perbaikan'));
+        $laporan = $perbaikan->laporan;
+
+        // Ambil semua PelaporLaporan terkait laporan ini
+        $pelaporLaporan = $laporan->pelaporLaporan;
+
+        // Hitung jumlah pendukung (total PelaporLaporan)
+        $jumlahPendukung = $pelaporLaporan->count();
+
+        // Ambil rating yang tidak null
+        $ratings = $pelaporLaporan->whereNotNull('rating_pengguna')->pluck('rating_pengguna');
+
+        // Hitung jumlah yang sudah memberikan rating
+        $jumlahRatingDiberikan = $ratings->count();
+
+        // Hitung total nilai rating
+        $totalRating = $ratings->sum();
+
+        // Hitung rating akhir skala 0-5
+        $totalPossibleScore = 5 * $jumlahPendukung;
+        $ratingAkhir = $totalPossibleScore > 0 ? ($totalRating / $totalPossibleScore) * 5 : 0;
+
+        // Ambil maksimal 5 feedback_pengguna pertama yang tidak null
+        $ulasan = $pelaporLaporan
+            ->whereNotNull('feedback_pengguna')
+            ->pluck('feedback_pengguna')
+            ->take(10);
+
+        // Kirim ke view
+        return view('perbaikan.detail', compact(
+            'perbaikan',
+            'jumlahPendukung',
+            'jumlahRatingDiberikan',
+            'ratingAkhir',
+            'ulasan'
+        ));
     }
 }
