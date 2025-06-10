@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id('id_laporan');
             $table->unsignedBigInteger('id_fasilitas');
             $table->text('deskripsi');
+            $table->string('jumlah_kerusakan')->default(1);;
             $table->string('foto_kerusakan');
             $table->date('tanggal_lapor');
+            $table->date('tanggal_selesai')->nullable();
             $table->unsignedBigInteger('id_status');
             $table->timestamps();
 

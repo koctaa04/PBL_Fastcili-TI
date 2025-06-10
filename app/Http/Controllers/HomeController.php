@@ -36,8 +36,8 @@ class HomeController extends Controller
     {
         // Hitung jumlah laporan
         $jmlLaporan = LaporanKerusakan::count();
-        $laporanAktif = LaporanKerusakan::whereIn('id_status', [1, 2, 3])->count();
-        $laporanTerverifikasi = LaporanKerusakan::whereIn('id_status', [2])->count();
+        $laporanDiajukan = LaporanKerusakan::whereIn('id_status', [1])->count();
+        $laporanDiproses = LaporanKerusakan::whereIn('id_status', [2,3])->count();
         $laporanSelesai = LaporanKerusakan::whereIn('id_status', [4])->count();
 
         // Data grafik laporan perbulan
@@ -56,8 +56,8 @@ class HomeController extends Controller
         // Debug data yang dikirim ke view
         $debugData = [
             'jmlLaporan' => $jmlLaporan,
-            'laporanAktif' => $laporanAktif,
-            'laporanTerverifikasi' => $laporanTerverifikasi,
+            'laporanDiajukan' => $laporanDiajukan,
+            'laporanDiproses' => $laporanDiproses,
             'laporanSelesai' => $laporanSelesai,
             'laporanPerBulan' => $laporanPerBulan,
             'statusLaporan' => $statusLaporan,
@@ -134,10 +134,89 @@ class HomeController extends Controller
 
     public function pelapor()
     {
-        $laporan = PelaporLaporan::where('id_user', Auth::id())->get();
-        $status = PelaporLaporan::where('id_user', Auth::id())
+        $laporanAuth = PelaporLaporan::where('id_user', Auth::id())->get();
+        $statusList = PelaporLaporan::where('id_user', Auth::id())
+            ->whereNull('rating_pengguna')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.pelapor.index', compact('laporanAuth', 'statusList'));
+    }
+
+    public function teknisi()
+    {
+        $riwayat = PenugasanTeknisi::where('id_user', Auth::id())->get();
+        $penugasan = PenugasanTeknisi::with('laporan')
+            ->where('id_user', Auth::id())
             ->orderBy('created_at', 'desc')
             ->first();
-        return view('pages.pelapor.index', compact('laporan', 'status'));
+
+        //Hitung untuk card
+        $jmlPenugasan = PenugasanTeknisi::count();
+        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Sedang dikerjakan')->count();
+        $laporanSelesaiDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Selesai Dikerjakan')->count();
+        $laporanBlmPenugasan = LaporanKerusakan::whereIn('id_status', [1, 2])->count();
+
+        //Data Grafik Penugasan Per Gedung
+        $penugasanPerGedung = $this->getPenugasanPerGedung();
+
+        //Data Grafik Perbaikan Perbulan
+        $tahun = now()->year;
+        $perbaikanPerBulan = $this->getPerbaikanPerBulan($tahun);
+
+        return view('pages.teknisi.index', compact(
+            'riwayat', 'penugasan', 'jmlPenugasan', 'laporanDikerjakan',
+            'laporanSelesaiDikerjakan', 'laporanBlmPenugasan', 'penugasanPerGedung',
+            'perbaikanPerBulan'
+        ));
+    }
+
+    protected function getPenugasanPerGedung()
+    {
+        $countPerGedung = DB::table('penugasan_teknisi')
+            ->join('laporan_kerusakan', 'penugasan_teknisi.id_laporan', '=', 'laporan_kerusakan.id_laporan')
+            ->join('fasilitas', 'laporan_kerusakan.id_fasilitas', '=', 'fasilitas.id_fasilitas')
+            ->join('ruangan', 'fasilitas.id_ruangan', '=', 'ruangan.id_ruangan')
+            ->join('gedung', 'ruangan.id_gedung', '=', 'gedung.id_gedung')
+            ->select('gedung.id_gedung', DB::raw('COUNT(*) as jumlah'))
+            ->groupBy('gedung.id_gedung')
+            ->pluck('jumlah', 'gedung.id_gedung');
+
+        $gedungLabels = Gedung::pluck('kode_gedung', 'id_gedung');
+
+        return $gedungLabels->mapWithKeys(function ($kodeGedung, $id) use ($countPerGedung) {
+            return [$kodeGedung => $countPerGedung[$id] ?? 0];
+        });
+    }
+
+    protected function getPerbaikanPerBulan($tahun)
+    {
+        $bulanLengkap = collect([
+            'Jan' => 0,
+            'Feb' => 0,
+            'Mar' => 0,
+            'Apr' => 0,
+            'May' => 0,
+            'Jun' => 0,
+            'Jul' => 0,
+            'Aug' => 0,
+            'Sep' => 0,
+            'Oct' => 0,
+            'Nov' => 0,
+            'Dec' => 0
+        ]);
+
+        $dataPenugasan = PenugasanTeknisi::selectRaw('MONTH(tanggal_selesai) as bulan, COUNT(*) as jumlah')
+            ->whereYear('tanggal_selesai', $tahun)
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get()
+            ->pluck('jumlah', 'bulan')
+            ->mapWithKeys(function ($jumlah, $bulanAngka) {
+                $namaBulan = Carbon::create()->month($bulanAngka)->format('M');
+                return [$namaBulan => $jumlah];
+            });
+
+        return $bulanLengkap->merge($dataPenugasan);
     }
 }

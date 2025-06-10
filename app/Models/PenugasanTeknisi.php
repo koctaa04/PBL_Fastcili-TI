@@ -15,11 +15,18 @@ class PenugasanTeknisi extends Model
         'id_laporan',
         'id_user',
         'tanggal_selesai',
+        'tenggat',
         'status_perbaikan',
         'catatan_teknisi',
         'dokumentasi',
         'komentar_sarpras'
     ];
+
+    protected $casts = [
+        'tenggat' => 'date', // atau 'datetime'
+        'tanggal_selesai' => 'date', // atau 'datetime'
+    ];
+
 
     public function user()
     {

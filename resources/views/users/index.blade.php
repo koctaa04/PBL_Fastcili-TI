@@ -10,7 +10,7 @@
             <div class="card-tools">
                 <div class="card-tools d-flex justify-content-center flex-wrap">
                     <button onclick="modalAction('{{ url('/users/import') }}')" class="btn btn-warning mr-2">
-                        Import Data User (.xlsx)
+                        Impor Data User
                     </button>
                     <button onclick="modalAction('{{ url('/users/create') }}')" class="btn btn-success">
                         Tambah Data User
@@ -19,20 +19,6 @@
             </div>
         </div>
         <div class="card p-4">
-            {{-- <h3>Data User</h3>
-        <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex justify-content-center flex-wrap">
-                    <button onclick="modalAction('{{ url('/users/import') }}')" 
-                            class="btn btn-lg btn-warning mr-5 mb-2">
-                        Import Data User (.xlsx)
-                    </button>
-                    <button onclick="modalAction('{{ url('/users/create') }}')" 
-                            class="btn btn-lg btn-success mb-2">
-                        Tambah Data User
-                    </button>
-                </div>
-            </div> --}}
             <div class="card-body">
                 {{-- Filtering --}}
                 <div class="row pr-auto">
@@ -46,12 +32,10 @@
                                         <option value="{{ $item->id_level }}">{{ $item->nama_level }} </option>
                                     @endforeach
                                 </select>
-                                {{-- <small class="form-text text-muted">Level User</small> --}}
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-row-bordered" id="table_user">
                         <thead>
@@ -59,7 +43,7 @@
                                 <th width="10%">Profil</th>
                                 <th width="20%">Nama</th>
                                 <th width="25%">Email</th>
-                                <th width="20%">Nama Level</th>
+                                <th width="20%">Level User</th>
                                 <th width="10%">Akses</th>
                                 <th width="15%">Aksi</th>
                             </tr>
@@ -69,7 +53,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -123,7 +107,10 @@
                     {
                         data: 'level.nama_level',
                         name: 'level.nama_level',
-                        className: 'text-center'
+                        className: 'text-center',
+                            render: function(data, type, row) {
+        return data ? data : '--';
+    }
                     },
                     {
                         data: 'akses',
@@ -140,7 +127,11 @@
                     targets: [0, 3, 4, 5],
                     orderable: false,
                     searchable: false
-                }]
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data user yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data user seperti keyword yang ingin dicari"
+                }
             });
 
             // Ubah event change filter
@@ -202,7 +193,7 @@
                             }
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Error!',
+                                title: 'Gagal!',
                                 text: errorMsg
                             });
                         }

@@ -7,74 +7,65 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="mb-0">Kelola Data Ruangan</h3>
+            @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
             <div class="d-flex justify-content-center flex-wrap">
                 <button onclick="modalAction('{{ url('/ruangan/import') }}')" class="btn btn-warning text-truncate mr-2">
-                    Import Data Ruangan (.xlsx)
+                    Impor Data Ruangan
                 </button>
                 <button onclick="modalAction('{{ url('/ruangan/create') }}')" class="btn btn-success text-truncate">
                     Tambah Data Ruangan
                 </button>
             </div>
+            @endif
         </div>
         <div class="card p-4">
-        {{-- <h3>Data Ruangan</h3>
-        <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex flex-wrap justify-content-center gap-3">
-                    <button onclick="modalAction('{{ url('/ruangan/import') }}')" 
-                            class="btn btn-action btn-warning text-truncate">
-                        Import Data Ruangan (.xlsx)
-                    </button>
-                    <button onclick="modalAction('{{ url('/ruangan/create') }}')" 
-                            class="btn btn-action btn-success text-truncate">
-                        Tambah Data Ruangan
-                    </button>
-                </div>
-            </div> --}}
-        <div class="card-body">
-            {{-- Search and Filtering --}}
-            <div class="row pr-auto">
-                <div class="col-md-12">
-                    <div class="form-group row mb-3">
-                        <label class="col-2 control-label col-form-label">Cari Data Ruangan:</label>
-                        <div class="col-10">
-                            <input type="text" class="form-control" id="search" placeholder="Cari ruangan...">
-                            <small class="form-text text-muted">Masukkan nama ruangan</small>
+            <div class="card-body">
+                {{-- Search and Filtering --}}
+                <div class="row pr-auto">
+                    <div class="col-md-12">
+                        <div class="form-group row mb-3">
+                            <label class="col-2 control-label col-form-label">Cari Data Ruangan:</label>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="search" placeholder="Cari ruangan...">
+                                <small class="form-text text-muted">Masukkan nama ruangan</small>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row mb-5">
-                        <label class="col-2 control-label col-form-label">Filter:</label>
-                        <div class="col-5">
-                            <select class="form-control" id="id_gedung" name="id_gedung" required>
-                                <option value="">- Semua Gedung -</option>
-                                @foreach ($gedung as $item)
-                                    <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
-                                @endforeach
-                            </select>
-                            <small class="form-text text-muted">Gedung</small>
+                        <div class="form-group row mb-5">
+                            <label class="col-2 control-label col-form-label">Filter:</label>
+                            <div class="col-5">
+                                <select class="form-control" id="id_gedung" name="id_gedung" required>
+                                    <option value="">- Semua Gedung -</option>
+                                    @foreach ($gedung as $item)
+                                        <option value="{{ $item->id_gedung }}"
+                                            {{ request('id_gedung') == $item->id_gedung ? 'selected' : '' }}>
+                                            {{ $item->nama_gedung }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Gedung</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Card View --}}
-            <span class="badge badge-info p-2 mb-3">
-                <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Data Terakhir Ditambahkan
-            </span>
-            <div class="row g-3" id="ruangan-container">
-                <!-- Ruangan cards will be loaded here -->
-            </div>
+                {{-- Card View --}}
+                <span class="badge badge-info p-2 mb-3">
+                    <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Data Terakhir Ditambahkan
+                </span>
+                <div class="row g-3" id="ruangan-container">
+                    <!-- Ruangan cards will be loaded here -->
+                </div>
 
-            {{-- Pagination --}}
-            <div class="row mt-4">
-                <div class="col-md-12 d-flex justify-content-center">
-                    <div id="pagination-links"></div>
+                {{-- Pagination --}}
+                <div class="row mt-4">
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <div id="pagination-links"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -227,6 +218,15 @@
 
 @push('scripts')
     <script>
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const gedungId = urlParams.get('id_gedung');
+            if (gedungId) {
+                $('#id_gedung').val(gedungId).trigger('change');
+            }
+        });
+    </script>
+    <script>
         function adjustButtonText() {
             const buttons = document.querySelectorAll('.card-tools .btn');
 
@@ -298,26 +298,37 @@
                             const cardHtml = `
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                                     <div class="card ruangan-card">
-                                        <div class="ruangan-card-body">
+                                        <div class="ruangan-card-body" style="cursor: pointer;" onclick="window.location.href = '{{ url('/fasilitas?id_ruangan=${ruangan.id_ruangan}') }}'">
                                             <h5 class="ruangan-card-title">${ruangan.nama_ruangan}</h5>
                                             <p class="ruangan-card-text"><strong>Kode:</strong> <span class="ruangan-kode">${ruangan.kode_ruangan || '-'}</span></p>
                                             <p class="ruangan-card-text"><strong>Gedung:</strong> <span class="ruangan-gedung">${ruangan.gedung?.nama_gedung || 'Tidak ada gedung'}</span></p>
                                         </div>
-                                        <div class="ruangan-card-footer">
-                                            <div class="ruangan-card-actions">
-                                                <button onclick="modalAction('{{ url('/ruangan/edit') }}/${ruangan.id_ruangan}')" 
-                                                        class="btn btn-sm btn-warning" title="Edit">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <form class="form-delete d-inline" action="{{ url('/ruangan/delete') }}/${ruangan.id_ruangan}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="fa fa-trash"></i>
+                                        <div class="ruangan-card-footer p-2 border-top bg-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                
+                                                {{-- Tombol menuju halaman Fasilitas dengan filter --}}
+                                                <a href="{{ url('/fasilitas?id_ruangan=${ruangan.id_ruangan}') }}" class="btn btn-sm btn-info d-flex align-items-center">
+                                                    <i class="fas fa-door-open me-1"></i> Lihat Fasilitas
+                                                </a>
+                                                @if (auth()->user()->id_level == 1  || auth()->user()->id_level == 2)
+                                                <div class="d-flex ">
+                                                    <button onclick="modalAction('{{ url('/ruangan/edit') }}/${ruangan.id_ruangan}')" 
+                                                            class="btn btn-sm btn-warning mr-2" title="Edit">
+                                                        <i class="fa fa-edit"></i>
                                                     </button>
-                                                </form>
+
+                                                    <form class="form-delete d-inline" action="{{ url('/ruangan/delete') }}/${ruangan.id_ruangan}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             `;
@@ -325,7 +336,7 @@
                         });
                     } else {
                         container.append(
-                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data ruangan</p></div>'
+                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data ruangan seperti keyword yang ingin dicari</p></div>'
                         );
                     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\GedungController;
@@ -11,7 +12,9 @@ use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\VerifikasiLaporanController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PenugasanTeknisiController;
 use App\Http\Controllers\WaspasController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,10 +32,9 @@ use App\Http\Controllers\WaspasController;
  *  Welcome Page
  *  ---------------------------- */
 Route::get('/', function () {
-	if (Auth::check()) {
-		return redirect()->route('home');
+	if (!Auth::check()) {
+		return view('welcome');
 	}
-	return view('welcome');
 });
 
 Route::get('/panduan', function () {
@@ -49,7 +51,10 @@ Route::get('password/reset/{token}', 'App\Http\Controllers\Auth\ResetPasswordCon
 Route::post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.update');
 
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('/home', [HomeController::class, 'index'])->name('home');
+	Route::middleware(['authorize:1,2'])->group(function () {
+		Route::get('/home', [HomeController::class, 'index'])->name('home');
+	});
+
 
 	/** -----------------------------
 	 *  Profile & User Management
@@ -96,6 +101,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/', [GedungController::class, 'index'])->name('gedung.index');
 		Route::get('/create', [GedungController::class, 'create']);
 		Route::post('/', [GedungController::class, 'store'])->name('gedung.store');
+		Route::get('/detail/{id}', [GedungController::class, 'detail']);
 		Route::get('/edit/{id}', [GedungController::class, 'edit']);
 		Route::put('/update/{id}', [GedungController::class, 'update'])->name('gedung.update');
 		Route::delete('/delete/{id}', [GedungController::class, 'destroy']);
@@ -112,6 +118,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/update/{id}', [RuanganController::class, 'update']);
 		Route::delete('/delete/{id}', [RuanganController::class, 'destroy']);
 		Route::get('/ruangan/data', [RuanganController::class, 'getData'])->name('ruangan.data');
+		Route::get('/import', [RuanganController::class, 'import'])->name('users.import');
+		Route::post('/import_ajax', [RuanganController::class, 'import_ajax'])->name('users.import.ajax');
 	});
 
 	/** -----------------------------
@@ -126,6 +134,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::delete('/delete/{id}', [FasilitasController::class, 'destroy']);
 		Route::get('/get-ruangan/{id}', [FasilitasController::class, 'getRuangan'])->name('fasilitas.getRuangan');
 		Route::get('/list', [FasilitasController::class, 'list'])->name('fasilitas.list');
+		Route::get('/import', [FasilitasController::class, 'import'])->name('users.import');
+		Route::post('/import_ajax', [FasilitasController::class, 'import_ajax'])->name('users.import.ajax');
 	});
 
 
@@ -134,10 +144,7 @@ Route::group(['middleware' => 'auth'], function () {
 	 *  ---------------------------- */
 	Route::prefix('lapor_kerusakan')->group(function () {
 		Route::get('/', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
-		Route::get('/create', [LaporanKerusakanController::class, 'create']);
 		Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
-		// Route::get('/edit/{id}', [LaporanKerusakanController::class, 'edit']);
-		// Route::put('/update/{id}', [LaporanKerusakanController::class, 'update']);
 		Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('laporan.destroy');
 		Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
 		Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
@@ -153,16 +160,6 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/get-fasilitas-belum-lapor/{idRuangan}', [LaporanKerusakanController::class, 'getFasilitasBelumLapor']);
 
 
-	/** -----------------------------
-	 *  Verifikasi Laporan (Untuk Sarpras verifikasi laporan)
-	 *  ---------------------------- */
-	Route::prefix('verifikasi')->group(function () {
-		Route::get('/', [VerifikasiLaporanController::class, 'index']);
-		Route::get('/true/{id}', [VerifikasiLaporanController::class, 'verif']);
-		Route::post('/konfirm/{id}', [VerifikasiLaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
-		Route::get('/false/{id}', [VerifikasiLaporanController::class, 'tolakForm']);
-		Route::put('/tolak/{id}', [VerifikasiLaporanController::class, 'tolak'])->name('laporan.tolak');
-	});
 
 	/** -----------------------------
 	 *  WASPAS
@@ -179,7 +176,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 	});
 
-	Route::middleware(['authorize:1,3,4'])->group(function () {
+	Route::middleware(['authorize:1,5,4'])->group(function () {
 		Route::get('/pelapor', [HomeController::class, 'pelapor'])->name('pelapor');
 		Route::get('/pelapor/create', [LaporanKerusakanController::class, 'createPelapor'])->name('pelapor.create');
 		Route::post('/', [LaporanKerusakanController::class, 'storePelapor'])->name('pelapor.store');
@@ -192,6 +189,13 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/get-ruangan/{id}', [LaporanKerusakanController::class, 'getRuangan']);
 		Route::get('/get-fasilitas/{id}', [LaporanKerusakanController::class, 'getFasilitas']);
 	});
+
+	Route::middleware(['authorize:1,3'])->group(function () {
+		Route::get('/teknisi', [HomeController::class, 'teknisi'])->name('teknisi');
+		Route::get('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedback'])->name('teknisi.feedback');
+		Route::put('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedbackTeknisi'])->name('teknisi.feedbacksimpan');
+		Route::get('/detail-riwayat/{id}', [PenugasanTeknisiController::class, 'detailRiwayat'])->name('teknisi.detailRiwayat');
+	});
 	/** -----------------------------
 	 *  Verifikasi laporan perbaikan dan Penugasan Teknisi
 	 *  ---------------------------- */
@@ -199,4 +203,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
 	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+
+	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+	Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+	Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // Optional: page to view all notifications
 });

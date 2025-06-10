@@ -9,13 +9,16 @@
         <div class="card p-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_perbaikan">
+                    <table class="table table-striped table-hover table-row-bordered" id="table_perbaikan">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Foto Kerusakan</th>
-                                <th scope="col">Nama Fasilitas</th>
+                                <th scope="col">No</th>
+                                @if (auth()->user()->id_level != 1)
+                                    <th scope="col">Foto Kerusakan</th>
+                                @endif
                                 <th scope="col">Deskripsi</th>
+                                <th scope="col">Teknisi</th>
+                                <th scope="col">Tenggat</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Catatan Teknisi</th>
                                 <th scope="col">Dokumentasi Perbaikan</th>
@@ -27,42 +30,51 @@
                             @foreach ($laporan_kerusakan as $index => $laporan)
                                 <tr>
                                     <th scope="row">{{ $index + 1 }}</th>
-
-                                    {{-- Foto Kerusakan --}}
-                                    <td>
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
-                                            alt="Foto Kerusakan" height="65"
-                                            onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';">
-                                    </td>
-
-                                    {{-- Nama Fasilitas --}}
-                                    <td>{{ $laporan->laporan->fasilitas->nama_fasilitas ?? '-' }}</td>
-
+                                    @if (auth()->user()->id_level != 1)
+                                        {{-- Foto Kerusakan --}}
+                                        <td>
+                                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                                                alt="Foto Kerusakan" height="65"
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
+                                        </td>
+                                    @endif
                                     {{-- Deskripsi --}}
                                     <td>{{ $laporan->laporan->deskripsi ?? '-' }}</td>
 
+                                    {{-- Nama Teknisi --}}
+                                    <td>{{ $laporan->laporan->penugasan->user->nama ?? '-' }}</td>
+
+                                    {{-- Tenggat Laporan --}}
+                                    <td>
+                                        {{ $laporan->tenggat
+                                            ? $laporan->tenggat->translatedFormat('l, d F Y')
+                                            : '-' }}
+                                    </td>
+                                    
                                     <td>
                                         <span
-                                            class="badge badge-pill {{ $laporan->status_perbaikan == 'Sedang dikerjakan' ? 'badge-warning' : 'badge-success' }}">
+                                            class="badge badge-pill
+                                                {{ $laporan->status_perbaikan == 'Selesai Dikerjakan' ? 'badge-success' :
+                                                   ($laporan->status_perbaikan == 'Ditolak' ? 'badge-danger' : 'badge-warning') }}">
                                             {{ $laporan->status_perbaikan }}
                                         </span>
                                     </td>
 
                                     {{-- Catatan Teknisi --}}
-                                    <td>{{ $laporan->catatan_teknisi ?? '-' }}</td>
+                                    <td>{{ Str::limit($laporan->catatan_teknisi, 30) ?? '-' }}</td>
 
                                     {{-- Dokumentasi --}}
                                     <td>
                                         @if ($laporan->dokumentasi)
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
-                                                alt="Foto Kerusakan" height="65">
+                                                alt="Dokumentasi" height="65">
                                         @else
-                                            <span class="text-danger">Belum ada dokumentasi</span>
+                                            <span class="text-danger">(Belum ada dokumentasi)</span>
                                         @endif
                                     </td>
 
                                     {{-- Catatan Teknisi --}}
-                                    <td>{{ $laporan->komentar_sarpras ?? '-' }}</td>
+                                    <td>{{ Str::limit($laporan->komentar_sarpras, 30) ?? '-' }}</td>
 
                                     {{-- Tombol Aksi --}}
                                     <td>
@@ -76,11 +88,13 @@
                                                 $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
                                             @endphp
 
-                                            @if ($isEditable)
-                                                <button onclick="modalAction('{{ $laporanUrl }}')"
-                                                    class="btn btn-sm btn-warning mr-2">
-                                                    {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
-                                                </button>
+                                            @if (auth()->user()->id_level != 1)
+                                                @if ($isEditable)
+                                                    <button onclick="modalAction('{{ $laporanUrl }}')"
+                                                        class="btn btn-sm btn-danger mr-2">
+                                                        {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                                    </button>
+                                                @endif
                                             @endif
 
                                             <button onclick="modalAction('{{ $detailUrl }}')"
@@ -98,7 +112,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -163,8 +177,53 @@
                 }
             });
         });
+        const user = {
+            id_level: {{ auth()->user()->id_level }} // Data user di-pass dari backend
+        };
+
         $(document).ready(function() {
-            var datalaporan = $('#table_perbaikan').DataTable();
+            // Common configuration options
+            var commonConfig = {
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan seperti keyword yang ingin dicari"
+                }
+            };
+
+            // Configuration for admin/ (level 1)
+            if (user.id_level !== 1) {
+                var datalaporan = $('#table_perbaikan').DataTable({
+                    ...commonConfig,
+                    columnDefs: [{
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                        className: 'text-center',
+                    }, {
+                        targets: [0, 1, 2, 5, 6, 7, 8],
+                        orderable: false,
+                        searchable: true,
+                    }, {
+                        targets: [3, 4],
+                        searchable: true,
+                    }]
+                });
+            }
+            // Configuration for other users
+            else {
+                var datalaporan = $('#table_perbaikan').DataTable({
+                    ...commonConfig,
+                    columnDefs: [{
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7],
+                        className: 'text-center',
+                    }, {
+                        targets: [0, 1, 4, 5, 6, 7],
+                        orderable: false,
+                        searchable: true,
+                    }, {
+                        targets: [2, 3],
+                        searchable: true,
+                    }]
+                });
+            }
         });
     </script>
 @endpush

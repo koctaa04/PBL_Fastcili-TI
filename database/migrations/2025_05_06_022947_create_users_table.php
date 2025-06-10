@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->unsignedBigInteger('id_level')->index();
+            $table->unsignedBigInteger('id_level')->nullable()->index();
             $table->string('foto_profil')->nullable();
             $table->rememberToken();
             $table->timestamps();

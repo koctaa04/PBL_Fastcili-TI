@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Database\Seeders\pelaporLaporanSeeder;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\PelaporNotifikasi;
 
 class LaporanKerusakanController extends Controller
 {
@@ -28,8 +29,9 @@ class LaporanKerusakanController extends Controller
             'laporan.status',
             'user'
         ])->get();
+        $laporanAuth = PelaporLaporan::where('id_user', Auth::id())->get();
         $gedung = Gedung::all();
-        return view('laporan.index', compact('gedung', 'laporan'));
+        return view('laporan.index', compact('gedung', 'laporan', 'laporanAuth'));
     }
 
     public function getRuangan($idGedung)
@@ -37,11 +39,12 @@ class LaporanKerusakanController extends Controller
         return Ruangan::where('id_gedung', $idGedung)->get();
     }
 
+    // Untuk Card sebelah kanan
     public function getFasilitasTerlapor($idRuangan)
     {
         return LaporanKerusakan::with('fasilitas')
             ->whereHas('fasilitas', fn($q) => $q->where('id_ruangan', $idRuangan))
-            // ->whereIn('id_status', [1, 2, 3, 4])
+            ->whereIn('id_status', [1, 2, 3])
             // ->where('id_user', '!=', Auth::user()->id)
             ->get()
             ->map(fn($lap) => [
@@ -53,10 +56,10 @@ class LaporanKerusakanController extends Controller
             ]);
     }
 
-
+    // Untuk drop-down sebelah kiri
     public function getFasilitasBelumLapor($idRuangan)
     {
-        $terlaporIds = LaporanKerusakan::whereIn('id_status', [1, 2, 3, 4])
+        $terlaporIds = LaporanKerusakan::whereIn('id_status', [1, 2, 3])
             ->pluck('id_fasilitas')
             ->toArray();
 
@@ -66,7 +69,7 @@ class LaporanKerusakanController extends Controller
     }
 
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         $pelapor = pelaporLaporan::find($id);
 
@@ -104,10 +107,17 @@ class LaporanKerusakanController extends Controller
     public function store(Request $request)
     {
         $userId = auth()->id();
-
         // Jika dukungan laporan sudah ada
         if ($request->filled('dukungan_laporan')) {
             $laporanId = $request->dukungan_laporan;
+            // Jika Fasilitas yang dilaporkan sedang tahap perbaikan
+            $sedangDiperbaiki = KriteriaPenilaian::where('id_laporan', $laporanId);
+            if ($sedangDiperbaiki) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fasilitas ini sedang dalam proses perbaikan atau sudah dilaporkan.'
+                ]);
+            }
 
             // Cek apakah user sudah mendukung laporan ini
             $sudahMendukung = PelaporLaporan::where('id_laporan', $laporanId)
@@ -138,10 +148,17 @@ class LaporanKerusakanController extends Controller
                 'message' => 'Dukungan terhadap laporan berhasil dikirim.'
             ]);
         } else {
+            $fasilitas = Fasilitas::findOrFail($request->id_fasilitas);
             // Validasi laporan baru
             $request->validate([
                 'id_fasilitas' => 'required|exists:fasilitas,id_fasilitas',
                 'deskripsi' => 'required|string|max:255',
+                'jumlah_kerusakan' => [
+                    'required',
+                    'numeric',
+                    'min:0',
+                    'max:' . $fasilitas->jumlah
+                ],
                 'foto_kerusakan' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
@@ -150,10 +167,14 @@ class LaporanKerusakanController extends Controller
                 ->whereIn('id_status', [1, 2, 3, 4]) // status aktif
                 ->first();
 
+
+            // Cek apakah user sudah pernah melaporkan laporan aktif ini
             if ($existing) {
-                // Cek apakah user sudah pernah melaporkan laporan aktif ini
                 $sudahMelaporkan = PelaporLaporan::where('id_laporan', $existing->id_laporan)
                     ->where('id_user', $userId)
+                    ->whereHas('laporan', function ($query) {
+                        $query->where('id_status', '!=', 4);
+                    })
                     ->exists();
 
                 if ($sudahMelaporkan) {
@@ -162,11 +183,6 @@ class LaporanKerusakanController extends Controller
                         'message' => 'Anda sudah pernah melaporkan kerusakan ini sebelumnya.'
                     ]);
                 }
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Fasilitas ini sudah memiliki laporan aktif. Anda dapat memberikan dukungan.'
-                ]);
             }
 
             // Upload foto
@@ -177,6 +193,7 @@ class LaporanKerusakanController extends Controller
             $laporan = LaporanKerusakan::create([
                 'id_fasilitas' => $request->id_fasilitas,
                 'deskripsi' => $request->deskripsi,
+                'jumlah_kerusakan' => $request->jumlah_kerusakan,
                 'foto_kerusakan' => $filename,
                 'tanggal_lapor' => now(),
                 'id_status' => 1,
@@ -196,54 +213,161 @@ class LaporanKerusakanController extends Controller
         }
     }
 
-
-    public function trending()
+    public function trending(Request $request)
     {
-        // $data = LaporanKerusakan::with(['pelaporLaporan.user', 'fasilitas'])
-        //     ->where('id_status', 1)
-        //     ->get()
-        //     ->sortByDesc(function ($laporan) {
-        //         return $laporan->skor_trending;
-        //     })
-        //     ->take(10); // ambil 10 besar trending
+        $bobot = [
+            'MHS' => 1,
+            'TDK' => 2,
+            'DSN' => 3,
+            'ADM' => 3
+        ];
 
-        $data = PelaporLaporan::select('id_laporan', DB::raw('count(*) as total'))
-            ->groupBy('id_laporan')
-            ->orderByDesc('total')
-            ->whereHas('laporan', function ($laporan) {
-                $laporan->where('id_status', 1);
+        $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
+            ->whereHas('laporan', function ($query) {
+                $query->where('id_status', 1);
             })
             ->get();
 
-        return view('laporan.trending', compact('data'));
+        $skorPerLaporan = [];
+        foreach ($pelapor as $item) {
+            $idLaporan = $item->id_laporan;
+            $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
+            $skor = $bobot[$kodeLevel] ?? 0;
+
+            if (!isset($skorPerLaporan[$idLaporan])) {
+                $skorPerLaporan[$idLaporan] = [
+                    'skor' => 0,
+                    'total_pelapor' => 0,
+                    'created_at' => $item->laporan->created_at ?? now() // Get the report creation date
+                ];
+            }
+
+            $skorPerLaporan[$idLaporan]['skor'] += $skor;
+            $skorPerLaporan[$idLaporan]['total_pelapor']++;
+        }
+
+        $data = collect($skorPerLaporan)
+            ->map(function ($item, $idLaporan) {
+                $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
+                if (!$laporan) return null;
+
+                return [
+                    'laporan' => $laporan,
+                    'skor' => $item['skor'],
+                    'total_pelapor' => $item['total_pelapor'],
+                    'created_at' => $item['created_at'] // Include created_at in the final data
+                ];
+            })
+            ->filter()
+            ->values();
+
+        // Search
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = strtolower($request->search);
+            $data = $data->filter(function ($item) use ($searchTerm) {
+                return str_contains(strtolower($item['laporan']->fasilitas->nama_fasilitas ?? ''), $searchTerm) ||
+                    str_contains(strtolower($item['laporan']->deskripsi ?? ''), $searchTerm);
+            })->values();
+        }
+
+        // Multi-level sorting
+        $sortedData = $data->sortBy([
+            // Primary sort: skor (descending)
+            fn($a, $b) => $b['skor'] <=> $a['skor'],
+            // Secondary sort: total_pelapor (descending) if skor is equal
+            fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
+            // Tertiary sort: created_at (ascending - older reports first) if both skor and total_pelapor are equal
+            fn($a, $b) => $a['created_at'] <=> $b['created_at']
+        ])->values();
+
+        // Beri ranking dan ambil top 10
+        $rankedData = $sortedData->take(10)->map(function ($item, $index) {
+            $item['rank'] = $index + 1;
+            return $item;
+        });
+
+        return view('laporan.trending', [
+            'data' => $rankedData,
+            'search' => $request->input('search', '')
+        ]);
     }
 
     public function showPenilaian(string $id)
     {
-        $data = PelaporLaporan::select('id_laporan', DB::raw('count(*) as total'))
-            ->groupBy('id_laporan')
-            ->orderByDesc('total')
-            ->whereHas('laporan', function ($laporan) {
-                $laporan->where('id_status', 1);
+        // Langkah 1: Ambil bobot
+        $bobot = [
+            'MHS' => 1,
+            'TDK' => 2,
+            'DSN' => 3,
+            'ADM' => 3
+        ];
+
+        // Langkah 2: Ambil semua pelapor
+        $pelapor = PelaporLaporan::with(['user.level', 'laporan'])
+            ->whereHas('laporan', function ($query) {
+                $query->where('id_status', 1);
             })
             ->get();
 
-        $trendingRanks = [];
-        foreach ($data as $index => $item) {
-            $trendingRanks[$item->id_laporan] = $index + 1;
+        // Langkah 3: Hitung skor per laporan
+        $skorPerLaporan = [];
+        foreach ($pelapor as $item) {
+            $idLaporan = $item->id_laporan;
+            $kodeLevel = $item->user->level->kode_level ?? 'OTHER';
+            $skor = $bobot[$kodeLevel] ?? 0;
+
+            if (!isset($skorPerLaporan[$idLaporan])) {
+                $skorPerLaporan[$idLaporan] = [
+                    'skor' => 0,
+                    'total_pelapor' => 0,
+                    'created_at' => $item->laporan->created_at ?? now()
+                ];
+            }
+
+            $skorPerLaporan[$idLaporan]['skor'] += $skor;
+            $skorPerLaporan[$idLaporan]['total_pelapor']++;
         }
 
+        // Langkah 4: Konversi ke collection
+        $data = collect($skorPerLaporan)
+            ->map(function ($item, $idLaporan) {
+                $laporan = LaporanKerusakan::with(['fasilitas', 'pelaporLaporan'])->find($idLaporan);
+                if (!$laporan) return null;
+
+                return [
+                    'laporan' => $laporan,
+                    'skor' => $item['skor'],
+                    'total_pelapor' => $item['total_pelapor'],
+                    'created_at' => $item['created_at']
+                ];
+            })
+            ->filter()
+            ->values();
+
+        // Langkah 5: Sorting sama seperti trending()
+        $sortedData = $data->sortBy([
+            fn($a, $b) => $b['skor'] <=> $a['skor'],
+            fn($a, $b) => $b['total_pelapor'] <=> $a['total_pelapor'],
+            fn($a, $b) => $a['created_at'] <=> $b['created_at']
+        ])->values();
+
+        // Langkah 6: Beri ranking
+        $trendingRanks = [];
+        foreach ($sortedData as $index => $item) {
+            $trendingRanks[$item['laporan']->id_laporan] = $index + 1;
+        }
+
+        // Langkah 7: Ambil laporan yang akan ditampilkan
         $laporan = LaporanKerusakan::with([
             'fasilitas',
             'pelaporLaporan'
         ])->findOrFail($id);
 
+        // Langkah 8: Ambil ranking untuk laporan ini
         $trendingNo = $trendingRanks[$laporan->id_laporan] ?? '-';
 
         return view('laporan.showPenilaian', compact('laporan', 'trendingNo'));
     }
-
-
 
     public function simpanPenilaian(Request $request, $id)
     {
@@ -271,12 +395,12 @@ class LaporanKerusakanController extends Controller
         if ($kriteria) {
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil diverifikasi'
+                'messages' => 'Laporan berhasil diberi nilai'
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal Diverifikasi'
+                'messages' => 'Gagal diberi nilai'
             ]);
         }
 
@@ -294,38 +418,33 @@ class LaporanKerusakanController extends Controller
     public function verifikasiPerbaikan($id)
     {
         $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
-        // dd($laporan);
 
         return view('laporan_prioritas.verifikasi', compact('laporan'));
     }
-    // public function verifikasiPerbaikan($id)
-    // {
-    //     $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
-    //     return view('laporan_prioritas.modal-verifikasi', compact('laporan'));
-    // }
-
-
     public function simpanPenugasan(Request $request)
     {
         $request->validate([
             'id_laporan' => 'required',
             'id_user' => 'required',
+            'tenggat' => 'required|date|after_or_equal:today',
         ]);
 
         PenugasanTeknisi::updateOrCreate(
             ['id_laporan' => $request->id_laporan],
             [
                 'id_user' => $request->id_user,
+                'tenggat' => $request->tenggat,
                 'status_perbaikan' => 'Sedang dikerjakan',
                 'tanggal_selesai' => null,
             ]
         );
 
         LaporanKerusakan::where('id_laporan', $request->id_laporan)
-            ->update(['id_status' => 3]); // Asumsikan 3 = 'Dalam Perbaikan'
+            ->update(['id_status' => 3]); // Dalam Perbaikan
 
         return response()->json(['success' => true, 'messages' => 'Teknisi berhasil ditugaskan']);
     }
+
 
     public function simpanVerifikasi(Request $request)
     {
@@ -351,18 +470,16 @@ class LaporanKerusakanController extends Controller
         if ($request->verifikasi === 'setuju') {
             $laporan->update([
                 'id_status' => 4, // Selesai
+                'tanggal_selesai' => now(), // Selesai
             ]);
 
             $penugasan->update([
                 'status_perbaikan' => 'Selesai Dikerjakan',
                 'komentar_sarpras' => null,
             ]);
-        } else {
-            $laporan->update([
-                // id status berubah menjadi diperbaiki lagi ketika Ditolak
-                'id_status' => 3,
-            ]);
 
+            KriteriaPenilaian::where('id_laporan', $idLaporan)->delete();
+        } else {
             $penugasan->update([
                 'status_perbaikan' => 'Ditolak',
                 'komentar_sarpras' => $request->keterangan,
@@ -375,79 +492,16 @@ class LaporanKerusakanController extends Controller
         ]);
     }
 
-    // ---------------------------------------------------
-
-
-
-
-
-
-
-
-    public function edit(string $id)
-    {
-        $laporan = LaporanKerusakan::find($id);
-
-        return view('laporan.edit', ['laporan' => $laporan]);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $laporan = LaporanKerusakan::findOrFail($id);
-
-        // Validasi data input
-        $rules = [
-            'deskripsi' => 'required|string|max:255',
-            'foto_kerusakan' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'msgField' => $validator->errors()
-            ]);
-        }
-
-        // Update deskripsi
-        $laporan->deskripsi = $request->deskripsi;
-        $laporan->id_status = 1;
-
-        // Cek apakah ada file baru yang diunggah
-        if ($request->hasFile('foto_kerusakan')) {
-            // Hapus file lama jika ada
-            if ($laporan->foto_kerusakan && Storage::exists('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan)) {
-                Storage::delete('public/uploads/laporan_kerusakan/' . $laporan->foto_kerusakan);
-            }
-
-            // Simpan file baru
-            $file = $request->file('foto_kerusakan');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/uploads/laporan_kerusakan', $filename);
-
-            $laporan->foto_kerusakan = $filename;
-        }
-
-
-        $laporan->save();
-
-        return response()->json([
-            'success' => true,
-            'messages' => 'Data berhasil diperbarui'
-        ]);
-    }
-
-
-
     public function createPelapor()
     {
-        $fasilitas = Fasilitas::all();
-        $statusList = StatusLaporan::all();
-        $gedungList = Gedung::all();
+         $laporan = PelaporLaporan::with([
+            'laporan.fasilitas.ruangan.gedung',
+            'laporan.status',
+            'user'
+        ])->get();
+        $gedung = Gedung::all();
 
-        return view('pages.pelapor.create', compact('fasilitas', 'statusList', 'gedungList'));
+        return view('pages.pelapor.create', compact('laporan', 'gedung'));
     }
 
     public function storePelapor(Request $request)
@@ -578,7 +632,9 @@ class LaporanKerusakanController extends Controller
 
     public function rate(string $id)
     {
-        $laporan =  PelaporLaporan::where('id_user', $id)->first();
+        $laporan = PelaporLaporan::with(['laporan.penugasan.user'])
+            ->where('id_laporan', $id)
+            ->first();
 
         return view('pages.pelapor.rating', ['laporan' => $laporan]);
     }
@@ -590,14 +646,17 @@ class LaporanKerusakanController extends Controller
             'feedback_pengguna' => 'required|string|max:500',
         ]);
 
-        $laporan = PelaporLaporan::where('id_user', $id)->first();
+        $laporan = PelaporLaporan::where('id_laporan', $id);
         if (!$laporan) {
             return response()->json(['success' => false, 'message' => 'Laporan tidak ditemukan.']);
         }
 
-        $laporan->rating_pengguna = $request->rating_pengguna;
-        $laporan->feedback_pengguna = $request->feedback_pengguna;
-        $laporan->save();
+        // $laporan->rating_pengguna = $request->rating_pengguna;
+        // $laporan->feedback_pengguna = $request->feedback_pengguna;
+        $laporan->update([
+            'rating_pengguna' => $request->rating_pengguna,
+            'feedback_pengguna' => $request->feedback_pengguna
+        ]);
 
         return response()->json([
             'success' => true,

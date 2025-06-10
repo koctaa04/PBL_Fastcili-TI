@@ -15,27 +15,6 @@
             </div>
         </div>
         <div class="card p-4">
-            {{-- <h3>Kelola Data Level</h3>
-        <div class="card px-2">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="mb-0">Data Level</h3>
-                <div class="card-tools">
-                    <button onclick="modalAction('{{ url('/level/create') }}')" class="btn btn-success ">
-                        Tambah Data Level
-                    </button>
-                </div>
-            </div> --}}
-
-            {{-- <h3>Data Level</h3>
-        <div class="card px-2">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex justify-content-center flex-wrap">
-                    <button onclick="modalAction('{{ url('/level/create') }}')" 
-                            class="btn btn-lg btn-success mb-2">
-                        Tambah Data Level
-                    </button>
-                </div>
-            </div> --}}
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-row-bordered" id="table_level">
@@ -52,7 +31,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -62,7 +41,7 @@
         $(document).ready(function() {
             dataLevel = $('#table_level').DataTable({
                 processing: true,
-                serverSide: false, // karena kita menggunakan server-side processing sederhana
+                serverSide: true, 
                 ajax: {
                     url: window.location.href,
                     data: function(d) {
@@ -91,7 +70,11 @@
                     targets: [0, 1],
                     orderable: false,
                     searchable: true
-                }]
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data level yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data level seperti keyword yang ingin dicari"
+                }
             });
 
             $("#form-delete").validate({

@@ -25,8 +25,13 @@
                         <i class="nc-icon nc-sun-fog-29"></i>
                         <p>{{ __('Dashboard') }}</p>
                     </a>
+                @elseif (auth()->user()->id_level == 3)
+                    <a href="{{ route('teknisi') }}">
+                        <i class="nc-icon nc-sun-fog-29"></i>
+                        <p>{{ __('Dashboard') }}</p>
+                    </a>
                 @else
-                    <a href="{{ route('pelapor', 'dashboard') }}">
+                    <a href="{{ route('pelapor') }}">
                         <i class="nc-icon nc-sun-fog-29"></i>
                         <p>{{ __('Dashboard') }}</p>
                     </a>
@@ -98,7 +103,7 @@
             </li>
             
             {{-- Laporan --}}
-            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6 )
                 <li
                     class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'verifikasi_laporan' || $elementActive == 'prioritas' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#laporan">
@@ -113,22 +118,24 @@
                         <ul class="nav">
                             <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
                                 <a href="{{ route('perbaikan.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('L') }}</span>
+                                    <span class="sidebar-mini-icon">{{ __('LK') }}</span>
                                     <span class="sidebar-normal">{{ __(' Laporan Kerusakan ') }}</span>
                                 </a>
                             </li>
-                            <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
-                                <a href="{{ route('trending.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('V') }}</span>
-                                    <span class="sidebar-normal">{{ __(' Verifikasi Laporan ') }}</span>
-                                </a>
-                            </li>
-                            <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">
-                                <a href="{{ route('prioritas.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('P') }}</span>
-                                    <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
-                                </a>
-                            </li>
+                            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                                <li class="{{ $elementActive == 'verifikasi_laporan' ? 'active' : '' }}">
+                                    <a href="{{ route('trending.index') }}">
+                                        <span class="sidebar-mini-icon">{{ __('LT') }}</span>
+                                        <span class="sidebar-normal">{{ __(' Laporan Trending ') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">
+                                    <a href="{{ route('prioritas.index') }}">
+                                        <span class="sidebar-mini-icon">{{ __('PP') }}</span>
+                                        <span class="sidebar-normal">{{ __(' Prioritas Perbaikan ') }}</span>
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </li>
@@ -148,7 +155,7 @@
                         <ul class="nav">
                             <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
                                 <a href="{{ route('perbaikan_teknisi.index') }}">
-                                    <span class="sidebar-mini-icon">{{ __('P') }}</span>
+                                    <span class="sidebar-mini-icon">{{ __('DP') }}</span>
                                     <span class="sidebar-normal">{{ __(' Daftar Perbaikan ') }}</span>
                                 </a>
                             </li>
@@ -163,13 +170,32 @@
                         style="display: none;">
                         @csrf
                     </form>
-                    <a onclick="document.getElementById('formLogOut').submit();" class="bg-danger"
+                    <a onclick="confirmLogout(event)" class="bg-danger"
                         style="display: block; margin-bottom: 20px;">
                         <i class="nc-icon nc-button-power text-white"></i>
                         <p class="text-white">{{ __('Log out') }}</p>
                     </a>
                 </li>
             </div>
+            <script>
+                function confirmLogout(event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi Log out',
+                        text: "Apakah Anda yakin ingin keluar?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, Keluar!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('formLogOut').submit();
+                        }
+                    });
+                }
+              </script>
         </ul>
     </div>
 </div>

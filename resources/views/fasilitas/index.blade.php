@@ -6,41 +6,37 @@
 @section('content')
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="mb-0">Kelola Data User</h3>
-            <div class="d-flex justify-content-center flex-wrap">
-                <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
-                    Import Data Fasilitas (.xlsx)
-                </button>
-                <button onclick="modalAction('{{ url('/fasilitas/create') }}')" class="btn btn-success">
-                    Tambah Data Fasilitas
-                </button>
-            </div>
-        </div>
-
-        <div class="card p-4">
-            {{-- <h3>Data Fasilitas</h3>
-        <div class="card p-4">
-            <div class="card-header d-flex justify-content-center align-items-center mb-5">
-                <div class="card-tools d-flex flex-wrap justify-content-center gap-3">
-                    <button onclick="modalAction('{{ url('/fasilitas/import') }}')" 
-                            class="btn btn-action btn-warning text-truncate">
-                        Import Data Fasilitas (.xlsx)
+            <h3 class="mb-0">Kelola Data Fasilitas</h3>
+            @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                <div class="d-flex justify-content-center flex-wrap">
+                    <button onclick="modalAction('{{ url('/fasilitas/import') }}')" class="btn btn-warning mr-2">
+                        Impor Data Fasilitas
                     </button>
-                    <button onclick="modalAction('{{ url('/fasilitas/create') }}')" 
-                            class="btn btn-action btn-success text-truncate">
+                    <button onclick="modalAction('{{ url('/fasilitas/create') }}')" class="btn btn-success">
                         Tambah Data Fasilitas
                     </button>
                 </div>
-            </div> --}}
+            @endif
+        </div>
+
+        <div class="card p-4">
             <div class="card-body">
                 {{-- Search and Filtering --}}
                 <div class="row pr-auto">
                     <div class="col-md-12">
                         <div class="form-group row mb-5">
                             <label class="col-2 control-label col-form-label">Cari Data Fasilitas:</label>
-                            <div class="col-10">
+                            <div class="col-5">
                                 <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
                                 <small class="form-text text-muted">Masukkan nama fasilitas</small>
+                            </div>
+                            <label class="col-1 control-label col-form-label">Filter Status:</label>
+                            <div class="col-4">
+                                <select class="form-control" id="status_fasilitas" name="status_fasilitas" required>
+                                    <option value="">- Semua Status -</option>
+                                    <option value="Baik">Baik</option>
+                                    <option value="Rusak">Rusak</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group row mb-5">
@@ -55,12 +51,16 @@
                                 <small class="form-text text-muted">Gedung</small>
                             </div>
                             <div class="col-5">
-                                <select class="form-control" id="id_ruangan" name="id_ruangan" required disabled>
+                                <select class="form-control" id="id_ruangan" name="id_ruangan"
+                                    {{ request('id_ruangan') ? '' : 'disabled' }}>
+
                                     <option value="">- Semua Ruangan -</option>
                                     @if (isset($ruangan))
                                         @foreach ($ruangan as $item)
-                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}">
-                                                {{ $item->nama_ruangan }} </option>
+                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
+                                                {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
+                                                {{ $item->nama_ruangan }}
+                                            </option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -87,7 +87,7 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
         aria-hidden="true"></div>
 @endsection
 
@@ -196,6 +196,11 @@
         .fasilitas-jumlah {
             font-weight: bold;
             color: #28a745;
+        }
+
+        .fasilitas-kode {
+            font-weight: bolder;
+            color: #ffa200;
         }
 
         .fasilitas-ruangan {
@@ -323,21 +328,28 @@
                     loadFasilitasCards();
                 }, 500);
             });
+
+            $('#status_fasilitas').on('change', function() {
+                currentPage = 1;
+                loadFasilitasCards();
+            });
         });
 
         function loadFasilitasCards() {
-            const idRuangan = $('#id_ruangan').val();
+            const search = $('#search').val();
             const idGedung = $('#id_gedung').val();
-            const searchTerm = $('#search').val();
+            const idRuangan = $('#id_ruangan').val();
+            const statusFasilitas = $('#status_fasilitas').val();
 
             $.ajax({
                 url: "{{ url('fasilitas/list') }}",
                 type: "GET",
                 dataType: "json",
                 data: {
-                    id_ruangan: idRuangan,
+                    search: search,
                     id_gedung: idGedung,
-                    search: searchTerm,
+                    id_ruangan: idRuangan,
+                    status_fasilitas: statusFasilitas,
                     page: currentPage,
                     per_page: perPage
                 },
@@ -347,38 +359,45 @@
 
                     if (response.data && response.data.length > 0) {
                         response.data.forEach((fasilitas) => {
+                            const statusBadgeClass = fasilitas.status_fasilitas === 'Rusak' ?
+                                'badge-danger' : 'badge-success';
+
                             const cardHtml = `
-                                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                                    <div class="card fasilitas-card">
-                                        <div class="fasilitas-card-body">
-                                            <h5 class="fasilitas-card-title">${fasilitas.nama_fasilitas}</h5>
-                                            <p class="fasilitas-card-text"><strong>Ruangan:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
-                                            <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
-                                            <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
-                                        </div>
-                                        <div class="fasilitas-card-footer">
-                                            <div class="fasilitas-card-actions">
-                                                <button onclick="modalAction('{{ url('/fasilitas/edit') }}/${fasilitas.id_fasilitas}')" 
-                                                        class="btn btn-sm btn-warning" title="Edit">
-                                                    <i class="fa fa-edit"></i>
+                            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
+                                <div class="card fasilitas-card">
+                                    <div class="fasilitas-card-body p-3">
+                                        <h5 class="fasilitas-card-title">${fasilitas.nama_fasilitas}</h5>
+                                        <p class="fasilitas-card-text"><strong>Kode:</strong> <span class="fasilitas-kode">${fasilitas.kode_fasilitas || '-'}</span></p>
+                                        <p class="fasilitas-card-text"><strong>Nama:</strong> <span class="fasilitas-ruangan">${fasilitas.ruangan?.nama_ruangan || '-'}</span></p>
+                                        <p class="fasilitas-card-text"><strong>Gedung:</strong> <span class="fasilitas-gedung">${fasilitas.ruangan?.gedung?.nama_gedung || '-'}</span></p>
+                                        <p class="fasilitas-card-text"><strong>Jumlah:</strong> <span class="fasilitas-jumlah">${fasilitas.jumlah}</span></p>
+                                        <span class="badge badge-pill ${statusBadgeClass} p-2 mt-2">Status: ${fasilitas.status_fasilitas}</span> 
+                                    </div>
+                                    @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                                    <div class="fasilitas-card-footer p-2">
+                                        <div class="fasilitas-card-actions">
+                                            <button onclick="modalAction('{{ url('/fasilitas/edit') }}/${fasilitas.id_fasilitas}')" 
+                                                    class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <form class="form-delete d-inline" action="{{ url('/fasilitas/delete') }}/${fasilitas.id_fasilitas}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                    <i class="fa fa-trash"></i>
                                                 </button>
-                                                <form class="form-delete d-inline" action="{{ url('/fasilitas/delete') }}/${fasilitas.id_fasilitas}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                            </form>
                                         </div>
                                     </div>
+                                    @endif
                                 </div>
+                            </div>
                             `;
                             container.append(cardHtml);
                         });
                     } else {
                         container.append(
-                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data fasilitas</p></div>'
+                            '<div class="col-12 text-center py-4"><p class="text-muted">Tidak ada data fasilitas seperti keyword yang ingin dicari</p></div>'
                         );
                     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Level;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -53,20 +54,23 @@ class RegisterController extends Controller
     }
 
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
+    public function register(Request $request)
     {
-        return Validator::make($data, [
+        $validator = Validator::make($request->all(), [
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'id_level' => ['required', 'exists:level,id_level'],
-            'agree_terms_and_conditions' => ['required'],
+            'agree_terms_and_conditions' => ['required', 'accepted'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $this->create($request->all());
+
+        return response()->json([
+            'message' => 'Akun berhasil dibuat! Silakan login setelah disetujui.'
         ]);
     }
 
@@ -78,15 +82,9 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        // Validasi tambahan untuk memastikan id_level > 1
-        if ($data['id_level'] <= 1) {
-            abort(403, 'Level tidak valid');
-        }
-
         return User::create([
             'nama' => $data['nama'],
             'email' => $data['email'],
-            'id_level' => $data['id_level'],
             'password' => Hash::make($data['password']),
             'akses' => 0,
         ]);

@@ -13,12 +13,29 @@ class PenugasanTeknisiSeeder extends Seeder
      */
     public function run(): void
     {
-        // PenugasanTeknisi::insert([
-        //     ['id_laporan' => 1, 'id_user' => 6, 'tanggal_selesai' => null, 'status_perbaikan' => 'Sedang dikerjakan'],
-        //     ['id_laporan' => 2, 'id_user' => 6, 'tanggal_selesai' => null, 'status_perbaikan' => 'Sedang dikerjakan'],
-        //     ['id_laporan' => 3, 'id_user' => 6, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Selesai Dikerjakan'],
-        //     ['id_laporan' => 4, 'id_user' => 6, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Sedang dikerjakan'],
-        //     ['id_laporan' => 5, 'id_user' => 6, 'tanggal_selesai' => now(), 'status_perbaikan' => 'Selesai Dikerjakan'],
-        // ]);
+        PenugasanTeknisi::insert([
+            [
+                'id_laporan' => 4,
+                'id_user' => 5,
+                'status_perbaikan' => 'Sedang dikerjakan',
+                'tanggal_selesai' => null,
+                'tenggat' => now()->addDays(3),
+                'catatan_teknisi' => null,
+                'dokumentasi' => null,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id_laporan' => 6,
+                'id_user' => 5,
+                'status_perbaikan' => 'Selesai Dikerjakan',
+                'tanggal_selesai' => now(),
+                'tenggat' => now()->addDays(3),
+                'catatan_teknisi' => 'Printer sudah diperbaiki. Kerusakan diakibatkan karena kabel printer rusak',
+                'dokumentasi' => 'printer-3d.jpg',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        ]);
     }
 }

@@ -21,9 +21,18 @@ The above copyright notice and this permission notice shall be included in all c
 
 <head>
     <meta charset="utf-8" />
+
+    {{-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> --}}
+
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('logo-round.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('logo-round.png') }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    @php
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+    @endphp
+    
 
     <!-- Extra details for Live View on GitHub Pages -->
 
@@ -68,13 +77,13 @@ The above copyright notice and this permission notice shall be included in all c
     <script src="{{ asset('paper') }}/js/core/jquery.min.js"></script>
     <script src="{{ asset('paper') }}/js/core/popper.min.js"></script>
     <script src="{{ asset('paper') }}/js/core/bootstrap.min.js"></script>
-    <script src="{{ asset('paper') }}/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+    {{-- <script src="{{ asset('paper') }}/js/plugins/perfect-scrollbar.jquery.min.js"></script> --}}
     <!-- Chart JS -->
     <script src="{{ asset('paper') }}/js/plugins/chartjs.min.js"></script>
     <!--  Notifications Plugin    -->
     <script src="{{ asset('paper') }}/js/plugins/bootstrap-notify.js"></script>
     <!-- Control Center for Now Ui Dashboard: parallax effects, scripts for the example pages etc -->
-    <script src="{{ asset('paper') }}/js/paper-dashboard.min.js?v=2.0.0" type="text/javascript"></script>
+    {{-- <script src="{{ asset('paper') }}/js/paper-dashboard.min.js?v=2.0.0" type="text/javascript"></script> --}}
     <!-- Paper Dashboard DEMO methods, don't include it in your project! -->
     <script src="{{ asset('paper') }}/demo/demo.js"></script>
     <!-- Sweetalert -->
@@ -90,7 +99,7 @@ The above copyright notice and this permission notice shall be included in all c
     </script>
 
     <script src="{{ asset('script/script.js') }}"></script>
-
+    @stack('styles')
     @stack('scripts')
 </body>
 

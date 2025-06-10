@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Ruangan;
 use App\Models\Gedung;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Ruangan;
+use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Validator;
 
 class RuanganController extends Controller
 {
@@ -17,7 +19,8 @@ class RuanganController extends Controller
         }
 
         $gedung = Gedung::all();
-        return view('ruangan.index', compact('gedung'));
+        $ruangan = Ruangan::all();
+        return view('ruangan.index', compact('gedung', 'ruangan'));
     }
 
     private function getRuanganData(Request $request)
@@ -54,6 +57,7 @@ class RuanganController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $rules = [
             'id_gedung' => 'required|exists:gedung,id_gedung',
             'kode_ruangan' => 'required|string|max:20|unique:ruangan,kode_ruangan',
@@ -69,25 +73,22 @@ class RuanganController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
                 'msgField' => $validator->errors()
-            ], 422); // Tambahkan status code 422 untuk validation error
+            ], 422);
         }
 
-        try {
-            Ruangan::create([$request->all(), 'created_at' => now()]);
+        Ruangan::create([
+            'id_gedung' => $request->id_gedung,
+            'kode_ruangan' => $request->kode_ruangan,
+            'nama_ruangan' => $request->nama_ruangan,
+            'created_at' => now()
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menambahkan data ruangan!'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menyimpan data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menambahkan data ruangan!'
+        ]);
     }
 
     public function edit(string $id)
@@ -156,5 +157,119 @@ class RuanganController extends Controller
         }
 
         redirect('/');
+    }
+
+    public function import()
+    {
+        return view('ruangan.import');
+    }
+
+    public function import_ajax(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file_ruangan' => ['required', 'mimes:xlsx', 'max:1024']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi file gagal.',
+                'errors' => $validator->errors(),
+                'msgField' => ['file_ruangan' => $validator->errors()->get('file_ruangan')]
+            ], 422);
+        }
+
+        try {
+            $file = $request->file('file_ruangan');
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray();
+
+            $errors = [];
+            $rowsToInsert = [];
+
+            foreach ($data as $index => $row) {
+                if ($index === 0) continue; // skip header
+                $barisExcel = $index + 1;
+
+                $id_gedung = trim($row[0] ?? '');
+                $kode_ruangan = trim($row[1] ?? '');
+                $nama_ruangan = trim($row[2] ?? '');
+
+                $rowErrors = [];
+
+                if ($id_gedung === '' || $kode_ruangan === '' || $nama_ruangan === '') {
+                    $rowErrors[] = "Semua kolom harus diisi.";
+                }
+
+                if (!is_numeric($id_gedung) || !Gedung::find($id_gedung)) {
+                    $rowErrors[] = "ID Gedung '{$id_gedung}' tidak ditemukan.";
+                }
+
+                if (Ruangan::where('kode_ruangan', $kode_ruangan)->exists()) {
+                    $rowErrors[] = "Kode Ruangan '{$kode_ruangan}' sudah ada di database.";
+                }
+
+                if ($rowErrors) {
+                    $errors[] = "Baris ke-{$barisExcel}: " . implode(' ', $rowErrors);
+                    continue;
+                }
+
+                $rowsToInsert[] = [
+                    'id_gedung' => $id_gedung,
+                    'kode_ruangan' => $kode_ruangan,
+                    'nama_ruangan' => $nama_ruangan,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            if (!empty($errors)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Terdapat kesalahan pada data Excel.',
+                    'errors' => $errors,
+                    'msgField' => ['file_ruangan' => $errors]
+                ], 422);
+            }
+
+            // ✅ Simpan semua data hanya jika tidak ada error
+            DB::transaction(function () use ($rowsToInsert) {
+                Ruangan::insert($rowsToInsert);
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => "Berhasil mengimpor " . count($rowsToInsert) . " data ruangan."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat proses import.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+
+    protected function convertErrorsToFields($errors)
+    {
+        $result = [];
+        foreach ($errors as $error) {
+            if (str_contains($error, 'id_ruangan')) {
+                $result['id_ruangan'] = [$error];
+            } elseif (str_contains($error, 'kode_ruangan')) {
+                $result['kode_ruangan'] = [$error];
+            } elseif (str_contains($error, 'nama_ruangan')) {
+                $result['nama_ruangan'] = [$error];
+            } else {
+                $result['file_ruangan'] = [$error];
+            }
+        }
+        return $result;
     }
 }

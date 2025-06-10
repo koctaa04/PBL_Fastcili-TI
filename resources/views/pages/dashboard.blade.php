@@ -17,7 +17,7 @@
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Total Laporan Masuk</p>
+                                    <p class="card-category">Total Laporan</p>
                                     <p class="card-title">{{ $jmlLaporan }}</p>
                                 </div>
                             </div>
@@ -36,8 +36,8 @@
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Laporan Terverifikasi</p>
-                                    <p class="card-title">{{ $laporanTerverifikasi }}
+                                    <p class="card-category">Laporan Diajukan</p>
+                                    <p class="card-title">{{ $laporanDiajukan }}
                                     <p>
                                 </div>
                             </div>
@@ -56,8 +56,8 @@
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category">Laporan Aktif</p>
-                                    <p class="card-title">{{ $laporanAktif }}
+                                    <p class="card-category">Laporan Diproses</p>
+                                    <p class="card-title">{{ $laporanDiproses }}
                                     <p>
                                 </div>
                             </div>
@@ -124,16 +124,32 @@
                                         <td>{{ $item['rank'] ?? '-' }}</td>
                                         <td>{{ $item['id_laporan'] ?? '-' }}</td>
                                         <td>{{ $item['deskripsi'] ?? 'Tidak ada deskripsi' }}</td>
-                                        <td>{{ $item['status'] ?? 'Status tidak tersedia' }}</td>
+                                        <td>
+                                            @php
+                                                $status = $item['status'] ?? 'Tidak diketahui';
+
+                                                $statusColor = match ($status) {
+                                                    'Diproses' => 'bg-primary text-white',
+                                                    'Diperbaiki' => 'bg-secondary text-white',
+                                                    default => 'bg-primary text-white',
+                                                };
+                                            @endphp
+                                            <span class="badge p-2 {{ $statusColor }}">
+                                                {{ $status }}
+                                            </span>
+                                        </td>
+
                                         <td>{{ isset($item['Q']) ? number_format($item['Q'], 4) : '890' }}</td>
                                         <td>
-                                            {{ $item['penugasan']['user']['nama'] ?? 'Belum Ditugaskan' }}
+                                            {{-- {{ laporan->penugasan->user->nama }} --}}
+                                            {{ $item['penugasan']['nama_teknisi'] ?? 'Belum Ditugaskan' }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="6" class="text-center text-muted">
-                                            <i class="fas fa-info-circle"></i> Tidak ada data prioritas perbaikan yang tersedia
+                                            <i class="fas fa-info-circle"></i> Tidak ada data prioritas perbaikan yang
+                                            tersedia
                                         </td>
                                     </tr>
                                 @endforelse
@@ -167,10 +183,17 @@
             </div>
         </div>
     </div>
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
+        aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
     <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
         $(document).ready(function() {
             //grafik laporan per bulan
             const ctx1 = document.getElementById('laporanPerBulan').getContext('2d');

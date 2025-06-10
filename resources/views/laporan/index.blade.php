@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="content">
-        <h3>Laporan kerusakan</h3>
+        <h3>Laporan Kerusakan</h3>
         <div class="card p-4">
             <div class="card-header">
                 <h3 class="mb-0">Form Laporan Kerusakan</h3>
@@ -41,13 +41,30 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="deskripsi">Deskripsi</label>
+                                        <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika
+                                            diperlukan)</label>
                                         <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="jumlah_kerusakan">Jumlah fasilitas yang rusak</label>
+                                        <input type="number" name="jumlah_kerusakan" class="form-control" required>
+                                        <small class="text-muted d-block mt-1">*Jumlah fasiltas yang rusak tidak bisa lebih
+                                            dari jumlah fasilitas</small>
+                                    </div>
 
-                                    <div class="">
-                                        <label for="foto_kerusakan">Foto Kerusakan</label>
-                                        <input type="file" name="foto_kerusakan" class="form-control" required>
+                                    <div class="form-group">
+                                        <!-- Custom File Input -->
+                                        <label for="foto_kerusakan" class="d-block mb-2">Foto Kerusakan</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" name="foto_kerusakan"
+                                                id="foto_kerusakan" accept="image/*" required>
+                                            <label class="custom-file-label bg-warning text-dark text-center w-100"
+                                                for="foto_kerusakan" id="file-label">
+                                                <i class="fas fa-upload mr-2"></i>Pilih foto kerusakan
+                                            </label>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">Format: JPG, PNG, JPEG (Maks. 2MB)</small>
+                                        <small class="text-danger" id="error-foto_kerusakan"></small>
                                     </div>
                                 </div>
                             </div>
@@ -81,81 +98,156 @@
                             <div class="col-md-12 text-end">
                                 <button type="submit" id="btn-submit" class="btn btn-success" disabled>Kirim
                                     Laporan</button>
-
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="card p-4">
-            <div class="card-header">
-                <h3>Daftar Laporan Kerusakan</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm" id="table_laporan">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Foto Kerusakan</th>
-                                <th>Fasilitas</th>
-                                <th>Gedung</th>
-                                <th>Ruangan</th>
-                                <th>Pelapor</th>
-                                <th>Deskripsi</th>
-                                <th>Status</th>
-                                <th>Tanggal Lapor</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($laporan as $i => $item)
+        @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+            <div class="card p-4">
+                <div class="card-header">
+                    <h3>Daftar Laporan Kerusakan</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-row-bordered" id="table_laporan">
+                            <thead>
                                 <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>
-                                        <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
-                                            alt="Foto Kerusakan" class="card-img-top img-fluid"
-                                            style="height: 120px; object-fit: cover;">
-                                    </td>
-                                    <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
-                                    <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
-                                    <td>{{ $item->laporan->fasilitas->ruangan->nama_ruangan }}</td>
-                                    <td>{{ $item->user->nama }}</td>
-                                    <td>{{ $item->deskripsi_tambahan ?? '-' }}</td>
-                                    <td>
-
-                                        @php
-                                            $statusColor = match ($item->laporan->status->id_status) {
-                                                1 => 'bg-warning',
-                                                2 => 'bg-primary',
-                                                3 => 'bg-secondary text-white',
-                                                4 => 'bg-success text-white',
-                                                default => 'bg-dark',
-                                            };
-                                        @endphp
-                                        <p class=" p-2 badge {{ $statusColor }}">
-                                            {{ $item->laporan->status->nama_status }}</p>
-                                    </td>
-                                    <td>{{ $item->laporan->tanggal_lapor }}</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $item->id }}"
-                                            data-nama="{{ $item->user->nama }}">
-                                            <i class="fas fa-trash"></i> Hapus
-                                        </button>
-                                    </td>
-
+                                    <th width="5%">No</th>
+                                    <th width="15%">Foto Kerusakan</th>
+                                    <th width="10%">Fasilitas</th>
+                                    <th width="15%">Tempat</th>
+                                    <th width="10%">Pelapor</th>
+                                    <th width="6%">Jumlah kerusakan</th>
+                                    <th width="15%">Deskripsi</th>
+                                    <th width="7%">Status</th>
+                                    <th width="7%">Tanggal Lapor</th>
+                                    <th width="6%">Aksi</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($laporan as $i => $item)
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $item->laporan->foto_kerusakan) }}"
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
+                                                alt="Foto Kerusakan" class="card-img-top img-fluid"
+                                                style="height: 120px; object-fit: cover;">
+                                        </td>
+                                        <td>{{ $item->laporan->fasilitas->nama_fasilitas }}</td>
+                                        <td>{{ $item->laporan->fasilitas->ruangan->gedung->nama_gedung }} -
+                                            {{ $item->laporan->fasilitas->ruangan->nama_ruangan }}</td>
+                                        <td>{{ $item->user->nama }}</td>
+                                        <td>{{ $item->laporan->jumlah_kerusakan }}</td>
+                                        <td>{{ $item->deskripsi_tambahan ?? '-' }}</td>
+                                        <td>
+
+                                            @php
+                                                $statusColor = match ($item->laporan->status->id_status) {
+                                                    1 => 'bg-warning',
+                                                    2 => 'bg-primary text-white',
+                                                    3 => 'bg-secondary text-white',
+                                                    4 => 'bg-success text-white',
+                                                    default => 'bg-dark',
+                                                };
+                                            @endphp
+                                            <p class=" p-2 badge {{ $statusColor }}">
+                                                {{ $item->laporan->status->nama_status }}</p>
+                                        </td>
+                                        <td>{{ $item->laporan->tanggal_lapor->translatedFormat('l, d F Y') }}</td>
+
+
+                                        <td>
+                                            <button class="btn btn-danger btn-sm btn-delete"
+                                                data-id="{{ $item->id }}" data-nama="{{ $item->user->nama }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        @else
+            <div class="card shadow-lg border-0 rounded-4 mt-5">
+                <div class="card-header bg-warning text-white rounded-top-4">
+                    <h3 class="mb-3">Riwayat Laporan</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-striped table-bordered" id="table_level">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="text-center">#</th>
+                                    <th scope="col">Nama Fasilitas</th>
+                                    <th scope="col">Deskripsi</th>
+                                    <th scope="col">Tanggal Lapor</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($laporanAuth as $lapor => $l)
+                                    <tr>
+                                        <th scope="row" class="text-center">{{ $lapor + 1 }}</th>
+                                        <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
+                                        <td>{{ $l->deskripsi_tambahan }}</td>
+                                        <td>{{ $l->created_at->translatedFormat('l, d F Y') }}</td>
+                                        <td>
+                                            @php
+                                                $statusColor = match ($l->laporan->id_status) {
+                                                    1 => 'bg-secondary text-white',
+                                                    2 => 'bg-info text-white',
+                                                    3 => 'bg-warning text-white',
+                                                    4 => 'bg-success text-white',
+                                                    default => 'bg-dark',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $statusColor }} px-3 py-2">
+                                                {{ $l->laporan->status->nama_status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button
+                                                onclick="modalAction('{{ route('pelapor.detail', ['id' => $l->id]) }}')"
+                                                class="btn btn-sm btn-info text-white">
+                                                Detail
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
+    aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
+    <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
+        // Handle file input change
+        $('#foto_kerusakan').on('change', function() {
+            var fileName = $(this).val().split('\\').pop();
+            if (fileName) {
+                $('#file-label').html('<i class="fas fa-file-image mr-2"></i>' + fileName);
+            } else {
+                $('#file-label').html('<i class="fas fa-upload mr-2"></i>Pilih Foto Kerusakan');
+            }
+        });
+    </script>
     <script>
         var currentUserId = {{ auth()->id() }};
         $(document).ready(function() {
@@ -209,7 +301,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                window.location.href = "{{ url("/lapor_kerusakan") }}";
+                                window.location.href = "{{ url('/lapor_kerusakan') }}";
                             });
                         } else {
                             Swal.fire({
@@ -239,7 +331,7 @@
                 $('#ruangan-group').show();
                 $('#id_ruangan').html('<option value="">Memuat...</option>');
 
-                var url = '{{ url("/get-ruangan") }}/' + idGedung;
+                var url = '{{ url('/get-ruangan') }}/' + idGedung;
                 $.get(url, function(data) {
                     let options = '<option value="">-- Pilih Ruangan --</option>';
                     data.forEach(r => options +=
@@ -256,7 +348,7 @@
                 $('#laporan-terlapor-list').empty();
                 $('#laporan-terlapor-container, #form-dukungan, #form-laporan-baru').hide();
 
-                var url = '{{ url("/get-fasilitas-terlapor") }}/' + idRuangan;
+                var url = '{{ url('/get-fasilitas-terlapor') }}/' + idRuangan;
                 $.get(url, function(data) {
                     const filteredData = data.filter(f => f.id_user !== currentUserId);
 
@@ -284,7 +376,7 @@
                     }
                 });
 
-                var url = '{{ url("/get-fasilitas-belum-lapor") }}/' + idRuangan;
+                var url = '{{ url('/get-fasilitas-belum-lapor') }}/' + idRuangan;
                 $.get(url, function(data) {
                     let options = '<option value="">-- Pilih Fasilitas --</option>';
                     data.forEach(f => options +=
@@ -304,6 +396,7 @@
                 $('#form-laporan-baru').hide();
 
                 showFormDukungan();
+                updateSubmitButtonState();
             });
 
             // Klik tombol: Buat laporan baru
@@ -323,8 +416,9 @@
                 let enable = false;
 
                 if (isDukung) {
-                    const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
-                    enable = tambahanDeskripsi.length > 0;
+                    // const tambahanDeskripsi = $('textarea[name="tambahan_deskripsi"]').val().trim();
+                    // enable = tambahanDeskripsi.length > 0;
+                    enable = true;
                 }
 
                 if (isLaporanBaru) {
@@ -351,7 +445,27 @@
     </script>
     <script>
         $(document).ready(function() {
-            $('#table_laporan').DataTable();
+            $('#table_laporan').DataTable({
+                columnDefs: [{
+                    targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    className: 'text-center',
+                }, {
+                    targets: [0, 1, 4, 9],
+                    orderable: false,
+                    searchable: false,
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan seperti keyword yang ingin dicari"
+                },
+                rowCallback: function(row, data, index) {
+                    // Ganti isi kolom "No" (kolom ke-0)
+                    var info = this.api().page.info();
+                    var page = info.page;
+                    var length = info.length;
+                    $('td:eq(0)', row).html(index + 1 + page * length);
+                }
+            });
         });
     </script>
 

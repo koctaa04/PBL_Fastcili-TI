@@ -25,8 +25,8 @@ class UserController extends Controller
             return Datatables::of($users)
                 ->addColumn('profil', function ($user) {
                     return $user->foto_profil
-                        ? '<img src="' . asset('uploads/foto_profil/' . $user->foto_profil) . '" width="50" style="border-radius:10px;">'
-                        : '<img src="' . asset('default-avatar.jpg') . '" width="50" style="border-radius:10px;">';
+                        ? '<img src="' . asset('storage/uploads/foto_profil/' . $user->foto_profil) . '" width="150px" style="border-radius:10px;">'
+                        : '<img src="' . asset('default-avatar.jpg') . '" width="150px" style="border-radius:10px;">';
                 })
                 ->addColumn('akses', function ($user) {
                     return $user->akses
@@ -69,33 +69,34 @@ class UserController extends Controller
             'email' => 'required|string|max:50|unique:users,email',
         ];
 
-        $validator = Validator::make($request->all(), $rules, [
-            'email.unique' => 'Email ini sudah digunakan oleh pengguna lain'
-        ]);
+        $customMessages = [
+            'email.unique' => 'Email ini sudah digunakan oleh pengguna lain',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $customMessages);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
                 'msgField' => $validator->errors()
             ], 422);
         }
 
-        try {
-            User::create($request->all());
+        User::create([
+            'id_level' => $request->id_level,
+            'nama' => $request->nama,
+            'email' => $request->email,
+            'password' => Hash::make('password'),
+            'created_at' => now()
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menambahkan data!'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menambahkan data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menambahkan data!'
+        ]);
     }
+
 
     public function edit(string $id)
     {
@@ -112,29 +113,37 @@ class UserController extends Controller
             'email' => 'required|string|max:50|unique:users,email,' . $id . ',id_user',
         ];
 
-        $validator = Validator::make($request->all(), $rules, [
+        $messages = [
             'email.unique' => 'Email ini sudah digunakan oleh pengguna lain'
-        ]);
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi inputan gagal. Mohon cek kembali inputan Anda!',
                 'msgField' => $validator->errors()
             ], 422);
         }
 
-        $data = User::find($id);
+        $user = User::find($id);
 
-        if (!$data) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data tidak ditemukan!'
+                'message' => 'Data pengguna tidak ditemukan!'
             ], 404);
         }
 
         try {
-            $data->update($request->all());
+            $user->update([
+                'id_level' => $request->id_level,
+                'nama' => $request->nama,
+                'email' => $request->email,
+                // tambahkan field lain jika perlu
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mengubah data!'
@@ -142,11 +151,12 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengubah data',
+                'message' => 'Terjadi kesalahan saat menyimpan data.',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
+
 
     public function destroy(Request $request, $id)
     {
@@ -178,12 +188,25 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
+
+            // Jika ingin diaktifkan (akses = true)
+            if (!$user->akses) {
+                // Cek apakah level_kode ada 
+                if (empty($user->id_level)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'level user belum diatur. Atur level terlebih dahulu!'
+                    ], 400);
+                }
+            }
+
+            // Toggle akses
             $user->akses = !$user->akses;
             $user->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Status akses berhasil diubah',
+                'message' => 'Status akses berhasil diubah.',
                 'new_status' => $user->akses
             ]);
         } catch (\Exception $e) {
@@ -193,6 +216,7 @@ class UserController extends Controller
             ], 500);
         }
     }
+
 
     public function import()
     {
@@ -206,14 +230,12 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi data import gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-            return redirect()->back()->withErrors($validator)->withInput();
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi file gagal',
+                'errors' => $validator->errors(),
+                'msgField' => ['file_user' => $validator->errors()->get('file_user')]
+            ], 422);
         }
 
         try {
@@ -224,70 +246,97 @@ class UserController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
             $data = $sheet->toArray();
 
-            $insert = [];
             $errors = [];
+            $insert = [];
+            $emailInFile = [];
 
+            // Step 1: Validasi semua data dulu
             foreach ($data as $index => $row) {
                 if ($index === 0) continue; // Skip header
+                $barisExcel = $index + 1;
 
-                // Validasi data
-                if (!Level::find($row[0])) {
-                    $errors[] = "Level ID {$row[0]} tidak ditemukan";
+                $id_level = trim($row[0] ?? '');
+                $email = trim($row[1] ?? '');
+                $nama = trim($row[2] ?? '');
+                $password_plain = trim($row[3] ?? '');
+
+                $rowErrors = [];
+
+                // Validasi kosong
+                if ($id_level === '' || $email === '' || $nama === '' || $password_plain === '') {
+                    $rowErrors[] = "Kolom tidak boleh kosong.";
+                }
+
+                // Validasi Level
+                if (!is_numeric($id_level) || !Level::find($id_level)) {
+                    $rowErrors[] = "Level ID {$id_level} tidak ditemukan.";
+                }
+
+                // Validasi Email format
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $rowErrors[] = "Format email '{$email}' tidak valid.";
+                }
+
+                // Cek duplikat email di file itu sendiri
+                if (in_array($email, $emailInFile)) {
+                    $rowErrors[] = "Email '{$email}' duplikat di dalam file.";
+                } else {
+                    $emailInFile[] = $email;
+                }
+
+                // Cek email sudah ada di DB
+                if (User::where('email', $email)->exists()) {
+                    $rowErrors[] = "Email '{$email}' sudah terdaftar.";
+                }
+
+                if ($rowErrors) {
+                    $errors[] = "Baris ke-{$barisExcel}: " . implode(' ', $rowErrors);
                     continue;
                 }
 
-                if (User::where('email', $row[1])->exists()) {
-                    $errors[] = "Email {$row[1]} sudah terdaftar";
-                    continue;
-                }
-
+                // Simpan data yang valid untuk insert nanti
                 $insert[] = [
-                    'id_level' => $row[0],
-                    'email' => $row[1],
-                    'nama' => $row[2],
-                    'password' => Hash::make($row[3]),
+                    'id_level' => $id_level,
+                    'email' => $email,
+                    'nama' => $nama,
+                    'password' => Hash::make($password_plain),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
             }
 
+            // Kalau ada error → batalkan semua
             if (!empty($errors)) {
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Terdapat error validasi data',
-                        'msgField' => $this->convertErrorsToFields($errors), // tambahan agar bisa ditampilkan di bawah input
-                        'errors' => $errors // semua pesan error ditampilkan
-                    ], 422);
-                }
-
-                return redirect()->back()->with('error', implode('<br>', $errors));
-            }
-
-
-            if (!empty($insert)) {
-                User::insert($insert);
-            }
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data user berhasil diimport',
-                    'count' => count($insert)
-                ]);
-            }
-            return redirect()->route('users.index')->with('success', 'Data user berhasil diimport (' . count($insert) . ' data)');
-        } catch (\Exception $e) {
-            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                    'error' => $e->getMessage()
-                ], 500);
+                    'message' => 'Terdapat kesalahan pada data Excel. Tidak ada data yang disimpan.',
+                    'errors' => $errors,
+                    'msgField' => ['file_user' => $errors]
+                ], 422);
             }
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            // Step 2: Jalankan Transaction
+            DB::transaction(function () use ($insert) {
+                if (!empty($insert)) {
+                    User::insert($insert);
+                }
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data User berhasil diimport.',
+                'count' => count($insert)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat proses import: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
+
+
     protected function convertErrorsToFields(array $errors)
     {
         $result = [];
@@ -296,10 +345,10 @@ class UserController extends Controller
             // Coba deteksi field dari string error
             if (str_contains($error, 'email')) {
                 $result['email'] = [$error];
-            } elseif (str_contains($error, 'level') || str_contains($error, 'level_id')) {
-                $result['level_id'] = [$error];
+            } elseif (str_contains($error, 'level') || str_contains($error, 'id_level')) {
+                $result['id_level'] = [$error];
             } elseif (str_contains($error, 'nama')) {
-                $result['name'] = [$error];
+                $result['nama'] = [$error];
             } else {
                 $result['file_user'] = [$error]; // fallback ke file_user
             }
