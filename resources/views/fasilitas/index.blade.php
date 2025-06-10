@@ -23,49 +23,43 @@
             <div class="card-body">
                 {{-- Search and Filtering --}}
                 <div class="row pr-auto">
-                    <div class="col-md-12">
-                        <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Cari Data Fasilitas:</label>
-                            <div class="col-5">
-                                <input type="text" class="form-control" id="search" placeholder="Cari fasilitas...">
-                                <small class="form-text text-muted">Masukkan nama fasilitas</small>
-                            </div>
-                            <label class="col-1 control-label col-form-label">Filter Status:</label>
-                            <div class="col-4">
-                                <select class="form-control" id="status_fasilitas" name="status_fasilitas" required>
-                                    <option value="">- Semua Status -</option>
-                                    <option value="Baik">Baik</option>
-                                    <option value="Rusak">Rusak</option>
-                                </select>
-                            </div>
+                    <div class="col-12">
+                        <div class="form-group mb-4">
+                            <label class="form-label font-weight-bold">Cari Data Fasilitas:</label>
+                            <input type="text" class="form-control mb-2" id="search" placeholder="Cari fasilitas...">
                         </div>
-                        <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Filter:</label>
-                            <div class="col-5">
-                                <select class="form-control" id="id_gedung" name="id_gedung" required>
-                                    <option value="">- Semua Gedung -</option>
-                                    @foreach ($gedung as $item)
-                                        <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }} </option>
-                                    @endforeach
-                                </select>
-                                <small class="form-text text-muted">Gedung</small>
-                            </div>
-                            <div class="col-5">
-                                <select class="form-control" id="id_ruangan" name="id_ruangan"
-                                    {{ request('id_ruangan') ? '' : 'disabled' }}>
 
-                                    <option value="">- Semua Ruangan -</option>
-                                    @if (isset($ruangan))
-                                        @foreach ($ruangan as $item)
-                                            <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}"
-                                                {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
-                                                {{ $item->nama_ruangan }}
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <small class="form-text text-muted">Ruangan</small>
-                            </div>
+                        <div class="form-group mb-4">
+                            <label class="form-label font-weight-bold">Filter Status:</label>
+                            <select class="form-control mb-2" id="status_fasilitas" name="status_fasilitas" required>
+                                <option value="">- Semua Status -</option>
+                                <option value="Baik">Baik</option>
+                                <option value="Rusak">Rusak</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="form-label font-weight-bold">Filter Gedung:</label>
+                            <select class="form-control mb-2" id="id_gedung" name="id_gedung" required>
+                                <option value="">- Semua Gedung -</option>
+                                @foreach ($gedung as $item)
+                                    <option value="{{ $item->id_gedung }}">{{ $item->nama_gedung }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="form-label font-weight-bold">Filter Ruangan:</label>
+                            <select class="form-control mb-2" id="id_ruangan" name="id_ruangan" {{ request('id_ruangan') ? '' : 'disabled' }}>
+                                <option value="">- Semua Ruangan -</option>
+                                @if (isset($ruangan))
+                                    @foreach ($ruangan as $item)
+                                        <option value="{{ $item->id_ruangan }}" data-gedung="{{ $item->id_gedung }}" {{ request('id_ruangan') == $item->id_ruangan ? 'selected' : '' }}>
+                                            {{ $item->nama_ruangan }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -93,6 +87,25 @@
 
 @push('styles')
     <style>
+        @media (min-width: 768px) {
+            /* Pada layar medium ke atas, tata letak search & filter jadi 2 kolom */
+            .form-group {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .form-group > label {
+                flex: 0 0 200px;
+                margin-bottom: 0;
+            }
+
+            .form-group > .form-control,
+            .form-group > select {
+                flex: 1;
+            }
+        }
+
         /* Container untuk buttons */
         .card-tools {
             display: flex;
