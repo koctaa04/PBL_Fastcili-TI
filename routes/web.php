@@ -37,6 +37,10 @@ Route::get('/', function () {
 	}
 });
 
+Route::get('/panduan', function () {
+	return view('panduan');
+});
+
 Auth::routes();
 
 
