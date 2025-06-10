@@ -99,6 +99,7 @@
                             <div class="col-md-4 mb-3 mb-md-0">
                                 <div class="text-center">
                                     <img src="{{ asset('storage/uploads/dokumentasi/' . $perbaikan->dokumentasi) }}"
+                                        onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                         alt="Dokumentasi Perbaikan" class="img-fluid rounded shadow-sm border"
                                         style="max-height: 250px; width: auto;">
                                 </div>

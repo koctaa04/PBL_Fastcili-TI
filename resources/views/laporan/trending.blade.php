@@ -1,6 +1,6 @@
 @extends('layouts.app', [
 'class' => '',
-'elementActive' => 'verifikasi_laporan',
+'elementActive' => 'trending',
 ])
 
 @section('content')
@@ -53,31 +53,62 @@
                                 <div class="d-flex flex-column flex-md-row">
                                     <div class="mr-0 mr-md-3 mb-3 mb-md-0 w-100" style="max-width: 250px;">
                                         <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan['laporan']->foto_kerusakan) }}"
+                                            onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                             alt="Foto Kerusakan"
                                             class="img-fluid rounded w-100"
                                             style="height: 180px; object-fit: cover;">
                                     </div>
                                     <div class="flex-grow-1 d-flex flex-column">
                                         <div>
-                                            <h4 class="card-title font-weight-bold mb-2">{{ $laporan['laporan']->fasilitas->nama_fasilitas ?? '-' }}</h4>
+                                            <h3 class="card-title font-weight-bold mb-2">{{ $laporan['laporan']->fasilitas->nama_fasilitas ?? '-' }}</h3>
+                                            <p class="card-text text-secondary font-weight-bold mb-2">{{ $laporan['laporan']->fasilitas->ruangan->nama_ruangan }} - {{ $laporan['laporan']->fasilitas->ruangan->gedung->nama_gedung }}</p>
                                             <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">{{ $laporan['laporan']->deskripsi ?? '-' }}</p>
                                         </div>
+                                        @if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6)
+                                        <div class="mt-auto">
+                                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                                                <div class="mb-2 mb-md-0 d-flex flex-wrap gap-2">
+                                                    @php
+                                                        $statusColor = match ($laporan['laporan']->id_status) {
+                                                            1 => 'bg-secondary',
+                                                            2 => 'bg-info',
+                                                            3 => 'bg-danger',
+                                                            4 => 'bg-success',
+                                                            default => 'bg-dark',
+                                                        };
+                                                    @endphp
+                                                    <span class="badge badge-pill {{ $statusColor }} text-white px-2 px-md-3 py-2 mr-3 mb-2">
+                                                        <i class="fa-solid fa-circle-info mr-1"></i> {{ $laporan['laporan']->status->nama_status }}
+                                                    </span>
+                                                    <span class="badge badge-pill badge-primary px-2 px-md-3 py-2 mr-3 mb-2">
+                                                        <i class="fas fa-users mr-1"></i> Pelapor: {{ $laporan['total_pelapor'] }}
+                                                    </span>
+                                                </div>
+                                                <div class="ml-auto">
+                                                    <span class="badge badge-warning px-2 px-md-3 py-2 py-md-3 mr-3 mb-2">
+                                                        <i class="fas fa-star mr-1"></i>Skor: <i class="text-skor"> {{ $laporan['skor'] }}</i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @else
                                         <div class="mt-auto">
                                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                                                 <div class="mb-2 mb-md-0 d-flex flex-wrap gap-2">
                                                     <span class="badge badge-pill badge-primary px-2 px-md-3 py-2 mr-3">
                                                         <i class="fas fa-users mr-1"></i> Pelapor: {{ $laporan['total_pelapor'] }}
                                                     </span>
-                                                    <span class="badge badge-pill badge-warning px-2 px-md-3 py-2">
+                                                    <span class="badge badge-pill badge-warning px-2 px-md-3 py-2 mr-3">
                                                         <i class="fas fa-star mr-1"></i> Skor: {{ $laporan['skor'] }}
                                                     </span>
                                                 </div>
-                                                <button class="btn btn-danger btn-sm btn-md-lg"
-                                                    onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan['laporan']->id_laporan) }}')">
-                                                    <i class="fas fa-star mr-1"></i> Beri Nilai
-                                                </button>
+                                                    <button class="btn btn-danger btn-sm btn-md-lg"
+                                                        onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan['laporan']->id_laporan) }}')">
+                                                        <i class="fas fa-star mr-1"></i> Beri Nilai
+                                                    </button>
                                             </div>
                                         </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -95,6 +126,12 @@
 
 @push('styles')
 <style>
+    .card-title {
+        font-size: 2rem
+    }
+    .card-text {
+        font-size: 1rem
+    }
     .trending-card {
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -119,9 +156,14 @@
         color: #343a40;
     }
 
+    .text-skor {
+        font-size: 2rem;
+        color: #343a40;
+    }
+
     .badge {
         font-size: 0.85rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 1px 2px 10px rgba(0, 0, 0, 0.1);
         white-space: nowrap;
     }
 

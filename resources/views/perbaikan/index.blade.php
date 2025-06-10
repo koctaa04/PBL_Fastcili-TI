@@ -36,6 +36,7 @@
                                         {{-- Foto Kerusakan --}}
                                         <td>
                                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                                 alt="Foto Kerusakan" height="65"
                                                 onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
                                         </td>
@@ -74,7 +75,8 @@
                                     <td>
                                         @if ($laporan->dokumentasi)
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
-                                                alt="Dokumentasi" height="65">
+                                            onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"    
+                                            alt="Dokumentasi" height="65">
                                         @else
                                             <span class="text-danger">(Belum ada dokumentasi)</span>
                                         @endif
