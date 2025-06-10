@@ -111,7 +111,7 @@ class LaporanKerusakanController extends Controller
         if ($request->filled('dukungan_laporan')) {
             $laporanId = $request->dukungan_laporan;
             // Jika Fasilitas yang dilaporkan sedang tahap perbaikan
-            $sedangDiperbaiki = KriteriaPenilaian::where('id_laporan', $laporanId);
+            $sedangDiperbaiki = KriteriaPenilaian::where('id_laporan', $laporanId)->exists();
             if ($sedangDiperbaiki) {
                 return response()->json([
                     'success' => false,
@@ -137,11 +137,19 @@ class LaporanKerusakanController extends Controller
             ]);
 
             // Simpan dukungan
-            PelaporLaporan::create([
-                'id_laporan' => $laporanId,
-                'id_user' => $userId,
-                'deskripsi_tambahan' => $request->tambahan_deskripsi,
-            ]);
+            if ($request->tambahan_deskripsi) {
+                PelaporLaporan::create([
+                    'id_laporan' => $laporanId,
+                    'id_user' => $userId,
+                    'deskripsi_tambahan' => $request->tambahan_deskripsi,
+                ]);
+            } else {
+                PelaporLaporan::create([
+                    'id_laporan' => $laporanId,
+                    'id_user' => $userId,
+                    'deskripsi_tambahan' => LaporanKerusakan::where('id_laporan', $laporanId)->value('deskripsi'),
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
@@ -643,16 +651,26 @@ class LaporanKerusakanController extends Controller
             'feedback_pengguna' => 'required|string|max:500',
         ]);
 
-        $laporan = PelaporLaporan::where('id_laporan', $id);
+        // Ambil id_user yang login
+        $userId = auth()->user()->id_user;
+
+        // Cari PelaporLaporan yang sesuai id_laporan dan id_user yang login
+        $laporan = PelaporLaporan::where('id_laporan', $id)
+            ->where('id_user', $userId)
+            ->first();
+
+        // Jika tidak ditemukan, gagal
         if (!$laporan) {
-            return response()->json(['success' => false, 'message' => 'Laporan tidak ditemukan.']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda belum pernah melaporkan atau mendukung laporan ini.',
+            ]);
         }
 
-        // $laporan->rating_pengguna = $request->rating_pengguna;
-        // $laporan->feedback_pengguna = $request->feedback_pengguna;
+        // Update rating dan feedback
         $laporan->update([
             'rating_pengguna' => $request->rating_pengguna,
-            'feedback_pengguna' => $request->feedback_pengguna
+            'feedback_pengguna' => $request->feedback_pengguna,
         ]);
 
         return response()->json([
