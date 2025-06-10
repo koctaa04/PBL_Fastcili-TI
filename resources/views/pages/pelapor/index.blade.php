@@ -21,7 +21,7 @@
                                 <div class="card-body p-4">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <h5 class="card-title mb-0 fw-bold ">Laporan Kerusakan Fasilitas</h5>
-                                        <span class="text-muted small">{{ $status->created_at->diffForHumans() }}</span>
+                                        <span class="text-muted small mt-2" style="text-align: right">{{ $status->created_at->diffForHumans() }}</span>
                                     </div>
 
                                     <div class="row g-3 mb-3">

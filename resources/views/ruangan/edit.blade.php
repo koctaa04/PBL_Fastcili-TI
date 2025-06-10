@@ -14,7 +14,7 @@
             <div class="modal-body p-4">
                 <div class="card border-0">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-door-open mr-2 text-primary"></i>Informasi Ruangan
                         </h6>
                     </div>
@@ -48,7 +48,7 @@
                             <small class="text-danger" id="error-kode_ruangan"></small>
                         </div>
                         
-                        <div class="form-group mb-0">
+                        <div class="form-group mb-3">
                             <label class="text-muted small mb-1">Nama Ruangan <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-prepend">

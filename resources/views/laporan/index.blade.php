@@ -89,6 +89,7 @@
                                         <div class="form-group">
                                             <label>Tambahkan deskripsi (opsional)</label>
                                             <textarea name="tambahan_deskripsi" class="form-control" rows="3"></textarea>
+                                            <label for="tambahan_deskripsi" class="text-muted small">*Kosongkan jika ingin deskripsi sama dengan deskripsi dari laporan yang didukung</label>
                                         </div>
                                     </div>
                                 </div>
@@ -256,31 +257,28 @@
             // Fungsi: Menampilkan form dukungan laporan
             function showFormDukungan() {
                 $('#id_fasilitas').prop('required', false).prop('disabled', true).closest('.form-group').hide();
-                $('textarea[name="deskripsi"]').prop('required', false).prop('disabled', true).closest(
-                    '.form-group').hide();
-                $('input[name="foto_kerusakan"]').prop('required', false).prop('disabled', true).closest(
-                    '.form-group').hide();
+                $('textarea[name="deskripsi"]').prop('required', false).prop('disabled', true).closest('.form-group').hide();
+                $('input[name="foto_kerusakan"]').prop('required', false).prop('disabled', true).closest('.form-group').hide();
+                $('input[name="jumlah_kerusakan"]').prop('required', false).prop('disabled', true).closest('.form-group').hide(); // <== ini penting!
             }
 
             // Fungsi: Menampilkan form laporan baru
             function showFormBaru() {
                 $('#id_fasilitas').prop('disabled', false).prop('required', true).closest('.form-group').show();
-                $('textarea[name="deskripsi"]').prop('disabled', false).prop('required', true).closest(
-                    '.form-group').show();
-                $('input[name="foto_kerusakan"]').prop('disabled', false).prop('required', true).closest(
-                    '.form-group').show();
+                $('textarea[name="deskripsi"]').prop('disabled', false).prop('required', true).closest('.form-group').show();
+                $('input[name="foto_kerusakan"]').prop('disabled', false).prop('required', true).closest('.form-group').show();
+                $('input[name="jumlah_kerusakan"]').prop('disabled', false).prop('required', true).closest('.form-group').show(); // <== ini penting!
             }
 
             // Event Submit Form
             $('form').on('submit', function(e) {
                 e.preventDefault();
 
-                $('#form-laporan-baru input, #form-laporan-baru select, #form-laporan-baru textarea').each(
-                    function() {
-                        if ($(this).is(':hidden')) {
-                            $(this).prop('disabled', true).prop('required', false);
-                        }
-                    });
+                $('#form-laporan-baru').find('input, select, textarea').each(function() {
+                    if (!$(this).is(':visible')) {
+                        $(this).prop('disabled', true).prop('required', false);
+                    }
+                });
 
                 const form = this;
                 const formData = new FormData(form);

@@ -45,7 +45,7 @@
                             'Belum Dikerjakan' => 'badge-secondary',
                             'Sedang Dikerjakan' => 'badge-warning',
                             'Selesai Dikerjakan' => 'badge-info',
-                            'Selesai' => 'badge-success',
+                            'Selesai Diperbaiki' => 'badge-success',
                             default => 'badge-secondary'
                         };
                     @endphp
@@ -95,7 +95,7 @@
                                                             class="btn btn-danger btn-sm btn-md-lg px-3 px-md-4 py-2">
                                                             <i class="fas fa-user-tie mr-1"></i> Tugaskan Teknisi
                                                         </button>
-                                                    @elseif($r['status'] == 'Selesai')
+                                                    @elseif($r['status'] == 'Selesai Diperbaiki')
                                                         <span class="btn btn-success btn-sm btn-md-lg px-3 px-md-4 py-2 disabled">
                                                             <i class="fas fa-check-circle mr-1"></i> Sudah Selesai
                                                         </span>
@@ -411,7 +411,7 @@
                                         <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
                                         <td class="text-center">{{ number_format($wsm, 4) }}</td>
                                         <td class="text-center">{{ number_format($wpm, 4) }}</td>
-                                        <td class="text-center font-weight-bold text-primary">{{ number_format($q, 4) }}</td>
+                                        <td class="text-center font-weight-bold text-danger">{{ number_format($q, 4) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -439,7 +439,7 @@
                                     <tr>
                                         <td class="text-center font-weight-bold">#{{ $r['rank'] }}</td>
                                         <td>{{ Str::limit($r['deskripsi'], 50) }}</td>
-                                        <td class="text-center font-weight-bold text-primary">{{ number_format($r['Q'], 4) }}</td>
+                                        <td class="text-center font-weight-bold text-danger">{{ number_format($r['Q'], 4) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

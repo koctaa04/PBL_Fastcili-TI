@@ -22,7 +22,7 @@
                                 <th scope="col">Status</th>
                                 <th scope="col">Catatan Teknisi</th>
                                 <th scope="col">Dokumentasi Perbaikan</th>
-                                @if (auth()->user()->id_level !== 2)
+                                @if (auth()->user()->id_level === 3)
                                     <th scope="col">Catatan Sarpras</th>
                                 @endif
                                 <th scope="col">Aksi</th>
@@ -32,7 +32,7 @@
                             @foreach ($laporan_kerusakan as $index => $laporan)
                                 <tr>
                                     <td></td>
-                                    @if (auth()->user()->id_level === 3)
+                                    @if (auth()->user()->id_level == 3)
                                         {{-- Foto Kerusakan --}}
                                         <td>
                                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
@@ -55,10 +55,15 @@
                                     
                                     <td>
                                         <span
+                                        @if ($laporan->laporan->id_status == 4)
+                                                class="badge badge-pill py-2 badge-danger">
+                                            {{ $laporan->laporan->status->nama_status }}
+                                        @else
                                             class="badge badge-pill py-2
                                                 {{ $laporan->status_perbaikan == 'Selesai Dikerjakan' ? 'badge-success' :
                                                    ($laporan->status_perbaikan == 'Ditolak' ? 'badge-danger' : 'badge-warning') }}">
                                             {{ $laporan->status_perbaikan }}
+                                        @endif
                                         </span>
                                     </td>
 
@@ -75,7 +80,7 @@
                                         @endif
                                     </td>
 
-                                    @if (auth()->user()->id_level !== 2)
+                                    @if (auth()->user()->id_level == 3)
                                         {{-- Catatan Sarpras --}}
                                         <td>{{ Str::limit($laporan->komentar_sarpras, 30) ?? '-' }}</td>
                                     @endif
@@ -92,7 +97,7 @@
                                                 $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
                                             @endphp
 
-                                            @if (auth()->user()->id_level != 1)
+                                            @if (auth()->user()->id_level == 3)
                                                 @if ($isEditable)
                                                     <button onclick="modalAction('{{ $laporanUrl }}')"
                                                         class="btn btn-sm btn-danger mr-2">
@@ -202,14 +207,14 @@
             };
 
             // Configuration for teknisi
-            if (user.id_level === 1) {
+            if (user.id_level === 3) {
                 var datalaporan = $('#table_perbaikan').DataTable({
                     ...commonConfig,
                     columnDefs: [{
-                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                         className: 'text-center',
                     }, {
-                        targets: [0, 1, 2, 5, 6, 7, 8],
+                        targets: [0, 1, 2, 5, 6, 7, 8, 9],
                         orderable: false,
                         searchable: true,
                     }, {

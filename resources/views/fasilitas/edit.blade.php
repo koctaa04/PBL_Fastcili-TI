@@ -14,7 +14,7 @@
             <div class="modal-body p-4">
                 <div class="card border-0 mb-4">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-map-marker-alt mr-2 text-primary"></i>Lokasi Fasilitas
                         </h6>
                         <span class="badge badge-info">
@@ -57,7 +57,7 @@
 
                 <div class="card border-0">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-tools mr-2 text-warning"></i>Detail Fasilitas
                         </h6>
                         <span class="badge badge-warning">
@@ -99,7 +99,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group mb-0">
+                                <div class="form-group mb-3">
                                     <label class="text-muted small mb-1">Jumlah <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
@@ -114,7 +114,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group mb-0">
+                                <div class="form-group mb-3">
                                     <label class="text-muted small mb-1">Status</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">

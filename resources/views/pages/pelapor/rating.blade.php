@@ -16,7 +16,7 @@
                 <!-- Informasi Laporan Section -->
                 <div class="card border-0 mb-4">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-info-circle mr-2 text-primary"></i>Informasi Perbaikan
                         </h6>
                     </div>
@@ -30,7 +30,7 @@
                                 </p>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="text-muted small mb-1">Selesai Diverifikasi</label>
+                                <label class="text-muted small mb-1">Selesai Diperbaiki</label>
                                 <p class="font-weight-bold">
                                     <i class="fas fa-calendar-alt mr-2 text-info"></i>
                                     {{ $laporan->laporan->tanggal_selesai->translatedFormat('l, d F Y') }}
@@ -48,7 +48,7 @@
                         <div class="mb-3">
                             <label class="text-muted small mb-1">Catatan Teknisi</label>
                             <div class="bg-light p-3 rounded">
-                                <p class="mb-0">{{ $laporan->laporan->penugasan->catatan_teknisi }}</p>
+                                <p class="mb-3">{{ $laporan->laporan->penugasan->catatan_teknisi }}</p>
                             </div>
                         </div>
                         @endif
@@ -58,7 +58,7 @@
                 <!-- Rating Section -->
                 <div class="card border-0">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-comment-alt mr-2 text-primary"></i>Penilaian Anda
                         </h6>
                     </div>
@@ -152,6 +152,28 @@
     textarea.form-control {
         min-height: 120px;
         resize: vertical;
+    }
+
+    @media (max-width: 576px) {
+        .rating-container {
+            padding: 0.75rem; /* Perkecil padding */
+        }
+        .rating > label {
+            font-size: 1.8rem; /* Perkecil ukuran bintang */
+            margin: 0 1px;     /* Perkecil jarak antar bintang */
+        }
+        .modal-dialog.modal-lg {
+            max-width: 95%; /* Supaya modal tidak terlalu besar di layar kecil */
+        }
+        .modal-body {
+            padding: 1rem; /* Perkecil padding modal */
+        }
+        textarea.form-control {
+            min-height: 100px; /* Perkecil tinggi textarea */
+        }
+        .rating-container.text-center {
+            text-align: center !important; /* Pastikan rata tengah tetap */
+        }
     }
 </style>
 
