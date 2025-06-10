@@ -167,8 +167,8 @@ Route::group(['middleware' => 'auth'], function () {
 	 *  ---------------------------- */
 	Route::prefix('perbaikan')->group(function () {
 		Route::get('/', [PerbaikanController::class, 'index'])->name('perbaikan_teknisi.index');
-		Route::get('/edit/{id}', [PerbaikanController::class, 'edit']);
-		Route::put('/update/{id}', [PerbaikanController::class, 'update']);
+		// Route::get('/edit/{id}', [PerbaikanController::class, 'edit']);
+		// Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 		Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 	});
 
@@ -190,7 +190,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/teknisi', [HomeController::class, 'teknisi'])->name('teknisi');
 		Route::get('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedback'])->name('teknisi.feedback');
 		Route::put('/feedback-teknisi/{id}', [PenugasanTeknisiController::class, 'feedbackTeknisi'])->name('teknisi.feedbacksimpan');
-		Route::get('/detail-riwayat/{id}', [PenugasanTeknisiController::class, 'detailRiwayat'])->name('teknisi.detailRiwayat');
+		// Route::get('/detail-riwayat/{id}', [PenugasanTeknisiController::class, 'detailRiwayat'])->name('teknisi.detailRiwayat');
 	});
 	/** -----------------------------
 	 *  Verifikasi laporan perbaikan dan Penugasan Teknisi

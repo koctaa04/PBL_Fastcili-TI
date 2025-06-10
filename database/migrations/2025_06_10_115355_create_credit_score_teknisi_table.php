@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('credit_score_teknisi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('id_user');
             $table->integer('credit_score')->default(100);
             $table->timestamps();
+
+            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
+
         });
     }
 
