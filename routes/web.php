@@ -199,6 +199,9 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
 	Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 	Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+	Route::get('/laporan/ganti-teknisi/{id}', [LaporanKerusakanController::class, 'formGantiTeknisi']);
+	Route::post('/ganti-teknisi', [LaporanKerusakanController::class, 'gantiTeknisi']);
+
 
 	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 	Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');

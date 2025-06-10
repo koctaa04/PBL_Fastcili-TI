@@ -190,15 +190,6 @@
                                                     : '-' }}
                                             </td>
                                             <td>
-
-                                                {{ $l->laporan->tanggal_selesai
-                                                    ? \Carbon\Carbon::parse($l->laporan->tanggal_selesai)->locale('id')->translatedFormat('l, d F Y')
-
-                                                {{ $l->laporan->tanggal_lapor
-                                                    ? $l->laporan->tanggal_lapor->translatedFormat('l, d F Y')
-                                                    : '-' }}
-                                            </td>
-                                            <td>
                                                 {{ $l->tanggal_selesai
                                                     ? $l->tanggal_selesai->translatedFormat('l, d F Y')
 
@@ -207,10 +198,9 @@
                                             <td>
                                                 <button
 
-                                                    onclick="modalAction('{{ route('teknisi.detailRiwayat', ['id' => $l->id_penugasan]) }}')"
+                                                    {{-- onclick="modalAction('{{ route('teknisi.detailRiwayat', ['id' => $l->id_penugasan]) }}')"
                                                     class="btn btn-info btn-sm btn-round">
-                                                    <i class="nc-icon nc-zoom-split"></i> Detail
-
+                                                    <i class="nc-icon nc-zoom-split"></i> Detail --}}
                                                     onclick="modalAction('{{ url('/perbaikan/detail/'. $l->id_penugasan) }}')"
                                                     class="btn btn-warning btn-sm me-2">
                                                     Detail

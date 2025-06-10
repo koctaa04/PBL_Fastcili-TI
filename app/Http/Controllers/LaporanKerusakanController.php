@@ -415,6 +415,35 @@ class LaporanKerusakanController extends Controller
         return view('laporan_prioritas.tugaskan_teknisi', compact('laporan', 'teknisi'));
     }
 
+    public function formGantiTeknisi($id)
+    {
+        $laporan = LaporanKerusakan::with('fasilitas')->findOrFail($id);
+        $teknisi = User::where('id_level', '3')->get();
+
+        return view('laporan_prioritas.ganti_teknisi', compact('laporan', 'teknisi'));
+    }
+    public function gantiTeknisi(Request $request)
+    {
+        $request->validate([
+            'id_penugasan' => 'required|exists:penugasan_teknisi,id_penugasan',
+            'id_laporan'   => 'required|exists:laporan_kerusakan,id_laporan',
+            'id_user'      => 'required|exists:users,id_user',
+            'tenggat'      => 'required|date|after_or_equal:today',
+        ]);
+
+        $penugasan = PenugasanTeknisi::findOrFail($request->id_penugasan);
+        $penugasan->id_user = $request->id_user;
+        $penugasan->tenggat = $request->tenggat;
+        $penugasan->updated_at = now();
+        $penugasan->save();
+
+        return response()->json([
+            'success' => true,
+            'messages' => 'Teknisi berhasil diganti.',
+        ]);
+    }
+
+
     public function verifikasiPerbaikan($id)
     {
         $laporan = LaporanKerusakan::with('penugasan.user')->findOrFail($id);
@@ -494,7 +523,7 @@ class LaporanKerusakanController extends Controller
 
     public function createPelapor()
     {
-         $laporan = PelaporLaporan::with([
+        $laporan = PelaporLaporan::with([
             'laporan.fasilitas.ruangan.gedung',
             'laporan.status',
             'user'
