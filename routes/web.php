@@ -218,4 +218,6 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 	Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // Optional: page to view all notifications
 	Route::get('/notifikasi/history', [NotificationController::class, 'history'])->name('notifications.history');
+	Route::delete('/notifications/{id}', [NotificationController::class, 'delete'])->name('notifications.delete');
+	Route::delete('/notifications', [NotificationController::class, 'deleteAll'])->name('notifications.deleteAll');
 });

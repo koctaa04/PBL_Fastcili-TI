@@ -36,8 +36,31 @@ class NotificationController extends Controller
 
     public function history()
     {
-        $notifications = Auth::user()->notifications()->latest()->get();
+        $notifications = Auth::user()->notifications()->paginate(10);
         return view('pages.notifikasi', compact('notifications'));
     }
+
+    public function delete($notificationId)
+    {
+        $user = Auth::user();
+        $notification = $user->notifications()->where('id', $notificationId)->first();
+
+        if ($notification) {
+            $notification->delete();
+            return response()->json(['success' => true, 'message' => 'Notification deleted.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Notification not found.'], 404);
+    }
+
+    public function deleteAll()
+    {
+        $user = Auth::user();
+        $user->notifications()->delete();
+    
+        return response()->json(['success' => true, 'message' => 'All notifications deleted.']);
+    }
+
+
 
 }
