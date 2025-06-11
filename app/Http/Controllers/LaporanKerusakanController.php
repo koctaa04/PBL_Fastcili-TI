@@ -15,6 +15,13 @@ use App\Models\KriteriaPenilaian;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Chart\{
+    Chart, DataSeries, DataSeriesValues, PlotArea, Legend, Title
+};
+use App\Http\Controllers\HomeController;
+use Carbon\Carbon;
 use Database\Seeders\pelaporLaporanSeeder;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\PelaporNotifikasi;
@@ -759,5 +766,167 @@ class LaporanKerusakanController extends Controller
         } else {
             return back();
         }
+    }
+
+    public function exportLaporan()
+    {
+        $now = Carbon::now();
+        $tahun = $now->year;
+        $bulan = $now->month;
+
+        $laporan = LaporanKerusakan::select(
+            'id_laporan',
+            'id_fasilitas',
+            'deskripsi',
+            'foto_kerusakan',
+            'tanggal_lapor',
+            'tanggal_selesai',
+            'id_status'
+        )
+        ->whereYear('tanggal_lapor', $tahun)
+        ->whereMonth('tanggal_lapor', $bulan)
+        ->orderBy('id_laporan')
+        ->with('fasilitas', 'status')
+        ->get();
+
+        // Load library excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $bulanTeks = $now->format('F_Y');
+
+        // Sheet 1
+        $sheet->setTitle('Data Laporan ' .$bulanTeks);
+        $sheet->setCellValue('A1', 'ID Laporan');
+        $sheet->setCellValue('B1', 'Fasilitas');
+        $sheet->setCellValue('C1', 'Deskripsi');
+        $sheet->setCellValue('D1', 'Foto Kerusakan');
+        $sheet->setCellValue('E1', 'Tanggal Lapor');
+        $sheet->setCellValue('F1', 'Tanggal Selesai');
+        $sheet->setCellValue('G1', 'Status');
+
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+
+        $baris = 2;
+        foreach ($laporan as $value) {
+            $sheet->setCellValue('A' . $baris, $value->id_laporan);
+            $sheet->setCellValue('B' . $baris, $value->fasilitas->nama_fasilitas);
+            $sheet->setCellValue('C' . $baris, $value->deskripsi);
+            $sheet->setCellValue('E' . $baris, $value->tanggal_lapor);
+            $sheet->setCellValue('F' . $baris, $value->tanggal_selesai ?? '-');
+            $sheet->setCellValue('G' . $baris, $value->status->nama_status);
+
+            // Tambahkan gambar ke kolom D
+            $fotoPath = public_path('storage/uploads/laporan_kerusakan/' . $value->foto_kerusakan);
+            if (file_exists($fotoPath)) {
+                $drawing = new Drawing();
+                $drawing->setPath($fotoPath);
+                $drawing->setCoordinates('D' . $baris);
+                $drawing->setHeight(30);
+                $drawing->setWorksheet($sheet);
+            } else {
+                $sheet->setCellValue('D' . $baris, 'Foto tidak ditemukan');
+            }
+
+            $sheet->getRowDimension($baris)->setRowHeight(30);
+            $baris++;
+        }
+
+        foreach (range('A', 'G') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $laporanPerGedung = (new HomeController)->getLaporanPerGedung();
+        $laporanPerBulan = (new HomeController)->getLaporanPerBulan($tahun);
+
+        //hiddenSheet Data Grafik
+        $sheetHidden = new Worksheet($spreadsheet, 'SheetDataHidden');
+        $spreadsheet->addSheet($sheetHidden);
+        $spreadsheet->setActiveSheetIndexByName('SheetDataHidden');
+
+        //data per gedung
+        $sheetHidden->setCellValue('A1', 'Gedung');
+        $sheetHidden->setCellValue('B1', 'Jumlah Laporan');
+        $rowGedung = 2;
+        foreach ($laporanPerGedung as $gedung => $jumlah) {
+            $sheetHidden->setCellValue("A$rowGedung", $gedung);
+            $sheetHidden->setCellValue("B$rowGedung", $jumlah);
+            $rowGedung++;
+        }
+        $endGedung = $rowGedung - 1;
+
+        //data per bulan
+        $sheetHidden->setCellValue('D1', 'Bulan');
+        $sheetHidden->setCellValue('E1', 'Jumlah Laporan');
+        $rowBulan = 2;
+        foreach ($laporanPerBulan as $bulan => $jumlah) {
+            $sheetHidden->setCellValue("D$rowBulan", $bulan);
+            $sheetHidden->setCellValue("E$rowBulan", $jumlah);
+            $rowBulan++;
+        }
+        $endBulan = $rowBulan - 1;
+
+        // Sembunyikan sheet data
+        $sheetHidden->setSheetState(Worksheet::SHEETSTATE_VERYHIDDEN);
+
+        //Sheet 2: Statistik Laporan
+        $sheet2 = new Worksheet($spreadsheet, 'Statistik Laporan');
+        $spreadsheet->addSheet($sheet2, 1);
+
+        // Grafik per Gedung
+        $seriesGedung = new DataSeries(
+            DataSeries::TYPE_BARCHART,
+            null,
+            [0],
+            [new DataSeriesValues('String', "'SheetDataHidden'!\$B\$1", null, 1)],
+            [new DataSeriesValues('String', "'SheetDataHidden'!\$A\$2:\$A\${$endGedung}", null, $endGedung - 1)],
+            [new DataSeriesValues('Number', "'SheetDataHidden'!\$B\$2:\$B\${$endGedung}", null, $endGedung - 1)]
+        );
+        $plotGedung = new PlotArea(null, [$seriesGedung]);
+        $chartGedung = new Chart(
+            'chart_gedung',
+            new Title('Jumlah Laporan per Gedung'),
+            new Legend(Legend::POSITION_RIGHT, null, false),
+            $plotGedung
+        );
+        $chartGedung->setTopLeftPosition('A1');
+        $chartGedung->setBottomRightPosition('P20');
+        $sheet2->addChart($chartGedung);
+
+        // Grafik per Bulan
+        $seriesBulan = new DataSeries(
+            DataSeries::TYPE_LINECHART,
+            null,
+            [0],
+            [new DataSeriesValues('String', "'SheetDataHidden'!\$E\$1", null, 1)],
+            [new DataSeriesValues('String', "'SheetDataHidden'!\$D\$2:\$D\${$endBulan}", null, $endBulan - 1)],
+            [new DataSeriesValues('Number', "'SheetDataHidden'!\$E\$2:\$E\${$endBulan}", null, $endBulan - 1)]
+        );
+        $plotBulan = new PlotArea(null, [$seriesBulan]);
+        $chartBulan = new Chart(
+            'chart_bulan',
+            new Title('Jumlah Laporan per Bulan'),
+            new Legend(Legend::POSITION_BOTTOM, null, false),
+            $plotBulan
+        );
+        $chartBulan->setTopLeftPosition('A22');
+        $chartBulan->setBottomRightPosition('P40');
+        $sheet2->addChart($chartBulan);
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->setIncludeCharts(true);
+        $filename = 'Data_Laporan_Kerusakan_' .$bulanTeks. '.xlsx';
+
+        // Header untuk download file
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
     }
 }
