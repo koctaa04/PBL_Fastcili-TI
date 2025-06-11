@@ -14,12 +14,6 @@
                         placeholder="Cari Laporan Prioritas...">
                     <small class="form-text text-muted text-small">Cari berdasarkan deskripsi laporan atau status</small>
                 </div>
-                <span class="badge badge-warning px-3 py-2">
-                    <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Nilai WASPAS
-                </span>
-                <button class="btn btn-success px-3 py-2" data-toggle="modal" data-target="#waspasModal">
-                    <i class="fas fa-calculator mr-1"></i> Lihat Perhitungan WASPAS
-                </button>
             </div>
             <div class="d-flex flex-wrap gap-2 w-100 w-md-auto justify-content-start justify-content-md-end">
                 <a style="cursor: pointer" data-toggle="modal" data-target="#waspasModal">
@@ -221,6 +215,7 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
 
                     <!-- Step 3: Normalization -->
                     <div class="step mb-4 mb-md-5">
@@ -236,43 +231,34 @@
                                     <p class="mb-0">Untuk kriteria cost: <code>X_ij = min(nilai_kriteria) / nilai_awal</code></p>
                                 </div>
                             </div>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover table-striped">
-                                    <thead class="bg-light-blue">
-                                        <tr>
-                                            <th class="text-center font-weight-bold">Laporan</th>
-                                            <th class="text-center font-weight-bold">Tingkat Kerusakan</th>
-                                            <th class="text-center font-weight-bold">Frekuensi</th>
-                                            <th class="text-center font-weight-bold">Dampak</th>
-                                            <th class="text-center font-weight-bold">Estimasi Biaya</th>
-                                            <th class="text-center font-weight-bold">Potensi Bahaya</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($ranked as $r)
-                                            <tr>
-                                                <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
-                                                <td class="text-center">
-                                                    {{ number_format($r['tingkat_kerusakan'] / max(array_column($ranked, 'tingkat_kerusakan')), 4) }}
-                                                </td>
-                                                <td class="text-center">
-                                                    {{ number_format($r['frekuensi_digunakan'] / max(array_column($ranked, 'frekuensi_digunakan')), 4) }}
-                                                </td>
-                                                <td class="text-center">
-                                                    {{ number_format($r['dampak'] / max(array_column($ranked, 'dampak')), 4) }}
-                                                </td>
-                                                <td class="text-center">
-                                                    {{ number_format(min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'], 4) }}
-                                                </td>
-                                                <td class="text-center">
-                                                    {{ number_format($r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya')), 4) }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
+                                    <tr>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">Tingkat Kerusakan</th>
+                                        <th class="text-center font-weight-bold">Frekuensi</th>
+                                        <th class="text-center font-weight-bold">Dampak</th>
+                                        <th class="text-center font-weight-bold">Estimasi Biaya</th>
+                                        <th class="text-center font-weight-bold">Potensi Bahaya</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($ranked as $r)
+                                    <tr>
+                                        <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
+                                        <td class="text-center">{{ number_format($r['tingkat_kerusakan'] / max(array_column($ranked, 'tingkat_kerusakan')), 4) }}</td>
+                                        <td class="text-center">{{ number_format($r['frekuensi_digunakan'] / max(array_column($ranked, 'frekuensi_digunakan')), 4) }}</td>
+                                        <td class="text-center">{{ number_format($r['dampak'] / max(array_column($ranked, 'dampak')), 4) }}</td>
+                                        <td class="text-center">{{ number_format(min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'], 4) }}</td>
+                                        <td class="text-center">{{ number_format($r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya')), 4) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
                     <!-- Step 4: WSM Calculation -->
                     <div class="step mb-4 mb-md-5">
@@ -287,29 +273,45 @@
                                     <p class="mb-0"><code>WSM = Σ(X_ij × bobot_kriteria)</code></p>
                                 </div>
                             </div>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover table-striped">
-                                    <thead class="bg-light-blue">
-                                        <tr>
-                                            <th class="text-center font-weight-bold">Laporan</th>
-                                            <th class="text-center font-weight-bold">Perhitungan WSM</th>
-                                            <th class="text-center font-weight-bold">Hasil WSM</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($ranked as $r)
-                                            @php
-                                                $normalizedTK =
-                                                    $r['tingkat_kerusakan'] /
-                                                    max(array_column($ranked, 'tingkat_kerusakan'));
-                                                $normalizedFD =
-                                                    $r['frekuensi_digunakan'] /
-                                                    max(array_column($ranked, 'frekuensi_digunakan'));
-                                                $normalizedD = $r['dampak'] / max(array_column($ranked, 'dampak'));
-                                                $normalizedEB =
-                                                    min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'];
-                                                $normalizedPB =
-                                                    $r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya'));
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
+                                    <tr>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">Perhitungan WSM</th>
+                                        <th class="text-center font-weight-bold">Hasil WSM</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($ranked as $r)
+                                    @php
+                                        $normalizedTK = $r['tingkat_kerusakan'] / max(array_column($ranked, 'tingkat_kerusakan'));
+                                        $normalizedFD = $r['frekuensi_digunakan'] / max(array_column($ranked, 'frekuensi_digunakan'));
+                                        $normalizedD = $r['dampak'] / max(array_column($ranked, 'dampak'));
+                                        $normalizedEB = min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'];
+                                        $normalizedPB = $r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya'));
+                                        
+                                        $wsm = ($normalizedTK * 0.3) + ($normalizedFD * 0.1) + 
+                                               ($normalizedD * 0.05) + ($normalizedEB * 0.35) + 
+                                               ($normalizedPB * 0.2);
+                                    @endphp
+                                    <tr>
+                                        <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
+                                        <td>
+                                            ({{ number_format($normalizedTK, 4) }}×0.3) + 
+                                            ({{ number_format($normalizedFD, 4) }}×0.1) + 
+                                            ({{ number_format($normalizedD, 4) }}×0.05) + 
+                                            ({{ number_format($normalizedEB, 4) }}×0.35) + 
+                                            ({{ number_format($normalizedPB, 4) }}×0.2)
+                                        </td>
+                                        <td class="text-center font-weight-bold">{{ number_format($wsm, 4) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
                     <!-- Step 5: WPM Calculation -->
                     <div class="step mb-4 mb-md-5">
@@ -324,29 +326,45 @@
                                     <p class="mb-0"><code>WPM = Π(X_ij ^ bobot_kriteria)</code></p>
                                 </div>
                             </div>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover table-striped">
-                                    <thead class="bg-light-blue">
-                                        <tr>
-                                            <th class="text-center font-weight-bold">Laporan</th>
-                                            <th class="text-center font-weight-bold">Perhitungan WPM</th>
-                                            <th class="text-center font-weight-bold">Hasil WPM</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($ranked as $r)
-                                            @php
-                                                $normalizedTK =
-                                                    $r['tingkat_kerusakan'] /
-                                                    max(array_column($ranked, 'tingkat_kerusakan'));
-                                                $normalizedFD =
-                                                    $r['frekuensi_digunakan'] /
-                                                    max(array_column($ranked, 'frekuensi_digunakan'));
-                                                $normalizedD = $r['dampak'] / max(array_column($ranked, 'dampak'));
-                                                $normalizedEB =
-                                                    min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'];
-                                                $normalizedPB =
-                                                    $r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya'));
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="bg-light-blue">
+                                    <tr>
+                                        <th class="text-center font-weight-bold">Laporan</th>
+                                        <th class="text-center font-weight-bold">Perhitungan WPM</th>
+                                        <th class="text-center font-weight-bold">Hasil WPM</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($ranked as $r)
+                                    @php
+                                        $normalizedTK = $r['tingkat_kerusakan'] / max(array_column($ranked, 'tingkat_kerusakan'));
+                                        $normalizedFD = $r['frekuensi_digunakan'] / max(array_column($ranked, 'frekuensi_digunakan'));
+                                        $normalizedD = $r['dampak'] / max(array_column($ranked, 'dampak'));
+                                        $normalizedEB = min(array_column($ranked, 'estimasi_biaya')) / $r['estimasi_biaya'];
+                                        $normalizedPB = $r['potensi_bahaya'] / max(array_column($ranked, 'potensi_bahaya'));
+                                        
+                                        $wpm = pow($normalizedTK, 0.3) * pow($normalizedFD, 0.1) * 
+                                               pow($normalizedD, 0.05) * pow($normalizedEB, 0.35) * 
+                                               pow($normalizedPB, 0.2);
+                                    @endphp
+                                    <tr>
+                                        <td>{{ Str::limit($r['deskripsi'], 30) }}</td>
+                                        <td>
+                                            ({{ number_format($normalizedTK, 4) }}<sup>0.3</sup>) × 
+                                            ({{ number_format($normalizedFD, 4) }}<sup>0.1</sup>) × 
+                                            ({{ number_format($normalizedD, 4) }}<sup>0.05</sup>) × 
+                                            ({{ number_format($normalizedEB, 4) }}<sup>0.35</sup>) × 
+                                            ({{ number_format($normalizedPB, 4) }}<sup>0.2</sup>)
+                                        </td>
+                                        <td class="text-center font-weight-bold">{{ number_format($wpm, 4) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
                     <!-- Step 6: WASPAS Calculation -->
                     <div class="step mb-4 mb-md-5">
@@ -429,18 +447,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
-                        <i class="fas fa-times mr-1"></i> Tutup
-                    </button>
-                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Tutup
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Existing Modal -->
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
-        aria-hidden="true"></div>
+<!-- Existing Modal -->
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false" 
+    aria-hidden="true"></div>
 @endsection
 
 @push('styles')
@@ -616,60 +635,60 @@
 @endpush
 
 @push('scripts')
-    <script>
-        function modalAction(url = '') {
-            $('#myModal').load(url, function() {
-                $('#myModal').modal('show');
-            });
-        }
+<script>
+    function modalAction(url = '') {
+        $('#myModal').load(url, function() {
+            $('#myModal').modal('show');
+        });
+    }
 
-        // Array of colors for cards
-        const cardColors = [
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae43 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae43e6 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae43cb 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae43b7 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae43a0 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae438a 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae436c 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae435d 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae4348 110%)',
-            'linear-gradient(105deg, #faf8f5 0%, #f6ae432f 110%)'
-        ];
+    // Array of colors for cards
+    const cardColors = [
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae43 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae43e6 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae43cb 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae43b7 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae43a0 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae438a 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae436c 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae435d 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae4348 110%)',
+        'linear-gradient(105deg, #faf8f5 0%, #f6ae432f 110%)'
+    ];
 
-        $(document).ready(function() {
-            // Apply different background to each card
-            $('.priority-card').each(function(index) {
-                // Use modulo to cycle through colors if there are more cards than colors
-                const colorIndex = index % cardColors.length;
-                $(this).css('background', cardColors[colorIndex]);
+    $(document).ready(function() {
+        // Apply different background to each card
+        $('.priority-card').each(function(index) {
+            // Use modulo to cycle through colors if there are more cards than colors
+            const colorIndex = index % cardColors.length;
+            $(this).css('background', cardColors[colorIndex]);
+            
+            // Add hover effect that darkens the card slightly
+            $(this).hover(
+                function() {
+                    $(this).css('background', 
+                        cardColors[colorIndex].replace('135deg', '145deg') + 
+                        ' !important');
+                },
+                function() {
+                    $(this).css('background', 
+                        cardColors[colorIndex] + ' !important');
+                }
+            );
+        });
 
-                // Add hover effect that darkens the card slightly
-                $(this).hover(
-                    function() {
-                        $(this).css('background',
-                            cardColors[colorIndex].replace('135deg', '145deg') +
-                            ' !important');
-                    },
-                    function() {
-                        $(this).css('background',
-                            cardColors[colorIndex] + ' !important');
-                    }
-                );
-            });
-
-            // Search functionality
-            $('#search').on('input', function() {
-                const searchTerm = $(this).val().toLowerCase();
-                $('.priority-card').each(function() {
-                    const cardText = $(this).text().toLowerCase();
-                    if (cardText.includes(searchTerm)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
+        // Search functionality
+        $('#search').on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $('.priority-card').each(function() {
+                const cardText = $(this).text().toLowerCase();
+                if (cardText.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
             });
         });
-    </script>
+    });
+</script>
 @endpush
