@@ -30,7 +30,14 @@ class NotificationController extends Controller
     // You might also want a method to view all notifications
     public function index()
     {
-        $notifications = Auth::user()->unreadNotifications; // Paginate for larger lists
+        $notifications = Auth::user()->unreadNotifications; 
         return view('layouts.navbars.navs.auth', compact('notifications'));
     }
+
+    public function history()
+    {
+        $notifications = Auth::user()->notifications()->latest()->get();
+        return view('pages.notifikasi', compact('notifications'));
+    }
+
 }
