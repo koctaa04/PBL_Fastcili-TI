@@ -150,6 +150,7 @@ Route::group(['middleware' => 'auth'], function () {
 			Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
 			Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
 			Route::post('/simpan-penilaian/{id}', [LaporanKerusakanController::class, 'simpanPenilaian'])->name('laporan.simpanPenilaian');
+			Route::get('/export_laporan', [LaporanKerusakanController::class, 'exportLaporan'])->name('laporan.exportLaporan');
 		});
 	});
 
