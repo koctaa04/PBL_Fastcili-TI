@@ -22,29 +22,27 @@
             <div class="card-body">
                 {{-- Search and Filtering --}}
                 <div class="row pr-auto">
-                    <div class="col-md-12">
-                        <div class="form-group row mb-3">
-                            <label class="col-2 control-label col-form-label">Cari Data Ruangan:</label>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="search" placeholder="Cari ruangan...">
-                                <small class="form-text text-muted">Masukkan nama ruangan</small>
-                            </div>
+                    <div class="col-12">
+
+                        {{-- Search --}}
+                        <div class="form-group mb-4">
+                            <label class="form-label font-weight-bold">Cari Data Ruangan:</label>
+                            <input type="text" class="form-control mb-2" id="search" placeholder="Cari ruangan...">
                         </div>
-                        <div class="form-group row mb-5">
-                            <label class="col-2 control-label col-form-label">Filter:</label>
-                            <div class="col-5">
-                                <select class="form-control" id="id_gedung" name="id_gedung" required>
-                                    <option value="">- Semua Gedung -</option>
-                                    @foreach ($gedung as $item)
-                                        <option value="{{ $item->id_gedung }}"
-                                            {{ request('id_gedung') == $item->id_gedung ? 'selected' : '' }}>
-                                            {{ $item->nama_gedung }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <small class="form-text text-muted">Gedung</small>
-                            </div>
+
+                        {{-- Filter Gedung --}}
+                        <div class="form-group mb-4">
+                            <label class="form-label font-weight-bold">Filter Gedung:</label>
+                            <select class="form-control mb-2" id="id_gedung" name="id_gedung" required>
+                                <option value="">- Semua Gedung -</option>
+                                @foreach ($gedung as $item)
+                                    <option value="{{ $item->id_gedung }}" {{ request('id_gedung') == $item->id_gedung ? 'selected' : '' }}>
+                                        {{ $item->nama_gedung }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
+
                     </div>
                 </div>
 
@@ -71,6 +69,25 @@
 
 @push('styles')
     <style>
+        /* Responsive form-group for search & filter */
+        @media (min-width: 768px) {
+            .form-group {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .form-group > label {
+                flex: 0 0 200px;
+                margin-bottom: 0;
+            }
+
+            .form-group > .form-control,
+            .form-group > select {
+                flex: 1;
+            }
+        }
+
         /* Container untuk buttons */
         .card-tools {
             display: flex;

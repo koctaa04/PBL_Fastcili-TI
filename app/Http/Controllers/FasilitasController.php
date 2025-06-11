@@ -80,9 +80,6 @@ class FasilitasController extends Controller
         ]);
     }
 
-
-
-
     public function getRuangan($id)
     {
         $ruangan = Ruangan::where('id_gedung', $id)->get();
@@ -91,13 +88,16 @@ class FasilitasController extends Controller
 
     public function create()
     {
-        $ruangan = Ruangan::all();
-        $gedung = Gedung::all();
-        return view('fasilitas.create', compact('ruangan', 'gedung'));
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $ruangan = Ruangan::all();
+            $gedung = Gedung::all();
+            return view('fasilitas.create', compact('ruangan', 'gedung'));
+        } else {
+            return back();
+        }
     }
 
     public function store(Request $request)
-
     {
         $rules = [
             'id_ruangan' => 'required|exists:ruangan,id_ruangan',
@@ -119,19 +119,6 @@ class FasilitasController extends Controller
             ], 422);
         }
 
-
-        // Cek apakah fasilitas dengan nama dan ruangan yang sama sudah ada
-        // $fasilitas = Fasilitas::where('id_ruangan', $request->id_ruangan)
-        //     ->where('nama_fasilitas', $request->nama_fasilitas)
-        //     ->where('kode_fasilitas', $request->kode_fasilitas)
-        //     ->first();
-
-        // if ($fasilitas) {
-        //     // Jika ada, update jumlah saja
-        //     $fasilitas->jumlah += $request->jumlah;
-        //     $fasilitas->save();
-        // } else {
-        // Jika tidak ada, buat data baru
         Fasilitas::create([
             'id_ruangan' => $request->id_ruangan,
             'nama_fasilitas' => $request->nama_fasilitas,
@@ -139,7 +126,6 @@ class FasilitasController extends Controller
             'kode_fasilitas' => $request->kode_fasilitas,
             'created_at' => now()
         ]);
-        // }
 
         return response()->json([
             'success' => true,
@@ -149,8 +135,12 @@ class FasilitasController extends Controller
 
     public function edit(string $id)
     {
-        $fasilitas = Fasilitas::find($id);
-        return view('fasilitas.edit', compact('fasilitas'));
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $fasilitas = Fasilitas::find($id);
+            return view('fasilitas.edit', compact('fasilitas'));
+        } else {
+            return back();
+        }
     }
 
     public function update(Request $request, $id)
@@ -193,27 +183,35 @@ class FasilitasController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $data = Fasilitas::find($id);
-
-        if ($data) {
-            $data->delete($request->all());
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menghapus data!'
-            ]);
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $data = Fasilitas::find($id);
+    
+            if ($data) {
+                $data->delete($request->all());
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Berhasil menghapus data!'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan!'
+                ]);
+            }
+    
+            redirect('/');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan!'
-            ]);
+            return back();
         }
-
-        redirect('/');
     }
 
     public function import()
     {
-        return view('fasilitas.import');
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            return view('fasilitas.import');
+        } else {
+            return back();
+        }
     }
 
     public function import_ajax(Request $request)

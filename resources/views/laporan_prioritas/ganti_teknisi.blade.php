@@ -1,12 +1,13 @@
 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content border-0 shadow-lg">
-        <form id="form_penugasan" method="POST" action="{{ url('/penugasan-teknisi') }}">
+        <form id="form_ganti_teknisi" method="POST" action="{{ url('/ganti-teknisi') }}">
             @csrf
             <input type="hidden" name="id_laporan" value="{{ $laporan->id_laporan }}">
+            <input type="hidden" name="id_penugasan" value="{{ $laporan->penugasan->id_penugasan }}">
 
             <div class="modal-header bg-gradient-primary text-white">
                 <h5 class="modal-title font-weight-bold">
-                    <i class="fas fa-user-cog mr-2"></i>Penugasan Teknisi
+                    <i class="fas fa-user-cog mr-2"></i>Ganti Teknisi
                 </h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -19,7 +20,7 @@
                     <div class="col-md-6">
                         <div class="card border-0 mb-4">
                             <div class="card-header bg-light">
-                                <h6 class="mb-3 font-weight-bold">Form Penugasan</h6>
+                                <h6 class="mb-0 font-weight-bold">Form Penugasan</h6>
                             </div>
                             <div class="card-body">
                                 <div class="form-group">
@@ -45,13 +46,13 @@
                     <div class="col-md-6">
                         <div class="card border-0 h-100">
                             <div class="card-header bg-light">
-                                <h6 class="mb-3 font-weight-bold">Detail Laporan</h6>
+                                <h6 class="mb-0 font-weight-bold">Detail Laporan</h6>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label class="text-muted small mb-1">Deskripsi</label>
                                     <div class="bg-light p-3 rounded">
-                                        <p class="mb-3">{{ $laporan->deskripsi }}</p>
+                                        <p class="mb-0">{{ $laporan->deskripsi }}</p>
                                     </div>
                                 </div>
 
@@ -102,7 +103,7 @@
 </div>
 
 <script>
-    $(document).on('submit', '#form_penugasan', function(e) {
+    $(document).on('submit', '#form_ganti_teknisi', function(e) {
         e.preventDefault();
 
         $('.error-text').text('');
@@ -116,11 +117,11 @@
             processData: false,
             dataType: "json",
             beforeSend: function() {
-                $('#form_penugasan button[type=submit]').prop('disabled', true).text(
-                'Menyimpan...');
+                $('#form_ganti_teknisi button[type=submit]').prop('disabled', true).text(
+                    'Menyimpan...');
             },
             success: function(response) {
-                $('#form_penugasan button[type=submit]').prop('disabled', false).text('Okay');
+                $('#form_ganti_teknisi button[type=submit]').prop('disabled', false).text('Okay');
                 if (response.success) {
                     $('#myModal').modal('hide');
                     Swal.fire({
@@ -135,7 +136,7 @@
                 }
             },
             error: function(xhr) {
-                $('#form_penugasan button[type=submit]').prop('disabled', false).text('Okay');
+                $('#form_ganti_teknisi button[type=submit]').prop('disabled', false).text('Okay');
                 if (xhr.responseJSON && xhr.responseJSON.errors) {
                     let errors = xhr.responseJSON.errors;
                     $.each(errors, function(field, messages) {

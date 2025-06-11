@@ -104,57 +104,53 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Top 5 Prioritas Perbaikan</h5>
-                        <p class="card-category">Berdasarkan hasil perhitungan SPK</p>
+                        <p class="card-category">Berdasarkan hasil perhitungan SPK Metode WASPAS</p>
                     </div>
                     <div class="card-body">
-                        <table class="table table-striped table-hover table-row-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>ID Laporan</th>
-                                    <th>Deskripsi</th>
-                                    <th>Status</th>
-                                    <th>Nilai SPK</th>
-                                    <th>Teknisi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse (collect($spkRank)->take(5) as $item)
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-row-bordered" id="table_admin">
+                                <thead>
                                     <tr>
-                                        <td>{{ $item['rank'] ?? '-' }}</td>
-                                        <td>{{ $item['id_laporan'] ?? '-' }}</td>
-                                        <td>{{ $item['deskripsi'] ?? 'Tidak ada deskripsi' }}</td>
-                                        <td>
-                                            @php
-                                                $status = $item['status'] ?? 'Tidak diketahui';
-
-                                                $statusColor = match ($status) {
-                                                    'Diproses' => 'bg-primary text-white',
-                                                    'Diperbaiki' => 'bg-secondary text-white',
-                                                    default => 'bg-primary text-white',
-                                                };
-                                            @endphp
-                                            <span class="badge p-2 {{ $statusColor }}">
-                                                {{ $status }}
-                                            </span>
-                                        </td>
-
-                                        <td>{{ isset($item['Q']) ? number_format($item['Q'], 4) : '890' }}</td>
-                                        <td>
-                                            {{-- {{ laporan->penugasan->user->nama }} --}}
-                                            {{ $item['penugasan']['nama_teknisi'] ?? 'Belum Ditugaskan' }}
-                                        </td>
+                                        <th>Rank</th>
+                                        <th>Fasilitas</th>
+                                        <th>Lokasi</th>
+                                        <th>Deskripsi</th>
+                                        <th>Status</th>
+                                        <th>Nilai</th>
+                                        <th>Teknisi</th>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted">
-                                            <i class="fas fa-info-circle"></i> Tidak ada data prioritas perbaikan yang
-                                            tersedia
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (collect($spkRank)->take(5) as $item)
+                                        <tr>
+                                            <td>{{ $item['rank'] ?? '-' }}</td>
+                                            <td>{{ $item['fasilitas'] ?? '-' }}</td>
+                                            <td>{{ $item['ruangan'] ?? '-' }} - {{ $item['gedung'] ?? '-' }}</td>
+                                            <td>{{ $item['deskripsi'] ?? 'Tidak ada deskripsi' }}</td>
+                                            <td>
+                                                @php
+                                                    $status = $item['status'] ?? 'Tidak diketahui';
+
+                                                    $statusColor = match ($status) {
+                                                        'Diproses' => 'bg-primary text-white',
+                                                        'Diperbaiki' => 'bg-secondary text-white',
+                                                        default => 'bg-primary text-white',
+                                                    };
+                                                @endphp
+                                                <span class="badge p-2 {{ $statusColor }}">
+                                                    {{ $status }}
+                                                </span>
+                                            </td>
+
+                                            <td>{{ isset($item['Q']) ? number_format($item['Q'], 4) : '890' }}</td>
+                                            <td>
+                                                {{ $item['teknisi'] ?? 'Belum Ditugaskan' }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,6 +191,26 @@
             });
         }
         $(document).ready(function() {
+            $('#table_admin').DataTable({
+                columnDefs: [{
+                    targets: [0, 1, 2, 3, 4, 5, 6],
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: false,
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas seperti keyword yang ingin dicari"
+                },
+                rowCallback: function(row, data, index) {
+                    // Ganti isi kolom "No" (kolom ke-0)
+                    var info = this.api().page.info();
+                    var page = info.page;
+                    var length = info.length;
+                    $('td:eq(0)', row).html(index + 1 + page * length);
+                }
+            });
+
             //grafik laporan per bulan
             const ctx1 = document.getElementById('laporanPerBulan').getContext('2d');
             new Chart(ctx1, {

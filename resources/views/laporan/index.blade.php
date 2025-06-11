@@ -6,104 +6,107 @@
 @section('content')
     <div class="content">
         <h3>Laporan Kerusakan</h3>
-        <div class="card p-4">
-            <div class="card-header">
-                <h3 class="mb-0">Form Laporan Kerusakan</h3>
-                <div class="card-body">
-                    <form action="{{ route('laporan.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row">
-                            <!-- Kiri: Pilih Gedung & Ruangan -->
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="id_gedung">Pilih Gedung</label>
-                                    <select name="id_gedung" id="id_gedung" class="form-control" required>
-                                        <option value="">-- Pilih Gedung --</option>
-                                        @foreach ($gedung as $g)
-                                            <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group" id="ruangan-group" style="display: none;">
-                                    <label for="id_ruangan">Pilih Ruangan</label>
-                                    <select name="id_ruangan" id="id_ruangan" class="form-control" required>
-                                        <option value="">-- Pilih Ruangan --</option>
-                                    </select>
-                                </div>
-
-                                <!-- Form Laporan Baru (muncul saat klik 'Bukan salah satu') -->
-                                <div id="form-laporan-baru" style="display: none;" class="mt-4">
+        @if (auth()->user()->id_level != 2)
+            <div class="card p-4">
+                <div class="card-header">
+                    <h3 class="mb-0">Form Laporan Kerusakan</h3>
+                    <div class="card-body">
+                        <form action="{{ route('laporan.store') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row">
+                                <!-- Kiri: Pilih Gedung & Ruangan -->
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="id_fasilitas">Fasilitas</label>
-                                        <select name="id_fasilitas" id="id_fasilitas" class="form-control"
-                                            required></select>
+                                        <label for="id_gedung">Pilih Gedung</label>
+                                        <select name="id_gedung" id="id_gedung" class="form-control" required>
+                                            <option value="">-- Pilih Gedung --</option>
+                                            @foreach ($gedung as $g)
+                                                <option value="{{ $g->id_gedung }}">{{ $g->nama_gedung }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika
-                                            diperlukan)</label>
-                                        <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="jumlah_kerusakan">Jumlah fasilitas yang rusak</label>
-                                        <input type="number" name="jumlah_kerusakan" class="form-control" required>
-                                        <small class="text-muted d-block mt-1">*Jumlah fasiltas yang rusak tidak bisa lebih
-                                            dari jumlah fasilitas</small>
+                                    <div class="form-group" id="ruangan-group" style="display: none;">
+                                        <label for="id_ruangan">Pilih Ruangan</label>
+                                        <select name="id_ruangan" id="id_ruangan" class="form-control" required>
+                                            <option value="">-- Pilih Ruangan --</option>
+                                        </select>
                                     </div>
 
-                                    <div class="form-group">
-                                        <!-- Custom File Input -->
-                                        <label for="foto_kerusakan" class="d-block mb-2">Foto Kerusakan</label>
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="foto_kerusakan"
-                                                id="foto_kerusakan" accept="image/*" required>
-                                            <label class="custom-file-label bg-warning text-dark text-center w-100"
-                                                for="foto_kerusakan" id="file-label">
-                                                <i class="fas fa-upload mr-2"></i>Pilih foto kerusakan
-                                            </label>
+                                    <!-- Form Laporan Baru (muncul saat klik 'Bukan salah satu') -->
+                                    <div id="form-laporan-baru" style="display: none;" class="mt-4">
+                                        <div class="form-group">
+                                            <label for="id_fasilitas">Fasilitas</label>
+                                            <select name="id_fasilitas" id="id_fasilitas" class="form-control"
+                                                required></select>
                                         </div>
-                                        <small class="text-muted d-block mt-1">Format: JPG, PNG, JPEG (Maks. 2MB)</small>
-                                        <small class="text-danger" id="error-foto_kerusakan"></small>
+
+                                        <div class="form-group">
+                                            <label for="deskripsi">Deskripsi (*Tambahkan lokasi spesifik jika
+                                                diperlukan)</label>
+                                            <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="jumlah_kerusakan">Jumlah fasilitas yang rusak</label>
+                                            <input type="number" name="jumlah_kerusakan" class="form-control" required>
+                                            <small class="text-muted d-block mt-1">*Jumlah fasiltas yang rusak tidak bisa lebih
+                                                dari jumlah fasilitas</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <!-- Custom File Input -->
+                                            <label for="foto_kerusakan" class="d-block mb-2">Foto Kerusakan</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="foto_kerusakan"
+                                                    id="foto_kerusakan" accept="image/*" required>
+                                                <label class="custom-file-label bg-warning text-dark text-center w-100"
+                                                    for="foto_kerusakan" id="file-label">
+                                                    <i class="fas fa-upload mr-2"></i>Pilih foto kerusakan
+                                                </label>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">Format: JPG, PNG, JPEG (Maks. 2MB)</small>
+                                            <small class="text-danger" id="error-foto_kerusakan"></small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Kanan: Card Laporan Sudah Ada -->
+                                <div class="col-md-8">
+                                    <div id="laporan-terlapor-container" style="display: none;" class="mt-2">
+                                        <label>Laporan yang Sudah Ada:</label>
+                                        <div class="mb-3">
+                                            <button type="button" id="bukan-laporan" class="btn btn-warning">
+                                                Bukan salah satu laporan di bawah?
+                                            </button>
+                                        </div>
+                                        <div id="laporan-terlapor-list" class="row"></div>
+
+                                    </div>
+
+                                    <!-- Jika memilih dukung laporan -->
+                                    <div id="form-dukungan" style="display: none;" class="mt-4">
+                                        <input type="hidden" name="dukungan_laporan" id="dukungan_laporan">
+                                        <div class="form-group">
+                                            <label>Tambahkan deskripsi (opsional)</label>
+                                            <textarea name="tambahan_deskripsi" class="form-control" rows="3"></textarea>
+                                            <label for="tambahan_deskripsi" class="text-muted small">*Kosongkan jika ingin deskripsi sama dengan deskripsi dari laporan yang didukung</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Kanan: Card Laporan Sudah Ada -->
-                            <div class="col-md-8">
-                                <div id="laporan-terlapor-container" style="display: none;" class="mt-2">
-                                    <label>Laporan yang Sudah Ada:</label>
-                                    <div class="mb-3">
-                                        <button type="button" id="bukan-laporan" class="btn btn-warning">
-                                            Bukan salah satu laporan di bawah?
-                                        </button>
-                                    </div>
-                                    <div id="laporan-terlapor-list" class="row"></div>
-
-                                </div>
-
-                                <!-- Jika memilih dukung laporan -->
-                                <div id="form-dukungan" style="display: none;" class="mt-4">
-                                    <input type="hidden" name="dukungan_laporan" id="dukungan_laporan">
-                                    <div class="form-group">
-                                        <label>Tambahkan deskripsi (opsional)</label>
-                                        <textarea name="tambahan_deskripsi" class="form-control" rows="3"></textarea>
-                                    </div>
+                            <!-- Tombol Submit -->
+                            <div class="row mt-4">
+                                <div class="col-md-12 text-end">
+                                    <button type="submit" id="btn-submit" class="btn btn-success" disabled>Kirim
+                                        Laporan</button>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Tombol Submit -->
-                        <div class="row mt-4">
-                            <div class="col-md-12 text-end">
-                                <button type="submit" id="btn-submit" class="btn btn-success" disabled>Kirim
-                                    Laporan</button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
         @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
             <div class="card p-4">
                 <div class="card-header">
@@ -179,7 +182,7 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle table-striped table-bordered" id="table_level">
+                        <table class="table table-hover align-middle table-striped table-bordered" id="table_pelapor">
                             <thead class="table-light">
                                 <tr>
                                     <th scope="col" class="text-center">#</th>
@@ -193,7 +196,7 @@
                             <tbody>
                                 @foreach ($laporanAuth as $lapor => $l)
                                     <tr>
-                                        <th scope="row" class="text-center">{{ $lapor + 1 }}</th>
+                                        <td></td>
                                         <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
                                         <td>{{ $l->deskripsi_tambahan }}</td>
                                         <td>{{ $l->created_at->translatedFormat('l, d F Y') }}</td>
@@ -202,7 +205,7 @@
                                                 $statusColor = match ($l->laporan->id_status) {
                                                     1 => 'bg-secondary text-white',
                                                     2 => 'bg-info text-white',
-                                                    3 => 'bg-warning text-white',
+                                                    3 => 'bg-danger text-white',
                                                     4 => 'bg-success text-white',
                                                     default => 'bg-dark',
                                                 };
@@ -254,31 +257,28 @@
             // Fungsi: Menampilkan form dukungan laporan
             function showFormDukungan() {
                 $('#id_fasilitas').prop('required', false).prop('disabled', true).closest('.form-group').hide();
-                $('textarea[name="deskripsi"]').prop('required', false).prop('disabled', true).closest(
-                    '.form-group').hide();
-                $('input[name="foto_kerusakan"]').prop('required', false).prop('disabled', true).closest(
-                    '.form-group').hide();
+                $('textarea[name="deskripsi"]').prop('required', false).prop('disabled', true).closest('.form-group').hide();
+                $('input[name="foto_kerusakan"]').prop('required', false).prop('disabled', true).closest('.form-group').hide();
+                $('input[name="jumlah_kerusakan"]').prop('required', false).prop('disabled', true).closest('.form-group').hide(); // <== ini penting!
             }
 
             // Fungsi: Menampilkan form laporan baru
             function showFormBaru() {
                 $('#id_fasilitas').prop('disabled', false).prop('required', true).closest('.form-group').show();
-                $('textarea[name="deskripsi"]').prop('disabled', false).prop('required', true).closest(
-                    '.form-group').show();
-                $('input[name="foto_kerusakan"]').prop('disabled', false).prop('required', true).closest(
-                    '.form-group').show();
+                $('textarea[name="deskripsi"]').prop('disabled', false).prop('required', true).closest('.form-group').show();
+                $('input[name="foto_kerusakan"]').prop('disabled', false).prop('required', true).closest('.form-group').show();
+                $('input[name="jumlah_kerusakan"]').prop('disabled', false).prop('required', true).closest('.form-group').show(); // <== ini penting!
             }
 
             // Event Submit Form
             $('form').on('submit', function(e) {
                 e.preventDefault();
 
-                $('#form-laporan-baru input, #form-laporan-baru select, #form-laporan-baru textarea').each(
-                    function() {
-                        if ($(this).is(':hidden')) {
-                            $(this).prop('disabled', true).prop('required', false);
-                        }
-                    });
+                $('#form-laporan-baru').find('input, select, textarea').each(function() {
+                    if (!$(this).is(':visible')) {
+                        $(this).prop('disabled', true).prop('required', false);
+                    }
+                });
 
                 const form = this;
                 const formData = new FormData(form);
@@ -457,6 +457,30 @@
                 language: {
                     emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan yang tersedia",
                     zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data laporan kerusakan seperti keyword yang ingin dicari"
+                },
+                rowCallback: function(row, data, index) {
+                    // Ganti isi kolom "No" (kolom ke-0)
+                    var info = this.api().page.info();
+                    var page = info.page;
+                    var length = info.length;
+                    $('td:eq(0)', row).html(index + 1 + page * length);
+                }
+            });
+            $('#table_pelapor').DataTable({
+                columnDefs: [{
+                    targets: [0, 1, 2, 5],
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: true,
+                }, {
+                    targets: [3, 4],
+                    className: 'text-center',
+                    orderable: true,
+                    searchable: true,
+                }],
+                language: {
+                    emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas yang tersedia",
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data prioritas seperti keyword yang ingin dicari"
                 },
                 rowCallback: function(row, data, index) {
                     // Ganti isi kolom "No" (kolom ke-0)

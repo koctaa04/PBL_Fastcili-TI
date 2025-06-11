@@ -21,7 +21,7 @@
             <!-- Informasi Laporan Card -->
             <div class="card border-0">
                 <div class="card-header bg-light">
-                    <h6 class="mb-0 font-weight-bold">
+                    <h6 class="mb-3 font-weight-bold">
                         <i class="fas fa-info-circle mr-2 text-primary"></i>Detail Laporan
                     </h6>
                 </div>
@@ -48,7 +48,7 @@
                                     <th class="text-right text-muted">Deskripsi:</th>
                                     <td>
                                         <div class="bg-light p-3 rounded">
-                                            <p class="mb-0">{{ $laporan->deskripsi_tambahan }}</p>
+                                            <p class="mb-3">{{ $laporan->deskripsi_tambahan }}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -76,7 +76,7 @@
                                         </span>
                                     </td>
                                 </tr>
-                                @if ($laporan->laporan->status->nama_status == 'Selesai')
+                                @if ($laporan->laporan->status->nama_status == 'Selesai Diperbaiki')
                                     <tr>
                                         <th class="text-right text-muted">Tanggal Selesai:</th>
                                         <td>
@@ -102,7 +102,9 @@
                                 <tr>
                                     <th class="text-right text-muted">Rating:</th>
                                     <td class="text-danger">
-                                        @if ($laporan->rating_pengguna)
+                                        @if ($laporan->laporan->status->nama_status != 'Selesai Diperbaiki')
+                                            Laporan belum selesai sehingga tidak bisa di-rating
+                                        @elseif ($laporan->laporan->status->nama_status == 'Selesai Diperbaiki' && $laporan->rating_pengguna)
                                             @for ($i = 0; $i < $laporan->rating_pengguna; $i++)
                                                 <span style="color: gold; font-size: 1.2rem;">&#9733;</span>
                                             @endfor
@@ -115,9 +117,11 @@
                                 <tr>
                                     <th class="text-right text-muted">Ulasan:</th>
                                     <td class="text-danger">
-                                        @if ($laporan->feedback_pengguna)
+                                        @if ($laporan->laporan->status->nama_status != 'Selesai Diperbaiki')
+                                            Laporan belum selesai sehingga tidak bisa diulas
+                                        @elseif ($laporan->laporan->status->nama_status == 'Selesai Diperbaiki' && $laporan->feedback_pengguna)
                                             <div class="bg-light p-3 rounded">
-                                                <p class="mb-0">{{ $laporan->feedback_pengguna }}</p>
+                                                <p class="mb-3">{{ $laporan->feedback_pengguna }}</p>
                                             </div>
                                         @else
                                             Belum diulas

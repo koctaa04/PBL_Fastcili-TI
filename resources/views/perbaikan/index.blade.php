@@ -12,8 +12,8 @@
                     <table class="table table-striped table-hover table-row-bordered" id="table_perbaikan">
                         <thead>
                             <tr>
-                                <th scope="col">No</th>
-                                @if (auth()->user()->id_level != 1)
+                                <th>No</th>
+                                @if (auth()->user()->id_level === 3)
                                     <th scope="col">Foto Kerusakan</th>
                                 @endif
                                 <th scope="col">Deskripsi</th>
@@ -22,18 +22,21 @@
                                 <th scope="col">Status</th>
                                 <th scope="col">Catatan Teknisi</th>
                                 <th scope="col">Dokumentasi Perbaikan</th>
-                                <th scope="col">Catatan Sarpras</th>
+                                @if (auth()->user()->id_level === 3)
+                                    <th scope="col">Catatan Sarpras</th>
+                                @endif
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($laporan_kerusakan as $index => $laporan)
                                 <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
-                                    @if (auth()->user()->id_level != 1)
+                                    <td></td>
+                                    @if (auth()->user()->id_level == 3)
                                         {{-- Foto Kerusakan --}}
                                         <td>
                                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                                 alt="Foto Kerusakan" height="65"
                                                 onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
                                         </td>
@@ -46,17 +49,20 @@
 
                                     {{-- Tenggat Laporan --}}
                                     <td>
-                                        {{ $laporan->tenggat
-                                            ? $laporan->tenggat->translatedFormat('l, d F Y')
-                                            : '-' }}
+                                        {{ $laporan->tenggat ? $laporan->tenggat->translatedFormat('l, d F Y') : '-' }}
                                     </td>
-                                    
+
                                     <td>
                                         <span
-                                            class="badge badge-pill
+                                        @if ($laporan->laporan->id_status == 4)
+                                                class="badge badge-pill py-2 badge-danger">
+                                            {{ $laporan->laporan->status->nama_status }}
+                                        @else
+                                            class="badge badge-pill py-2
                                                 {{ $laporan->status_perbaikan == 'Selesai Dikerjakan' ? 'badge-success' :
                                                    ($laporan->status_perbaikan == 'Ditolak' ? 'badge-danger' : 'badge-warning') }}">
                                             {{ $laporan->status_perbaikan }}
+                                        @endif
                                         </span>
                                     </td>
 
@@ -67,19 +73,23 @@
                                     <td>
                                         @if ($laporan->dokumentasi)
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
-                                                alt="Dokumentasi" height="65">
+                                            onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"    
+                                            alt="Dokumentasi" height="65">
                                         @else
                                             <span class="text-danger">(Belum ada dokumentasi)</span>
                                         @endif
                                     </td>
 
-                                    {{-- Catatan Teknisi --}}
-                                    <td>{{ Str::limit($laporan->komentar_sarpras, 30) ?? '-' }}</td>
-
+                                    @if (auth()->user()->id_level == 3)
+                                        {{-- Catatan Sarpras --}}
+                                        <td>{{ Str::limit($laporan->komentar_sarpras, 30) ?? '-' }}</td>
+                                    @endif
+                                    
                                     {{-- Tombol Aksi --}}
                                     <td>
                                         <div class="d-flex">
                                             @php
+                                                $isLate = \Carbon\Carbon::now()->greaterThan($laporan->tenggat);
                                                 $isEditable = $laporan->status_perbaikan != 'Selesai Dikerjakan';
                                                 $isRejected = !is_null($laporan->komentar_sarpras);
                                                 $isReported = !is_null($laporan->dokumentasi);
@@ -88,11 +98,16 @@
                                                 $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
                                             @endphp
 
-                                            @if (auth()->user()->id_level != 1)
-                                                @if ($isEditable)
+
+                                            @if (auth()->user()->id_level == 3)
+                                                @if ($isEditable && !$isLate)
                                                     <button onclick="modalAction('{{ $laporanUrl }}')"
                                                         class="btn btn-sm btn-danger mr-2">
                                                         {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                                    </button>
+                                                @elseif ($isLate && $isEditable)
+                                                    <button class="btn btn-sm btn-secondary mr-2" disabled>
+                                                        Tenggat Terlewat
                                                     </button>
                                                 @endif
                                             @endif
@@ -187,18 +202,25 @@
                 language: {
                     emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan yang tersedia",
                     zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ada data perbaikan seperti keyword yang ingin dicari"
+                },
+                rowCallback: function(row, data, index) {
+                    // Ganti isi kolom "No" (kolom ke-0)
+                    var info = this.api().page.info();
+                    var page = info.page;
+                    var length = info.length;
+                    $('td:eq(0)', row).html(index + 1 + page * length);
                 }
             };
 
-            // Configuration for admin/ (level 1)
-            if (user.id_level !== 1) {
+            // Configuration for teknisi
+            if (user.id_level === 3) {
                 var datalaporan = $('#table_perbaikan').DataTable({
                     ...commonConfig,
                     columnDefs: [{
-                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                         className: 'text-center',
                     }, {
-                        targets: [0, 1, 2, 5, 6, 7, 8],
+                        targets: [0, 1, 2, 5, 6, 7, 8, 9],
                         orderable: false,
                         searchable: true,
                     }, {

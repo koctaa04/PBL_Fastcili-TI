@@ -49,7 +49,7 @@ class LaporanKerusakanSeeder extends Seeder
                 'jumlah_kerusakan' => 1,
                 'tanggal_lapor' => Carbon::parse('2025-01-02'),
                 'tanggal_selesai' => null,
-                'id_status' => 2
+                'id_status' => 3
             ],
             [
                 'id_fasilitas' => 12,
@@ -67,7 +67,7 @@ class LaporanKerusakanSeeder extends Seeder
                 'jumlah_kerusakan' => 1,
                 'tanggal_lapor' => Carbon::parse('2025-04-10'),
                 'tanggal_selesai' => null,
-                'id_status' => 2
+                'id_status' => 3
             ],
             [
                 'id_fasilitas' => 16,

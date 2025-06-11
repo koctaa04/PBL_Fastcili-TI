@@ -37,7 +37,7 @@ class HomeController extends Controller
         // Hitung jumlah laporan
         $jmlLaporan = LaporanKerusakan::count();
         $laporanDiajukan = LaporanKerusakan::whereIn('id_status', [1])->count();
-        $laporanDiproses = LaporanKerusakan::whereIn('id_status', [2,3])->count();
+        $laporanDiproses = LaporanKerusakan::whereIn('id_status', [2, 3])->count();
         $laporanSelesai = LaporanKerusakan::whereIn('id_status', [4])->count();
 
         // Data grafik laporan perbulan
@@ -145,17 +145,30 @@ class HomeController extends Controller
 
     public function teknisi()
     {
-        $riwayat = PenugasanTeknisi::where('id_user', Auth::id())->get();
+
+        $id_user = auth()->user()->id_user;
+
+        $riwayat = PenugasanTeknisi::where('id_user', $id_user
+        )->where('status_perbaikan', 'Selesai Dikerjakan')
+        ->orderBy('created_at', 'desc')
+        ->get();
+        // dd($riwayat);
         $penugasan = PenugasanTeknisi::with('laporan')
             ->where('id_user', Auth::id())
             ->orderBy('created_at', 'desc')
             ->first();
 
         //Hitung untuk card
-        $jmlPenugasan = PenugasanTeknisi::count();
-        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Sedang dikerjakan')->count();
-        $laporanSelesaiDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Selesai Dikerjakan')->count();
-        $laporanBlmPenugasan = LaporanKerusakan::whereIn('id_status', [1, 2])->count();
+        $jmlPenugasan = PenugasanTeknisi::where('id_user', $id_user)->count();
+        $laporanDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Sedang dikerjakan')
+            ->where('id_user', $id_user)
+            ->count();
+        $laporanDitolak = PenugasanTeknisi::where('status_perbaikan', 'Ditolak')
+            ->where('id_user', $id_user)
+            ->count();
+        $laporanSelesaiDikerjakan = PenugasanTeknisi::where('status_perbaikan', 'Selesai Dikerjakan')
+            ->where('id_user', $id_user)
+            ->count();
 
         //Data Grafik Penugasan Per Gedung
         $penugasanPerGedung = $this->getPenugasanPerGedung();
@@ -165,8 +178,13 @@ class HomeController extends Controller
         $perbaikanPerBulan = $this->getPerbaikanPerBulan($tahun);
 
         return view('pages.teknisi.index', compact(
-            'riwayat', 'penugasan', 'jmlPenugasan', 'laporanDikerjakan',
-            'laporanSelesaiDikerjakan', 'laporanBlmPenugasan', 'penugasanPerGedung',
+            'riwayat',
+            'penugasan',
+            'jmlPenugasan',
+            'laporanDikerjakan',
+            'laporanDitolak',
+            'laporanSelesaiDikerjakan',
+            'penugasanPerGedung',
             'perbaikanPerBulan'
         ));
     }

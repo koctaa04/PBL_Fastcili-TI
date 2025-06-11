@@ -57,8 +57,12 @@ class UserController extends Controller
 
     public function create()
     {
-        $level = Level::all();
-        return view('users.create', ['level' => $level]);
+        if (auth()->user()->id_level == 1) {
+            $level = Level::all();
+            return view('users.create', ['level' => $level]);
+        } else {
+            return back();
+        }
     }
 
     public function store(Request $request)
@@ -100,9 +104,13 @@ class UserController extends Controller
 
     public function edit(string $id)
     {
-        $user = User::find($id);
-        $level = Level::all();
-        return view('users.edit', ['users' => $user, 'level' => $level]);
+        if (auth()->user()->id_level == 1) {
+            $user = User::find($id);
+            $level = Level::all();
+            return view('users.edit', ['users' => $user, 'level' => $level]);
+        } else {
+            return back();
+        }
     }
 
     public function update(Request $request, $id)
@@ -160,67 +168,79 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $data = User::find($id);
-
-        if (!$data) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan!'
-            ], 404);
-        }
-
-        try {
-            $data->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menghapus data!'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menghapus data',
-                'error' => $e->getMessage()
-            ], 500);
+        if (auth()->user()->id_level == 1) {
+            $data = User::find($id);
+    
+            if (!$data) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan!'
+                ], 404);
+            }
+    
+            try {
+                $data->delete();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Berhasil menghapus data!'
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus data',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+        } else {
+            return back();
         }
     }
 
     public function toggleAccess($id)
     {
-        try {
-            $user = User::findOrFail($id);
-
-            // Jika ingin diaktifkan (akses = true)
-            if (!$user->akses) {
-                // Cek apakah level_kode ada 
-                if (empty($user->id_level)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'level user belum diatur. Atur level terlebih dahulu!'
-                    ], 400);
+        if (auth()->user()->id_level == 1) {
+            try {
+                $user = User::findOrFail($id);
+    
+                // Jika ingin diaktifkan (akses = true)
+                if (!$user->akses) {
+                    // Cek apakah level_kode ada 
+                    if (empty($user->id_level)) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'level user belum diatur. Atur level terlebih dahulu!'
+                        ], 400);
+                    }
                 }
+    
+                // Toggle akses
+                $user->akses = !$user->akses;
+                $user->save();
+    
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Status akses berhasil diubah.',
+                    'new_status' => $user->akses
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                ], 500);
             }
-
-            // Toggle akses
-            $user->akses = !$user->akses;
-            $user->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Status akses berhasil diubah.',
-                'new_status' => $user->akses
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+        } else {
+            return back();
         }
     }
 
 
     public function import()
     {
-        return view('users.import');
+        if (auth()->user()->id_level == 1) {
+            return view('users.import');
+        } else {
+            return back();
+        }
     }
 
     public function import_ajax(Request $request)
@@ -335,7 +355,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-
 
     protected function convertErrorsToFields(array $errors)
     {

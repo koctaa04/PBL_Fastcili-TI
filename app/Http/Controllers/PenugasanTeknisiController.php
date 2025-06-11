@@ -11,9 +11,13 @@ class PenugasanTeknisiController extends Controller
 {
     public function feedback(string $id)
     {
-        $penugasan = PenugasanTeknisi::where('id_penugasan', $id)->first();
-
-        return view('pages.teknisi.feedback', compact('penugasan'));
+        if (auth()->user()->id_level == 3) {
+            $penugasan = PenugasanTeknisi::where('id_penugasan', $id)->first();
+    
+            return view('pages.teknisi.feedback', compact('penugasan'));
+        } else {
+            return back();
+        }
     }
 
     public function feedbackTeknisi(Request $request, $id)
@@ -43,8 +47,12 @@ class PenugasanTeknisiController extends Controller
 
     public function detailRiwayat(string $id)
     {
-        $laporan = PenugasanTeknisi::find($id);
-
-        return view('pages.teknisi.detail', compact('laporan'));
+        if (auth()->user()->id_level == 3) {
+            $laporan = PenugasanTeknisi::find($id);
+    
+            return view('pages.teknisi.detail', compact('laporan'));
+        } else {
+            return back();
+        }
     }
 }

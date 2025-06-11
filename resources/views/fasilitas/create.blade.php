@@ -13,7 +13,7 @@
             <div class="modal-body p-4">
                 <div class="card border-0 mb-4">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-map-marker-alt mr-2 text-primary"></i>Informasi Lokasi
                         </h6>
                     </div>
@@ -49,7 +49,7 @@
 
                 <div class="card border-0">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-tools mr-2 text-warning"></i>Detail Fasilitas
                         </h6>
                     </div>
@@ -84,7 +84,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group mb-0">
+                                <div class="form-group mb-3">
                                     <label class="text-muted small mb-1">Jumlah <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">

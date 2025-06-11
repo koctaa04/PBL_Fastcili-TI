@@ -64,6 +64,15 @@ html {
     box-shadow: none;
 }
 
+.card .card-header{
+    border-radius: 12px;
+}
+
+.card .card-body{
+    padding: 15px 15px 15px 15px;
+    border-radius: 12px;
+}
+
 .card-header p {
     color: gray;
     font-size: small;
@@ -138,15 +147,6 @@ html {
 }
 
 .team-members {
-    /* display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            margin: 1rem 0; */
-    /* display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 2rem;
-            margin: 2rem 0; */
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -288,6 +288,15 @@ html {
 
     .content-box p {
         font-size: 1.3rem;
+    }
+
+    .container-login {
+        margin-top: 0.5rem;
+    }
+
+    .card-signup {
+        margin-left: 1rem;
+        margin-right: 1rem;
     }
 
     .social-icons {

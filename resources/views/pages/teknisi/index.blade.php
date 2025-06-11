@@ -7,80 +7,80 @@
     <div class="content">
         {{-- Kartu Statistik --}}
         <div class="row">
-            {{-- Total Penugasan --}}
+
             <div class="col-lg-3 col-md-6 col-sm-6">
-                <div class="card card-stats shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-paper text-warning"></i>
+                                    <i class="nc-icon nc-paper"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
                                     <p class="card-category">Total Penugasan</p>
-                                    <h4 class="card-title">{{ $jmlPenugasan }}</h4>
+                                    <p class="card-title">{{ $jmlPenugasan }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- Laporan Belum Ditugaskan --}}
             <div class="col-lg-3 col-md-6 col-sm-6">
-                <div class="card card-stats shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-book-bookmark text-primary"></i>
+                                    <i class="nc-icon nc-book-bookmark"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category text-nowrap">Laporan Belum Ditugaskan</p>
-                                    <h4 class="card-title">{{ $laporanBlmPenugasan }}</h4>
+                                    <p class="card-category">Laporan Sedang Dikerjakan</p>
+                                    <p class="card-title">{{ $laporanDikerjakan }}</p>
+                                    <p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- Laporan Sedang Diperbaiki --}}
             <div class="col-lg-3 col-md-6 col-sm-6">
-                <div class="card card-stats shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-bullet-list-67 text-danger"></i> 
+                                    <i class="nc-icon nc-bullet-list-67"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category text-nowrap">Laporan Sedang Diperbaiki</p>
-                                    <h4 class="card-title">{{ $laporanDikerjakan }}</h4>
+                                    <p class="card-category">Perbaikan Ditolak</p>
+                                    <p class="card-title">{{ $laporanDitolak }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- Laporan Sudah Diperbaiki --}}
             <div class="col-lg-3 col-md-6 col-sm-6">
-                <div class="card card-stats shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
+                <div class="card card-stats">
+                    <div class="card-body ">
+                        <div class="row">
                             <div class="col-5 col-md-4">
                                 <div class="icon-big text-center icon-warning">
-                                    <i class="nc-icon nc-single-copy-04 text-success"></i>
+                                    <i class="nc-icon nc-single-copy-04"></i>
                                 </div>
                             </div>
                             <div class="col-7 col-md-8">
                                 <div class="numbers">
-                                    <p class="card-category text-nowrap">Laporan Sudah Diperbaiki</p>
-                                    <h4 class="card-title">{{ $laporanSelesaiDikerjakan }}</h4>
+                                    <p class="card-category">Laporan Selesai Dikerjakan</p>
+                                    <p class="card-title">{{ $laporanSelesaiDikerjakan }}
+                                    <p>
                                 </div>
                             </div>
                         </div>
@@ -90,177 +90,214 @@
         </div>
 
         {{-- Area Konten Utama --}}
-        <div class="container-fluid">
-            @if ($penugasan && $penugasan->tanggal_selesai == null)
-                {{-- Penugasan Aktif --}}
-                <div class="card shadow rounded p-4 mb-4">
-                    <h3 class="mb-4 fw-bold text-dark">Penugasan Perbaikan</h3>
-                    <div class="row g-0 align-items-center">
-                        <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
+        {{-- Sambutan --}}
+        <div class="jumbotron bg-white shadow rounded p-5 mb-4">
+            <h2 class="display-5 fw-bold mb-3">Selamat Datang, {{ auth()->user()->nama }}!</h2>
+            <p class="lead mt-3">Pantau dan tangani laporan kerusakan fasilitas kampus secara efisien. Silakan cek
+                daftar tugas yang telah ditugaskan kepada Anda, dan pastikan setiap perbaikan diselesaikan tepat
+                waktu demi kenyamanan bersama.</p>
+            <a href="{{ url('/perbaikan') }}" class="btn btn-success">
+                Lihat Daftar Perbaikan
+            </a>
+            <hr class="my-4">
+            <p>🔧 Jangan lupa untuk memperbarui status pekerjaan setelah perbaikan selesai dilakukan.</p>
+        </div>
+
+
+        <div class="card border-0 mb-4">
+            <div class="card-header bg-light pb-3">
+                <h6 class="mb-0 font-weight-bold">
+                    <i class="fas fa-info-circle mr-2 text-primary"></i>Penugasan Perbaikan
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center">
                             <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $penugasan->laporan->foto_kerusakan) }}"
+                                alt="Foto Kerusakan" class="img-fluid rounded shadow-sm border"
+                                style="max-height: 250px; width: auto;"
+                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
 
-                                onerror="this.onerror=null;this.src='{{ asset('images/fasilitas-rusak.jpeg') }}';"
-                                alt="Foto Kerusakan" class="img-fluid rounded shadow-sm">
-
-                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
-                                alt="Foto Kerusakan" class="img-fluid rounded">
-
+                            <button
+                                onclick="modalAction('{{ route('teknisi.feedback', ['id' => $penugasan->id_penugasan]) }}')"
+                                class="btn btn-primary btn-block mt-3 py-2" style="font-size: 16px;">
+                                <i class="fas fa-tools mr-2"></i> Laporkan Perbaikan
+                            </button>
                         </div>
-                        <div class="col-md-8">
-                            <div class="card-body p-4">
-                                <h5 class="card-title mb-4">Laporan Kerusakan Fasilitas</h5>
-                                <p class="mb-2"><strong>Fasilitas:</strong>
-                                    {{ $penugasan->laporan->fasilitas->nama_fasilitas }}</p>
-                                <p class="mb-2"><strong>Lokasi:</strong>
-                                    {{ $penugasan->laporan->fasilitas->ruangan->nama_ruangan }}, {{ $penugasan->laporan->fasilitas->ruangan->gedung->nama_gedung }}</p>
-                                <p class="mb-2"><strong>Tanggal Lapor:</strong>
+                    </div>
 
-                                     {{ $penugasan->laporan->tanggal_lapor ? \Carbon\Carbon::parse($penugasan->laporan->tanggal_lapor)
-                                        ->locale('id')->translatedFormat('l, d F Y') : '-' }}
-                                <p class="mb-2"><strong>Tenggat:</strong>
-                                    {{ $penugasan->tenggat ? \Carbon\Carbon::parse($penugasan->tenggat)
-                                        ->locale('id')->translatedFormat('l, d F Y') : '-' }}
-                                    {{ $penugasan->laporan->tanggal_lapor->translatedFormat('l, d F Y') }}</p>
-                                <p class="mb-2"><strong>Deskripsi:</strong>
-                                    {{ $penugasan->laporan->pelaporLaporan->first()->deskripsi_tambahan ?? '-' }}
-                                </p>
-                                <p class="mb-2"><strong>Deskripsi:</strong>
-                                    {{ $penugasan->laporan->pelaporLaporan->first()->deskripsi_tambahan ?? 'Tidak ada deskripsi tambahan.' }}
-                                </p>
-                                <div class="d-flex justify-content-end mt-4">
-                                    <button
 
-                                        onclick="modalAction('{{ route('teknisi.feedback', ['id' => $penugasan->id_penugasan]) }}')"
-                                        class="btn btn-primary btn-round btn-sm">
-                                        <i class="nc-icon nc-settings-gear-65"></i> Dokumentasi Perbaikan
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="text-muted small mb-1">Fasilitas</label>
+                            <p class="font-weight-bold">
+                                <i class="fas fa-tools mr-2 text-warning"></i>
+                                {{ $penugasan->laporan->fasilitas->nama_fasilitas }}
+                            </p>
 
-                                        onclick="modalAction('{{ url('/perbaikan/edit/' . $penugasan->id_penugasan) }}')"
-                                        class="btn btn-primary btn-sm me-2">
-                                        Dokumentasi Perbaikan
+                            </p>
+                        </div>
 
-                                    </button>
-                                </div>
+                        <div class="mb-3">
+                            <label class="text-muted small mb-1">Deskripsi Kerusakan</label>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-1">{{ $penugasan->laporan->deskripsi }}</p>
+
+                                @foreach ($penugasan->laporan->pelaporLaporan as $pelapor)
+                                    @if ($pelapor->deskripsi_tambahan)
+                                        <hr>
+                                        <p class="mb-1 text-muted small">Tambahan dari pelapor (Nama :
+                                            {{ $pelapor->user->nama }})</p>
+                                        <p class="mb-1">{{ $pelapor->deskripsi_tambahan }}</p>
+                                    @endif
+                                @endforeach
                             </div>
                         </div>
-                    </div>
-                </div>
-            @else
-                {{-- Sambutan --}}
-                <div class="jumbotron bg-white shadow rounded p-5 mb-4">
-                    <h2 class="display-5 fw-bold mb-3">Selamat Datang, {{ auth()->user()->nama }}!</h2> 
-                    <p class="lead mt-3">Pantau dan tangani laporan kerusakan fasilitas kampus secara efisien. Silakan cek
-                        daftar tugas yang telah ditugaskan kepada Anda, dan pastikan setiap perbaikan diselesaikan tepat
-                        waktu demi kenyamanan bersama.</p>
-                    <hr class="my-4">
-                    <p>🔧 Jangan lupa untuk memperbarui status pekerjaan setelah perbaikan selesai dilakukan.</p>
-                </div>
-            @endif
 
-            @if ($riwayat->count() > 0)
-                {{-- Tabel Riwayat Penugasan --}}
-                <div class="card p-4 shadow">
-                    <div class="card-header bg-light pb-0">
-                        <h3 class="card-title text-dark">Riwayat Penugasan Perbaikan</h3>
-                        <p class="card-category">Daftar perbaikan yang telah diselesaikan</p>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped table-sm" id="table_level">
-                                <thead class="bg-light text-dark">
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Nama Fasilitas</th>
-                                        <th scope="col">Ruangan</th>
-                                        <th scope="col">Gedung</th>
-                                        <th scope="col">Tanggal Lapor</th>
-                                        <th scope="col">Tanggal Selesai</th>
-                                        <th scope="col">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($riwayat as $lapor => $l)
-                                        <tr>
-                                            <th scope="row">{{ $lapor + 1 }}</th>
-                                            <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
-                                            <td>{{ $l->laporan->fasilitas->ruangan->nama_ruangan }}</td>
-                                            <td>{{ $l->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
-                                            <td>
-                                                {{ $l->laporan->tanggal_lapor
-                                                    ? \Carbon\Carbon::parse($l->laporan->tanggal_lapor)->locale('id')->translatedFormat('l, d F Y')
-                                                    : '-' }}
-                                            </td>
-                                            <td>
 
-                                                {{ $l->laporan->tanggal_selesai
-                                                    ? \Carbon\Carbon::parse($l->laporan->tanggal_selesai)->locale('id')->translatedFormat('l, d F Y')
+                        <!-- Komentar Sarpras Section -->
+                        <div class="mb-3">
+                            <label class="text-muted small mb-1">Komentar Sarpras</label>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-0">
+                                    {{ $penugasan->komentar_sarpras ?? '-' }}</p>
 
-                                                {{ $l->laporan->tanggal_lapor
-                                                    ? $l->laporan->tanggal_lapor->translatedFormat('l, d F Y')
-                                                    : '-' }}
-                                            </td>
-                                            <td>
-                                                {{ $l->tanggal_selesai
-                                                    ? $l->tanggal_selesai->translatedFormat('l, d F Y')
-
-                                                    : '-' }}
-                                            </td>
-                                            <td>
-                                                <button
-
-                                                    onclick="modalAction('{{ route('teknisi.detailRiwayat', ['id' => $l->id_penugasan]) }}')"
-                                                    class="btn btn-info btn-sm btn-round">
-                                                    <i class="nc-icon nc-zoom-split"></i> Detail
-
-                                                    onclick="modalAction('{{ url('/perbaikan/detail/'. $l->id_penugasan) }}')"
-                                                    class="btn btn-warning btn-sm me-2">
-                                                    Detail
-
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            @endif
 
-            {{-- Grafik --}}
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card shadow">
-                        <div class="card-header bg-light pb-0">
-                            <h5 class="card-title text-dark">Penugasan Per Bulan</h5>
-                            <p class="card-category">Perbaikan per bulan</p>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small mb-1">Tanggal Lapor</label>
+                                <p class="font-weight-bold">
+                                    <i class="fas fa-calendar-alt mr-2 text-info"></i>
+                                    {{ $penugasan->laporan->tanggal_lapor
+                                        ? \Carbon\Carbon::parse($penugasan->laporan->tanggal_lapor)->locale('id')->translatedFormat('l, d F Y')
+                                        : '-' }}
+
+                                </p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small mb-1">Tenggat Perbaikan</label>
+                                <p class="font-weight-bold">
+                                    <i class="fas fa-calendar-alt mr-2 text-info"></i>
+
+                                    {{ $penugasan->tenggat
+                                        ? \Carbon\Carbon::parse($penugasan->tenggat)->locale('id')->translatedFormat('l, d F Y')
+                                        : '-' }}
+                                </p>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <canvas id="perbaikanPerBulan"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card card-chart shadow">
-                        <div class="card-header bg-light pb-0">
-                            <h5 class="card-title text-dark">Penugasan Per Gedung</h5>
-                            <p class="card-category">Distribusi perbaikan antar gedung</p>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="penugasanGedungChart"></canvas>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small mb-1">Ruangan</label>
+                                <p class="font-weight-bold">
+                                    <i class="fas fa-door-open mr-2 text-info"></i>
+                                    {{ $penugasan->laporan->fasilitas->ruangan->nama_ruangan }}
+
+
+                                </p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small mb-1">Gedung</label>
+                                <p class="font-weight-bold">
+                                    <i class="fas fa-building mr-2 text-info"></i>
+                                    {{ $penugasan->laporan->fasilitas->ruangan->gedung->nama_gedung }}
+
+
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
+
+
+        @if ($riwayat->count() > 0)
+            {{-- Tabel Riwayat Penugasan --}}
+            <div class="card p-4 shadow">
+                <div class="card-header bg-light pb-0">
+                    <h3 class="card-title text-dark">Riwayat Penugasan Perbaikan</h3>
+                    <p class="card-category">Daftar perbaikan yang telah diselesaikan</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped table-sm" id="table_level">
+                            <thead class="bg-light text-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nama Fasilitas</th>
+                                    <th scope="col">Ruangan</th>
+                                    <th scope="col">Gedung</th>
+                                    <th scope="col">Tanggal Selesai</th>
+                                    <th scope="col">Catatan Teknisi</th>
+                                    <th scope="col">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($riwayat as $lapor => $l)
+                                    <tr>
+                                        <th scope="row">{{ $lapor + 1 }}</th>
+                                        <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
+                                        <td>{{ $l->laporan->fasilitas->ruangan->nama_ruangan }}</td>
+                                        <td>{{ $l->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
+                                        <td>
+                                            {{ $l->tanggal_selesai ? $l->tanggal_selesai->translatedFormat('l, d F Y') : '-' }}
+                                        </td>
+                                        <td>{{ $l->catatan_teknisi }}</td>
+                                        <td>
+                                            <button
+                                                onclick="modalAction('{{ url('/perbaikan/detail/' . $l->id_penugasan) }}')"
+                                                class="btn btn-info btn-sm btn-round">
+                                                <i class="nc-icon nc-zoom-split"></i> Detail
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Grafik --}}
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-light pb-0">
+                        <h5 class="card-title text-dark">Penugasan Per Bulan</h5>
+                        <p class="card-category">Perbaikan per bulan</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="perbaikanPerBulan"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-chart shadow">
+                    <div class="card-header bg-light pb-0">
+                        <h5 class="card-title text-dark">Penugasan Per Gedung</h5>
+                        <p class="card-category">Distribusi perbaikan antar gedung</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="penugasanGedungChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 
     {{-- Modal --}}
     <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
-
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
-
-        aria-hidden="true"></div>
+        <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true"
+        data-keyboard="false" aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
@@ -336,7 +373,7 @@
                             font: {
                                 size: 12
                             },
-                            precision: 0 
+                            precision: 0
                         }
                     }
                 }
@@ -352,12 +389,12 @@
                     label: 'Jumlah Penugasan',
                     data: Object.values(penugasanPerGedungData),
                     backgroundColor: [
-                        'rgba(54, 162, 235, 0.7)', 
-                        'rgba(255, 99, 132, 0.7)', 
-                        'rgba(75, 192, 192, 0.7)', 
-                        'rgba(153, 102, 255, 0.7)', 
-                        'rgba(255, 159, 64, 0.7)', 
-                        'rgba(201, 203, 207, 0.7)' 
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(201, 203, 207, 0.7)'
                     ],
                     borderColor: [
                         'rgba(54, 162, 235, 1)',
@@ -375,7 +412,7 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false 
+                        display: false
                     },
                     tooltip: {
                         mode: 'index',

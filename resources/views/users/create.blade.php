@@ -13,7 +13,7 @@
             <div class="modal-body p-4">
                 <div class="card border-0">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-user-cog mr-2 text-primary"></i>Informasi User
                         </h6>
                     </div>
@@ -55,7 +55,7 @@
                             <small class="text-danger error-text" id="error-email"></small>
                         </div>
 
-                        <div class="form-group mb-0">
+                        <div class="form-group mb-3">
                             <label class="text-muted small mb-1">Password <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
