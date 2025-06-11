@@ -12,7 +12,7 @@
             <!-- Informasi Laporan Card -->
             <div class="card border-0 mb-4">
                 <div class="card-header bg-light">
-                    <h6 class="mb-0 font-weight-bold">
+                    <h6 class="mb-3 font-weight-bold">
                         <i class="fas fa-info-circle mr-2 text-primary"></i>Informasi Laporan
                     </h6>
                 </div>
@@ -90,7 +90,7 @@
             @if ($perbaikan->status_perbaikan == 'Selesai Dikerjakan')
                 <div class="card border-0">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-check-circle mr-2 text-success"></i>Informasi Perbaikan
                         </h6>
                     </div>
@@ -99,6 +99,7 @@
                             <div class="col-md-4 mb-3 mb-md-0">
                                 <div class="text-center">
                                     <img src="{{ asset('storage/uploads/dokumentasi/' . $perbaikan->dokumentasi) }}"
+                                        onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                         alt="Dokumentasi Perbaikan" class="img-fluid rounded shadow-sm border"
                                         style="max-height: 250px; width: auto;">
                                 </div>
@@ -107,10 +108,17 @@
                                 <div class="mb-3">
                                     <label class="text-muted small mb-1">Status</label>
                                     <p>
-                                        <span class="badge badge-success px-3 py-2">
-                                            <i class="fas fa-check mr-1"></i>
-                                            {{ $perbaikan->status_perbaikan }}
-                                        </span>
+                                        @if ($perbaikan->laporan->id_status == 4)
+                                            <span class="badge badge-danger px-3 py-2">
+                                                <i class="fas fa-check mr-1"></i>
+                                                {{ $perbaikan->laporan->status->nama_status }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-success px-3 py-2">
+                                                <i class="fas fa-check mr-1"></i>
+                                                {{ $perbaikan->status_perbaikan }}
+                                            </span>
+                                        @endif
                                     </p>
                                 </div>
 
@@ -123,7 +131,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="text-muted small mb-1">Selesai Diperbaiki</label>
+                                    <label class="text-muted small mb-1">Selesai Dikerjakan</label>
                                     <p class="font-weight-bold">
                                         <i class="fas fa-calendar-check mr-2 text-primary"></i>
                                         {{ $perbaikan->tanggal_selesai
@@ -134,6 +142,68 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            @endif
+            
+            <!-- Informasi Rating Card -->
+            @if ($perbaikan->laporan->id_status == '4')
+                <div class="card border-0">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-3 font-weight-bold">
+                            <i class="fas fa-check-circle mr-2 text-success"></i>Rating dan Ulasan dari Pelapor
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <!-- Tampilan Rating berupa Bintang sebanyak 5 -->
+                            <div class="col-12 text-center mb-3">
+                                @php
+                                    $fullStars = floor($ratingAkhir);
+                                    $halfStar = ($ratingAkhir - $fullStars) >= 0.5 ? true : false;
+                                    $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                                @endphp
+                    
+                                <div class="d-flex justify-content-center align-items-center" style="font-size: 2rem;">
+                                    @for ($i = 0; $i < $fullStars; $i++)
+                                        <i class="fas fa-star" style="color: #FFA500;"></i>
+                                    @endfor
+                    
+                                    @if ($halfStar)
+                                        <i class="fas fa-star-half-alt" style="color: #FFA500;"></i>
+                                    @endif
+                    
+                                    @for ($i = 0; $i < $emptyStars; $i++)
+                                        <i class="far fa-star" style="color: #FFA500;"></i>
+                                    @endfor
+                                </div>
+                    
+                                <small class="text-muted mt-1 d-block">
+                                    Rating Akhir: {{ number_format($ratingAkhir, 2) }} / 5
+                                </small>
+                            </div>
+                    
+                            <!-- Informasi Pendukung dan Rating -->
+                            <div class="col-12 text-center mb-3">
+                                <p class="mb-1 font-weight-bold">
+                                    {{ $jumlahRatingDiberikan }} dari {{ $jumlahPendukung }} orang yang mendukung laporan ini telah memberikan rating.
+                                </p>
+                            </div>
+                    
+                            <!-- Daftar Ulasan -->
+                            <div class="col-12 mt-3">
+                                <label class="text-muted small mb-1">Ulasan Pengguna (Top 10)</label>
+                                <ul class="list-group">
+                                    @forelse ($ulasan as $item)
+                                        <li class="list-group-item">
+                                            <i class="fas fa-comment-dots text-primary mr-2"></i>{{ $item }}
+                                        </li>
+                                    @empty
+                                        <li class="list-group-item text-muted">Belum ada ulasan.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                        </div>
+                    </div>                    
                 </div>
             @endif
         </div>
@@ -170,5 +240,9 @@
 
     .badge-success {
         background-color: #28a745;
+    }
+
+    .fas.fa-star, .fas.fa-star-half-alt, .far.fa-star {
+        transition: color 0.3s ease;
     }
 </style>

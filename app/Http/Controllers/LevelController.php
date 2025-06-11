@@ -35,7 +35,11 @@ class LevelController extends Controller
 
     public function create()
     {
-        return view('level.create');
+        if (auth()->user()->id_level == 1) {
+            return view('level.create');
+        } else {
+            return back();
+        }
     }
 
     public function store(Request $request)
@@ -74,78 +78,85 @@ class LevelController extends Controller
 
     public function edit(string $id)
     {
-        $level = Level::find($id);
-
-        return view('level.edit', ['level' => $level]);
+        if (auth()->user()->id_level == 1) {
+            $level = Level::find($id);
+    
+            return view('level.edit', ['level' => $level]);
+        } else {
+            return back();
+        }
     }
 
     public function update(Request $request, $id)
-{
-    $rules = [
-        'kode_level' => 'required|string|max:10|unique:level,kode_level,' . $id . ',id_level',
-        'nama_level' => 'required|string|max:25'
-    ];
+    {
+        $rules = [
+            'kode_level' => 'required|string|max:10|unique:level,kode_level,' . $id . ',id_level',
+            'nama_level' => 'required|string|max:25'
+        ];
 
-    $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Validasi inputan gagal',
-            'msgField' => $validator->errors()
-        ], 422);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi inputan gagal',
+                'msgField' => $validator->errors()
+            ], 422);
+        }
+
+        $data = Level::find($id);
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
+
+        try {
+            $data->update($request->only(['kode_level', 'nama_level']));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data level berhasil diubah'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengupdate data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-
-    $data = Level::find($id);
-
-    if (!$data) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Data tidak ditemukan',
-        ], 404);
-    }
-
-    try {
-        $data->update($request->only(['kode_level', 'nama_level']));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data level berhasil diubah'
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan saat mengupdate data',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
 
     public function destroy(Request $request, $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            try {
-                $level = Level::find($id);
-                if ($level) {
-                    $level->delete();
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Data berhasil dihapus'
-                    ], 200);
-                } else {
+        if (auth()->user()->id_level == 1) {
+            if ($request->ajax() || $request->wantsJson()) {
+                try {
+                    $level = Level::find($id);
+                    if ($level) {
+                        $level->delete();
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Data berhasil dihapus'
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Data tidak ditemukan'
+                        ], 404);
+                    }
+                } catch (\Illuminate\Database\QueryException $e) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Data tidak ditemukan'
-                    ], 404);
+                        'message' => 'Data gagal dihapus karena masih terdapat user yang menggunakan level ini'
+                    ], 422);
                 }
-            } catch (\Illuminate\Database\QueryException $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data gagal dihapus karena masih terdapat user yang menggunakan level ini'
-                ], 422);
             }
+            return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+        } else {
+            return back();
         }
-        return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
     }
 }

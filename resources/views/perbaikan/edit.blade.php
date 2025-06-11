@@ -19,7 +19,7 @@
 
                 <div class="card border-0 mb-4">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-info-circle mr-2 text-primary"></i>Catatan Teknisi
                         </h6>
                     </div>
@@ -33,7 +33,7 @@
 
                 <div class="card border-0">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-camera mr-2 text-warning"></i>Dokumentasi Perbaikan
                         </h6>
                     </div>

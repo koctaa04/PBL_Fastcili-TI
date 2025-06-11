@@ -13,12 +13,12 @@
             <div class="modal-body p-4">
                 <div class="card border-0 mb-4">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-file-download mr-2 text-info"></i>Template Import
                         </h6>
                     </div>
                     <div class="card-body">
-                        <div class="form-group mb-0">
+                        <div class="form-group mb-3">
                             <label class="text-muted small mb-1">Download Template Excel</label>
                             <div>
                                 <a href="{{ asset('template_ruangan.xlsx') }}" class="btn btn-info" download>
@@ -34,7 +34,7 @@
 
                 <div class="card border-0">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-file-upload mr-2 text-warning"></i>File Import
                         </h6>
                     </div>

@@ -15,7 +15,7 @@
                 <!-- Detail Laporan Card -->
                 <div class="card border-0 mb-4">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-info-circle mr-2 text-danger"></i>Detail Laporan
                         </h6>
                         <a href="{{ route('trending.index') }}">
@@ -72,10 +72,10 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-0">
+                                <div class="mb-3">
                                     <label class="text-muted small mb-1">Deskripsi Pelapor</label>
                                     <div class="bg-light p-3 rounded">
-                                        <ul class="mb-0 pl-3">
+                                        <ul class="mb-3 pl-3">
                                             @foreach ($laporan->pelaporLaporan as $pp)
                                                 <li>{{ $pp->deskripsi_tambahan }}</li>
                                             @endforeach
@@ -91,7 +91,7 @@
                 <!-- Form Penilaian Card -->
                 <div class="card border-0">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 font-weight-bold">
+                        <h6 class="mb-3 font-weight-bold">
                             <i class="fas fa-edit mr-2 text-danger"></i>Form Penilaian
                         </h6>
                     </div>

@@ -17,7 +17,7 @@ class PenugasanTeknisiSeeder extends Seeder
             [
                 'id_laporan' => 4,
                 'id_user' => 5,
-                'status_perbaikan' => 'Sedang dikerjakan',
+                'status_perbaikan' => 'Sedang Dikerjakan',
                 'tanggal_selesai' => null,
                 'tenggat' => now()->addDays(3),
                 'catatan_teknisi' => null,

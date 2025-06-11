@@ -20,7 +20,7 @@
                     <div class="col-12" id="detailContainer">
                         <div class="card border-0 mb-4">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0 font-weight-bold">Detail Perbaikan</h6>
+                                <h6 class="mb-3 font-weight-bold">Detail Perbaikan</h6>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleImageBtn">
                                     <i class="fas fa-image mr-1"></i>
                                     <span id="toggleImageText">Lihat Dokumentasi</span>
@@ -40,7 +40,7 @@
                                         
                                         <div class="mb-3">
                                             <label class="text-muted small mb-1">Teknisi</label>
-                                            <p class="mb-0 font-weight-bold">
+                                            <p class="mb-3 font-weight-bold">
                                                 <i class="fas fa-user-tie mr-2 text-primary"></i>
                                                 {{ $laporan->penugasan->user->nama ?? '-' }}
                                             </p>
@@ -49,7 +49,7 @@
                                         <div class="mb-3">
                                             <label class="text-muted small mb-1">Catatan Teknisi</label>
                                             <div class="bg-light p-3 rounded">
-                                                <p class="mb-0">
+                                                <p class="mb-3">
                                                     <i class="fas fa-sticky-note mr-2 text-info"></i>
                                                     {{ $laporan->penugasan->catatan_teknisi ?? 'Tidak ada catatan' }}
                                                 </p>
@@ -74,7 +74,7 @@
                     <div class="col-12 d-none" id="expandedImageContainer">
                         <div class="card border-0 mb-4">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0 font-weight-bold">Dokumentasi Perbaikan</h6>
+                                <h6 class="mb-3 font-weight-bold">Dokumentasi Perbaikan</h6>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" id="hideImageBtn">
                                     <i class="fas fa-compress-alt mr-1"></i> Sembunyikan
                                 </button>
@@ -95,10 +95,10 @@
                     <!-- Notes Section -->
                     <div class="card border-0">
                         <div class="card-header bg-light">
-                            <h6 class="mb-0 font-weight-bold">Catatan Verifikasi</h6>
+                            <h6 class="mb-3 font-weight-bold">Catatan Verifikasi</h6>
                         </div>
                         <div class="card-body">
-                            <div class="form-group mb-0">
+                            <div class="form-group mb-3">
                                 <label for="keterangan" class="text-muted small">Berikan catatan jika menolak verifikasi</label>
                                 <textarea name="keterangan" id="keterangan" class="form-control" rows="3" 
                                         placeholder="Masukkan alasan penolakan (jika diperlukan)"></textarea>

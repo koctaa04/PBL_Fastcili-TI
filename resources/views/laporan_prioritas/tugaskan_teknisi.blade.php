@@ -19,7 +19,7 @@
                     <div class="col-md-6">
                         <div class="card border-0 mb-4">
                             <div class="card-header bg-light">
-                                <h6 class="mb-0 font-weight-bold">Form Penugasan</h6>
+                                <h6 class="mb-3 font-weight-bold">Form Penugasan</h6>
                             </div>
                             <div class="card-body">
                                 <div class="form-group">
@@ -45,13 +45,13 @@
                     <div class="col-md-6">
                         <div class="card border-0 h-100">
                             <div class="card-header bg-light">
-                                <h6 class="mb-0 font-weight-bold">Detail Laporan</h6>
+                                <h6 class="mb-3 font-weight-bold">Detail Laporan</h6>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label class="text-muted small mb-1">Deskripsi</label>
                                     <div class="bg-light p-3 rounded">
-                                        <p class="mb-0">{{ $laporan->deskripsi }}</p>
+                                        <p class="mb-3">{{ $laporan->deskripsi }}</p>
                                     </div>
                                 </div>
 

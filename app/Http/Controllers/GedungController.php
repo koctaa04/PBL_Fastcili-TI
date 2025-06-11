@@ -48,7 +48,11 @@ class GedungController extends Controller
 
     public function create()
     {
-        return view('gedung.create');
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            return view('gedung.create');
+        } else {
+            return back();
+        }
     }
 
     public function store(Request $request)
@@ -97,9 +101,13 @@ class GedungController extends Controller
 
     public function edit(string $id)
     {
-        $gedung = Gedung::find($id);
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $gedung = Gedung::find($id);
 
-        return view('gedung.edit', ['gedung' => $gedung]);
+            return view('gedung.edit', ['gedung' => $gedung]);
+        } else {
+            return back();
+        }
     }
 
     public function update(Request $request, $id)
@@ -148,26 +156,30 @@ class GedungController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $gedung = Gedung::find($id);
+        if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $gedung = Gedung::find($id);
 
-        if ($gedung) {
-            // Hapus foto jika ada dan file-nya masih ada di storage
-            if ($gedung->foto_gedung && Storage::exists('public/uploads/gedung/' . $gedung->foto_gedung)) {
-                Storage::delete('public/uploads/gedung/' . $gedung->foto_gedung);
+            if ($gedung) {
+                // Hapus foto jika ada dan file-nya masih ada di storage
+                if ($gedung->foto_gedung && Storage::exists('public/uploads/gedung/' . $gedung->foto_gedung)) {
+                    Storage::delete('public/uploads/gedung/' . $gedung->foto_gedung);
+                }
+
+                // Hapus data gedung
+                $gedung->delete();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                ]);
             }
-
-            // Hapus data gedung
-            $gedung->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data berhasil dihapus'
-            ]);
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan',
-            ]);
+            return back();
         }
     }
 }

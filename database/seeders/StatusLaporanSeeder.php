@@ -17,7 +17,7 @@ class StatusLaporanSeeder extends Seeder
             ['nama_status' => 'Diajukan'],
             ['nama_status' => 'Diproses'],
             ['nama_status' => 'Diperbaiki'],
-            ['nama_status' => 'Selesai'],
+            ['nama_status' => 'Selesai Diperbaiki'],
         ]);
     }
 }
