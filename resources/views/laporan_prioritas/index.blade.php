@@ -90,22 +90,31 @@
                                             </div>
                                             <div class="mt-auto">
                                                 <div class="d-flex justify-content-end">
-                                                    @if(!$penugasan)
-                                                        <button onclick="modalAction('{{ url('/laporan/penugasan/' . $r['id_laporan']) }}')"
-                                                            class="btn btn-danger btn-sm btn-md-lg px-3 px-md-4 py-2">
+
+                                                    @if (!$penugasan)
+                                                        {{-- Belum ada penugasan teknisi --}}
+                                                        <button
+                                                            onclick="modalAction('{{ url('/laporan/penugasan/' . $r['id_laporan']) }}')"
+                                                            class="btn btn-danger btn-lg px-4 py-2">
                                                             <i class="fas fa-user-tie mr-1"></i> Tugaskan Teknisi
                                                         </button>
-                                                    @elseif($r['status'] == 'Selesai Diperbaiki')
-                                                        <span class="btn btn-success btn-sm btn-md-lg px-3 px-md-4 py-2 disabled">
-                                                            <i class="fas fa-check-circle mr-1"></i> Sudah Selesai
-                                                        </span>
-                                                    @elseif($statusPerbaikan === 'Selesai Dikerjakan')
-                                                        <button onclick="modalAction('{{ url('/laporan/verifikasi/' . $r['id_laporan']) }}')"
-                                                                class="btn btn-info btn-sm btn-md-lg px-3 px-md-4 py-2">
+                                                    @elseif ($statusPerbaikan === 'Selesai Dikerjakan')
+                                                        {{-- Teknisi sudah menyelesaikan, sarpras perlu verifikasi --}}
+                                                        <button
+                                                            onclick="modalAction('{{ url('/laporan/verifikasi/' . $r['id_laporan']) }}')"
+                                                            class="btn btn-info btn-lg px-4 py-2">
                                                             <i class="fas fa-check-double mr-1"></i> Verifikasi
                                                         </button>
+                                                    @elseif ($penugasan && $statusPerbaikan !== 'Selesai Dikerjakan' && \Carbon\Carbon::parse($penugasan->tenggat)->isPast())
+                                                        {{-- Sudah ditugaskan, belum selesai, dan lewat tenggat waktu --}}
+                                                        <button
+                                                            onclick="modalAction('{{ url('/laporan/ganti-teknisi/' . $r['id_laporan']) }}')"
+                                                            class="btn btn-warning btn-lg px-4 py-2">
+                                                            <i class="fas fa-user-edit mr-1"></i> Ganti Teknisi
+                                                        </button>
                                                     @else
-                                                        <span class="btn btn-secondary btn-sm btn-md-lg px-3 px-md-4 py-2 disabled">
+                                                        {{-- Teknisi sudah ditugaskan, belum mulai atau belum update --}}
+                                                        <span class="btn btn-secondary btn-lg px-4 py-2 disabled">
                                                             <i class="fas fa-clock mr-1"></i> Menunggu perbaikan
                                                         </span>
                                                     @endif
