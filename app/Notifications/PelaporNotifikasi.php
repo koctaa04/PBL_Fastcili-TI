@@ -42,10 +42,10 @@ class PelaporNotifikasi extends Notification
         return [
             'id_laporan' => $this->laporan->id_laporan,
 
-            'fasilitas' => $this->laporan->laporan->fasilitas->nama_fasilitas, 
-            'status' => $this->laporan->laporan->status->nama_status, 
-            'assigned_by' => auth()->check() ? auth()->user()->name : 'System', 
-            'link' => route('perbaikan.index'), 
+            // 'fasilitas' => $this->laporan->laporan->fasilitas->nama_fasilitas, 
+            // 'status' => $this->laporan->laporan->status->nama_status, 
+            // 'assigned_by' => auth()->check() ? auth()->user()->name : 'System', 
+            // 'link' => route('perbaikan.index'), 
 
             'fasilitas' => $this->laporan->laporan->fasilitas->nama_fasilitas, // Assuming 'judul' is a field in PenugasanTeknisi
             'status' => $this->laporan->laporan->status->nama_status, // Assuming 'deskripsi' is a field

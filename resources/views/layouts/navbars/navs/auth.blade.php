@@ -99,6 +99,8 @@
                                 <a class="dropdown-item text-center" href="#" onclick="markAllNotificationsAsRead()">Tandai
                                     semua telah di baca</a>
                             @endif
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center" href="{{ route('notifications.history') }}">Lihat Semua Notifikasi</a>
                         </div>
                     </li>
                     <li class="nav-item btn-rotate dropdown">
