@@ -175,6 +175,8 @@ Route::group(['middleware' => 'auth'], function () {
 		 *  ---------------------------- */
 		Route::prefix('perbaikan')->group(function () {
 			Route::get('/', [PerbaikanController::class, 'index'])->name('perbaikan_teknisi.index');
+			Route::get('/riwayat_perbaikan', [PerbaikanController::class, 'riwayat_perbaikan'])->name('riwayat_perbaikan.index');
+			Route::get('/riwayat/ajax', [PerbaikanController::class, 'list_riwayat_perbaikan'])->name('riwayat.list');
 			Route::get('/edit/{id}', [PerbaikanController::class, 'edit']);
 			Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 			Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);

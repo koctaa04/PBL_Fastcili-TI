@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\PenugasanTeknisi;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class PerbaikanController extends Controller
 {
@@ -19,16 +21,66 @@ class PerbaikanController extends Controller
                 ->where('id_user', auth()->user()->id_user)
                 ->get();
         }
-        // dd(auth()->user()->id_user);
-        // dd($laporan);
+
         return view('perbaikan.index', ['laporan_kerusakan' => $laporan]);
     }
+
+    public function riwayat_perbaikan(Request $request)
+    {
+        if ($request->ajax()) {
+            //ketika teknisi login
+            if (auth()->user()->id_level == 3) {
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai Dikerjakan')->where('id_user', auth()->user()->id_user);
+            } else if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai Dikerjakan');
+            }
+
+            // Filter bulan berjalan
+            if ($request->bulan) {
+                $query->whereMonth('tanggal_selesai', $request->bulan)
+                    ->whereYear('tanggal_selesai', now()->year);
+            }
+
+            $data = $query->get();
+
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('nama_fasilitas', function ($row) {
+                    return $row->laporan->fasilitas->nama_fasilitas ?? '-';
+                })
+                ->addColumn('nama_ruangan', function ($row) {
+                    return $row->laporan->fasilitas->ruangan->nama_ruangan ?? '-';
+                })
+                ->addColumn('nama_gedung', function ($row) {
+                    return $row->laporan->fasilitas->ruangan->gedung->nama_gedung ?? '-';
+                })
+                ->addColumn('tanggal_selesai', function ($row) {
+                    return $row->tanggal_selesai
+                        ? \Carbon\Carbon::parse($row->tanggal_selesai)->translatedFormat('l, d F Y')
+                        : '-';
+                })
+                ->addColumn('catatan_teknisi', function ($row) {
+                    return $row->catatan_teknisi ?? '-';
+                })
+                ->addColumn('aksi', function ($row) {
+                    $url = url('/perbaikan/detail/' . $row->id_penugasan);
+                    return '<button onclick="modalAction(\'' . $url . '\')" class="btn btn-info btn-sm btn-round">
+                            <i class="nc-icon nc-zoom-split"></i> Detail
+                        </button>';
+                })
+                ->rawColumns(['aksi'])
+                ->toJson();
+        }
+
+        return view('perbaikan.riwayat_perbaikan');
+    }
+
 
     public function edit($id)
     {
         if (auth()->user()->id_level == 3) {
             $perbaikan = PenugasanTeknisi::with('laporan.fasilitas')->findOrFail($id);
-            
+
             return view('perbaikan.edit', ['laporan_kerusakan' => $perbaikan]);
         } else {
             return back();
@@ -106,34 +158,34 @@ class PerbaikanController extends Controller
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 3) {
             $perbaikan = PenugasanTeknisi::with(['laporan.fasilitas', 'user', 'laporan.pelaporLaporan'])
                 ->findOrFail($id);
-    
+
             $laporan = $perbaikan->laporan;
-    
+
             // Ambil semua PelaporLaporan terkait laporan ini
             $pelaporLaporan = $laporan->pelaporLaporan;
-    
+
             // Hitung jumlah pendukung (total PelaporLaporan)
             $jumlahPendukung = $pelaporLaporan->count();
-    
+
             // Ambil rating yang tidak null
             $ratings = $pelaporLaporan->whereNotNull('rating_pengguna')->pluck('rating_pengguna');
-    
+
             // Hitung jumlah yang sudah memberikan rating
             $jumlahRatingDiberikan = $ratings->count();
-    
+
             // Hitung total nilai rating
             $totalRating = $ratings->sum();
-    
+
             // Hitung rating akhir skala 0-5
             $totalPossibleScore = 5 * $jumlahPendukung;
             $ratingAkhir = $totalPossibleScore > 0 ? ($totalRating / $totalPossibleScore) * 5 : 0;
-    
+
             // Ambil maksimal 5 feedback_pengguna pertama yang tidak null
             $ulasan = $pelaporLaporan
                 ->whereNotNull('feedback_pengguna')
                 ->pluck('feedback_pengguna')
                 ->take(10);
-    
+
             // Kirim ke view
             return view('perbaikan.detail', compact(
                 'perbaikan',

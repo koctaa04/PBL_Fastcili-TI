@@ -69,7 +69,8 @@
             @endif
 
             {{-- Fasilitas --}}
-            <li class="{{ $elementActive == 'gedung' || $elementActive == 'fasilitas' || $elementActive == 'ruangan' ? 'active' : '' }}">
+            <li
+                class="{{ $elementActive == 'gedung' || $elementActive == 'fasilitas' || $elementActive == 'ruangan' ? 'active' : '' }}">
                 <a data-toggle="collapse" aria-expanded="false" href="#fas">
                     <i class="nc-icon nc-bank"></i>
                     <p>
@@ -101,9 +102,9 @@
                     </ul>
                 </div>
             </li>
-            
+
             {{-- Laporan --}}
-            @if (auth()->user()->id_level != 3 )
+            @if (auth()->user()->id_level != 3)
                 <li
                     class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'trending' || $elementActive == 'prioritas' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#laporan">
@@ -140,10 +141,10 @@
                     </div>
                 </li>
             @endif
-            
+
             {{-- Teknisi --}}
             @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2 || auth()->user()->id_level == 3)
-                <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
+                <li class="{{ $elementActive == 'perbaikan_teknisi' || $elementActive == 'riwayat_perbaikan' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#teknisi">
                         <i class="nc-icon nc-settings"></i>
                         <p>
@@ -151,12 +152,19 @@
                             <b class="caret"></b>
                         </p>
                     </a>
-                    <div class="collapse {{ $elementActive == 'perbaikan_teknisi' ? 'show' : '' }}" id="teknisi">
+                    <div class="collapse {{ $elementActive == 'perbaikan_teknisi' || $elementActive == 'riwayat_perbaikan' ? 'show' : '' }}"
+                        id="teknisi">
                         <ul class="nav">
                             <li class="{{ $elementActive == 'perbaikan_teknisi' ? 'active' : '' }}">
                                 <a href="{{ route('perbaikan_teknisi.index') }}">
                                     <span class="sidebar-mini-icon">{{ __('DP') }}</span>
                                     <span class="sidebar-normal">{{ __(' Daftar Perbaikan ') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ $elementActive == 'riwayat_perbaikan' ? 'active' : '' }}">
+                                <a href="{{ route('riwayat_perbaikan.index') }}">
+                                    <span class="sidebar-mini-icon">{{ __('RP') }}</span>
+                                    <span class="sidebar-normal">{{ __(' Riwayat Perbaikan ') }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -170,8 +178,7 @@
                         style="display: none;">
                         @csrf
                     </form>
-                    <a onclick="confirmLogout(event)" class="bg-danger"
-                        style="display: block; margin-bottom: 20px;">
+                    <a onclick="confirmLogout(event)" class="bg-danger" style="display: block; margin-bottom: 20px;">
                         <i class="nc-icon nc-button-power text-white"></i>
                         <p class="text-white">{{ __('Log out') }}</p>
                     </a>
@@ -195,7 +202,7 @@
                         }
                     });
                 }
-              </script>
+            </script>
         </ul>
     </div>
 </div>

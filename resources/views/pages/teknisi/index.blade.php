@@ -215,56 +215,6 @@
         </div>
 
 
-
-
-        @if ($riwayat->count() > 0)
-            {{-- Tabel Riwayat Penugasan --}}
-            <div class="card p-4 shadow">
-                <div class="card-header bg-light pb-0">
-                    <h3 class="card-title text-dark">Riwayat Penugasan Perbaikan</h3>
-                    <p class="card-category">Daftar perbaikan yang telah diselesaikan</p>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped table-sm" id="table_level">
-                            <thead class="bg-light text-dark">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nama Fasilitas</th>
-                                    <th scope="col">Ruangan</th>
-                                    <th scope="col">Gedung</th>
-                                    <th scope="col">Tanggal Selesai</th>
-                                    <th scope="col">Catatan Teknisi</th>
-                                    <th scope="col">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($riwayat as $lapor => $l)
-                                    <tr>
-                                        <th scope="row">{{ $lapor + 1 }}</th>
-                                        <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
-                                        <td>{{ $l->laporan->fasilitas->ruangan->nama_ruangan }}</td>
-                                        <td>{{ $l->laporan->fasilitas->ruangan->gedung->nama_gedung }}</td>
-                                        <td>
-                                            {{ $l->tanggal_selesai ? $l->tanggal_selesai->translatedFormat('l, d F Y') : '-' }}
-                                        </td>
-                                        <td>{{ $l->catatan_teknisi }}</td>
-                                        <td>
-                                            <button
-                                                onclick="modalAction('{{ url('/perbaikan/detail/' . $l->id_penugasan) }}')"
-                                                class="btn btn-info btn-sm btn-round">
-                                                <i class="nc-icon nc-zoom-split"></i> Detail
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        @endif
-
         {{-- Grafik --}}
         <div class="row mt-4">
             <div class="col-md-6">
@@ -293,20 +243,10 @@
 
     </div>
 
-
-    {{-- Modal --}}
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
-        <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true"
-        data-keyboard="false" aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
     <script>
-        function modalAction(url = '') {
-            $('#myModal').load(url, function() {
-                $('#myModal').modal('show');
-            });
-        }
 
         const perbaikanPerBulanData = {!! json_encode($perbaikanPerBulan) !!};
         const penugasanPerGedungData = {!! json_encode($penugasanPerGedung) !!};

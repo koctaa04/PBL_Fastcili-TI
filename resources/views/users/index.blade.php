@@ -108,9 +108,9 @@
                         data: 'level.nama_level',
                         name: 'level.nama_level',
                         className: 'text-center',
-                            render: function(data, type, row) {
-        return data ? data : '--';
-    }
+                        render: function(data, type, row) {
+                            return data ? data : '--';
+                        }
                     },
                     {
                         data: 'akses',
