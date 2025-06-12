@@ -584,7 +584,7 @@ class LaporanKerusakanController extends Controller
 
 
             $penugasan->update([
-                'status_perbaikan' => 'Selesai',
+                'status_perbaikan' => 'Selesai Dikerjakan',
                 'komentar_sarpras' => null,
             ]);
 

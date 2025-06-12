@@ -66,7 +66,7 @@
                                     <label class="text-muted small mb-1">Teknisi</label>
                                     <p class="font-weight-bold">
                                         <i class="fas fa-user-tie mr-2 text-success"></i>
-                                        {{ $perbaikan->laporan->penugasan->user->nama }}
+                                        {{ $perbaikan->user->nama }}
                                     </p>
                                 </div>
                             </div>

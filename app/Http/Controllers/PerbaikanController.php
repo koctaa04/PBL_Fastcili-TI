@@ -16,33 +16,20 @@ class PerbaikanController extends Controller
 {
     public function index()
     {
-        // Status perbaikan yang ingin ditampilkan
-        $status = ['Sedang Dikerjakan', 'Selesai Dikerjakan'];
+        // Status perbaikan yang ingin ditampilkan (tidak termasuk 'Selesai Dikerjakan')
+        $status = ['Sedang Dikerjakan', 'Selesai'];
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-
-            $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
-                ->whereHas('laporan', function ($query) {
-                    $query->where('status_perbaikan', '!=', 'Selesai');
-                })
-
-            // Admin & Sarpras melihat semua penugasan
+            // Admin & Sarpras melihat semua penugasan yang belum selesai
             $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
                 ->whereIn('status_perbaikan', $status)
                 ->latest()
-
                 ->get();
         } else {
-            // Teknisi melihat penugasannya sendiri
+            // Teknisi melihat penugasannya sendiri yang belum selesai
             $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
                 ->where('id_user', auth()->user()->id_user)
-
-                ->whereHas('laporan', function ($query) {
-                    $query->where('status_perbaikan', '!=', 'Selesai');
-                })
-
                 ->whereIn('status_perbaikan', $status)
                 ->latest()
-
                 ->get();
         }
 
@@ -55,20 +42,13 @@ class PerbaikanController extends Controller
             $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung']);
 
             if (auth()->user()->id_level == 3) {
-                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai')->where('id_user', auth()->user()->id_user);
+                // Teknisi hanya melihat riwayat miliknya yang selesai dikerjakan
+                $query->where('id_user', auth()->user()->id_user)
+                      ->where('status_perbaikan', 'Selesai Dikerjakan');
             } else if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai');
-                // Teknisi hanya lihat riwayat miliknya
-                $query->where('id_user', auth()->user()->id_user);
+                // Admin & Sarpras melihat semua yang selesai dikerjakan
+                $query->where('status_perbaikan', 'Selesai Dikerjakan');
             }
-
-            // Filter: yang sudah selesai (laporan) atau tidak selesai (penugasan)
-            $query->where(function ($q) {
-                $q->where('status_perbaikan', 'Tidak Selesai')
-                    ->orWhereHas('laporan', function ($subQuery) {
-                        $subQuery->where('id_status', 4); // Selesai diverifikasi
-                    });
-            });
 
             $data = $query->latest()->get();
 
@@ -88,22 +68,12 @@ class PerbaikanController extends Controller
                         ? \Carbon\Carbon::parse($row->tanggal_selesai)->translatedFormat('l, d F Y')
                         : '-';
                 })
-                // Kolom Status: ambil dari status_perbaikan atau id_status
                 ->addColumn('status', function ($row) {
-                    if ($row->status_perbaikan === 'Tidak Selesai') {
-                        return '<span class="badge badge-danger">Tidak Selesai</span>';
-                    } elseif ($row->laporan->id_status == 4) {
-                        return '<span class="badge badge-success">Selesai Diperbaiki</span>';
-                    } else {
-                        return '-';
-                    }
+                    return '<span class="badge badge-success">Selesai Dikerjakan</span>';
                 })
-
-                // Kolom Skor Kinerja (nilai deskriptif)
                 ->addColumn('skor_kinerja', function ($row) {
                     return $row->skor_kinerja ?? '-';
                 })
-
                 ->addColumn('aksi', function ($row) {
                     $url = url('/perbaikan/detail/' . $row->id_penugasan);
                     return '<button onclick="modalAction(\'' . $url . '\')" class="btn btn-info btn-sm btn-round">
@@ -116,7 +86,6 @@ class PerbaikanController extends Controller
 
         return view('perbaikan.riwayat_perbaikan');
     }
-
 
     public function skor_teknisi()
     {
@@ -175,7 +144,7 @@ class PerbaikanController extends Controller
         }
 
         try {
-            $perbaikan->status_perbaikan = 'Selesai Dikerjakan';
+            $perbaikan->status_perbaikan = 'Selesai';
             $perbaikan->catatan_teknisi = $request->catatan_teknisi;
             $perbaikan->tanggal_selesai = now();
 

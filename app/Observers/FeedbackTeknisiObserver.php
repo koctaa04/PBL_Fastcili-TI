@@ -52,7 +52,7 @@ class FeedbackTeknisiObserver
 
         if ($penugasanTeknisi->isDirty('status_perbaikan')) {
             $newStatus = $penugasanTeknisi->status_perbaikan;
-            if (in_array($newStatus, ['Selesai', 'Ditolak'])) {
+            if (in_array($newStatus, ['Selesai Dikerjakan', 'Ditolak'])) {
                 $teknisi = $penugasanTeknisi->user;
                 if ($teknisi) {
                     $teknisi->notify(new TeknisiNotifikasi($penugasanTeknisi, 'Status diperbarui menjadi ' . strtoupper($newStatus)));
