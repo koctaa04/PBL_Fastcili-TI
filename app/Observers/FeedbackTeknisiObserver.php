@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\PenugasanTeknisi;
 use App\Notifications\SarprasNotifikasi;
+use App\Notifications\TeknisiNotifikasi;
 use App\Models\User;
 
 class FeedbackTeknisiObserver
@@ -37,6 +38,25 @@ class FeedbackTeknisiObserver
                     'link' => url('/laporan/verifikasi/'. $penugasanTeknisi->id_laporan),
 
                 ]));
+            }
+        }
+
+        if ($penugasanTeknisi->wasChanged('id_user')) {
+            $teknisiBaru = User::find($penugasanTeknisi->id_user);
+            if ($teknisiBaru) {
+                $teknisiBaru->notify(new TeknisiNotifikasi($penugasanTeknisi, 'Penugasan Baru ' . 
+                                    $penugasanTeknisi->laporan->fasilitas->ruangan->nama_ruangan . 
+                                    ', ' . $penugasanTeknisi->laporan->fasilitas->ruangan->gedung->nama_gedung));
+            }
+        }
+
+        if ($penugasanTeknisi->isDirty('status_perbaikan')) {
+            $newStatus = $penugasanTeknisi->status_perbaikan;
+            if (in_array($newStatus, ['Selesai', 'Ditolak'])) {
+                $teknisi = $penugasanTeknisi->user;
+                if ($teknisi) {
+                    $teknisi->notify(new TeknisiNotifikasi($penugasanTeknisi, 'Status diperbarui menjadi ' . strtoupper($newStatus)));
+                }
             }
         }
     }

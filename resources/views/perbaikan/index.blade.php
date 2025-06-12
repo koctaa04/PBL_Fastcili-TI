@@ -59,7 +59,7 @@
                                             {{ $laporan->laporan->status->nama_status }}
                                         @else
                                             class="badge badge-pill py-2
-                                                {{ $laporan->status_perbaikan == 'Selesai Dikerjakan' ? 'badge-success' :
+                                                {{ $laporan->status_perbaikan == 'Selesai' ? 'badge-success' :
                                                    ($laporan->status_perbaikan == 'Ditolak' ? 'badge-danger' : 'badge-warning') }}">
                                             {{ $laporan->status_perbaikan }}
                                         @endif
@@ -90,7 +90,8 @@
                                         <div class="d-flex">
                                             @php
                                                 $isLate = \Carbon\Carbon::now()->greaterThan($laporan->tenggat);
-                                                $isEditable = $laporan->status_perbaikan != 'Selesai Dikerjakan';
+                                                $isEditable = $laporan->status_perbaikan != 'Selesai';
+                                                $isWaiting = $laporan->status_perbaikan == 'Selesai Dikerjakan';
                                                 $isRejected = !is_null($laporan->komentar_sarpras);
                                                 $isReported = !is_null($laporan->dokumentasi);
 
@@ -99,17 +100,19 @@
                                             @endphp
 
 
-                                            @if (auth()->user()->id_level == 3)
-                                                @if ($isEditable && !$isLate)
-                                                    <button onclick="modalAction('{{ $laporanUrl }}')"
-                                                        class="btn btn-sm btn-danger mr-2">
-                                                        {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
-                                                    </button>
-                                                @elseif ($isLate && $isEditable)
-                                                    <button class="btn btn-sm btn-secondary mr-2" disabled>
-                                                        Tenggat Terlewat
-                                                    </button>
-                                                @endif
+                                            @if ($isWaiting && $isEditable)
+                                                <button class="btn btn-sm btn-warning mr-2" disabled>
+                                                    Menunggu Verifikasi
+                                                </button>
+                                            @elseif ($isEditable && !$isLate)
+                                                <button onclick="modalAction('{{ $laporanUrl }}')"
+                                                    class="btn btn-sm btn-danger mr-2">
+                                                    {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                                </button>
+                                            @elseif ($isLate && $isEditable)
+                                                <button class="btn btn-sm btn-secondary mr-2" disabled>
+                                                    Tenggat Terlewat
+                                                </button>
                                             @endif
 
                                             <button onclick="modalAction('{{ $detailUrl }}')"

@@ -103,117 +103,130 @@
             <p>🔧 Jangan lupa untuk memperbarui status pekerjaan setelah perbaikan selesai dilakukan.</p>
         </div>
 
-
-        <div class="card border-0 mb-4">
-            <div class="card-header bg-light pb-3">
-                <h6 class="mb-0 font-weight-bold">
-                    <i class="fas fa-info-circle mr-2 text-primary"></i>Penugasan Perbaikan
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="text-center">
-                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $penugasan->laporan->foto_kerusakan) }}"
-                                alt="Foto Kerusakan" class="img-fluid rounded shadow-sm border"
-                                style="max-height: 250px; width: auto;"
-                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
-
-                            <button
-                                onclick="modalAction('{{ route('teknisi.feedback', ['id' => $penugasan->id_penugasan]) }}')"
-                                class="btn btn-primary btn-block mt-3 py-2" style="font-size: 16px;">
-                                <i class="fas fa-tools mr-2"></i> Laporkan Perbaikan
-                            </button>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-8">
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1">Fasilitas</label>
-                            <p class="font-weight-bold">
-                                <i class="fas fa-tools mr-2 text-warning"></i>
-                                {{ $penugasan->laporan->fasilitas->nama_fasilitas }}
-                            </p>
-
-                            </p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1">Deskripsi Kerusakan</label>
-                            <div class="bg-light p-3 rounded">
-                                <p class="mb-1">{{ $penugasan->laporan->deskripsi }}</p>
-
-                                @foreach ($penugasan->laporan->pelaporLaporan as $pelapor)
-                                    @if ($pelapor->deskripsi_tambahan)
-                                        <hr>
-                                        <p class="mb-1 text-muted small">Tambahan dari pelapor (Nama :
-                                            {{ $pelapor->user->nama }})</p>
-                                        <p class="mb-1">{{ $pelapor->deskripsi_tambahan }}</p>
-                                    @endif
-                                @endforeach
+        @if ($penugasan && $penugasan->status_perbaikan != "Selesai")
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-light pb-3">
+                    <h6 class="mb-0 font-weight-bold">
+                        <i class="fas fa-info-circle mr-2 text-primary"></i>Penugasan Perbaikan
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="text-center">
+                                @php
+                                    $isLate = \Carbon\Carbon::now()->greaterThan($penugasan->tenggat);
+                                    $isEditable = $penugasan->status_perbaikan != 'Selesai Dikerjakan';
+                                    $isRejected = !is_null($penugasan->komentar_sarpras);
+                                    $isReported = !is_null($penugasan->dokumentasi);
+                                    $laporanUrl = url('/perbaikan/edit/' . $penugasan->id_penugasan);
+                                    $detailUrl = url('/perbaikan/detail/' . $penugasan->id_penugasan);
+                                @endphp
+                                <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $penugasan->laporan->foto_kerusakan) }}"
+                                    alt="Foto Kerusakan" class="img-fluid rounded shadow-sm border"
+                                    style="max-height: 250px; width: auto;"
+                                    onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
+                                @if ($penugasan && $penugasan->status_perbaikan == 'Selesai Dikerjakan')
+                                    <button
+                                        class="btn btn-warning btn-block mt-3 py-2" style="font-size: 16px;" disabled>
+                                        <i class="fa-solid fa-spinner"></i> Menunggu Verifikasi
+                                    </button>
+                                @else 
+                                    <button onclick="modalAction('{{ $laporanUrl }}')"
+                                        class="btn btn-primary btn-block mt-3 py-2" style="font-size: 16px;">
+                                        <i class="fas fa-tools mr-2"></i>{{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
 
-                        <!-- Komentar Sarpras Section -->
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1">Komentar Sarpras</label>
-                            <div class="bg-light p-3 rounded">
-                                <p class="mb-0">
-                                    {{ $penugasan->komentar_sarpras ?? '-' }}</p>
-
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="text-muted small mb-1">Tanggal Lapor</label>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="text-muted small mb-1">Fasilitas</label>
                                 <p class="font-weight-bold">
-                                    <i class="fas fa-calendar-alt mr-2 text-info"></i>
-                                    {{ $penugasan->laporan->tanggal_lapor
-                                        ? \Carbon\Carbon::parse($penugasan->laporan->tanggal_lapor)->locale('id')->translatedFormat('l, d F Y')
-                                        : '-' }}
+                                    <i class="fas fa-tools mr-2 text-warning"></i>
+                                    {{ $penugasan->laporan->fasilitas->nama_fasilitas }}
+                                </p>
 
                                 </p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="text-muted small mb-1">Tenggat Perbaikan</label>
-                                <p class="font-weight-bold">
-                                    <i class="fas fa-calendar-alt mr-2 text-info"></i>
 
-                                    {{ $penugasan->tenggat
-                                        ? \Carbon\Carbon::parse($penugasan->tenggat)->locale('id')->translatedFormat('l, d F Y')
-                                        : '-' }}
-                                </p>
+                            <div class="mb-3">
+                                <label class="text-muted small mb-1">Deskripsi Kerusakan</label>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-1">{{ $penugasan->laporan->deskripsi }}</p>
+
+                                    @foreach ($penugasan->laporan->pelaporLaporan as $pelapor)
+                                        @if ($pelapor->deskripsi_tambahan)
+                                            <hr>
+                                            <p class="mb-1 text-muted small">Tambahan dari pelapor (Nama :
+                                                {{ $pelapor->user->nama }})</p>
+                                            <p class="mb-1">{{ $pelapor->deskripsi_tambahan }}</p>
+                                        @endif
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="text-muted small mb-1">Ruangan</label>
-                                <p class="font-weight-bold">
-                                    <i class="fas fa-door-open mr-2 text-info"></i>
-                                    {{ $penugasan->laporan->fasilitas->ruangan->nama_ruangan }}
 
 
-                                </p>
+                            <!-- Komentar Sarpras Section -->
+                            <div class="mb-3">
+                                <label class="text-muted small mb-1">Komentar Sarpras</label>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-0">
+                                        {{ $penugasan->komentar_sarpras ?? '-' }}</p>
+
+                                    </p>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="text-muted small mb-1">Gedung</label>
-                                <p class="font-weight-bold">
-                                    <i class="fas fa-building mr-2 text-info"></i>
-                                    {{ $penugasan->laporan->fasilitas->ruangan->gedung->nama_gedung }}
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small mb-1">Tanggal Lapor</label>
+                                    <p class="font-weight-bold">
+                                        <i class="fas fa-calendar-alt mr-2 text-info"></i>
+                                        {{ $penugasan->laporan->tanggal_lapor
+                                            ? \Carbon\Carbon::parse($penugasan->laporan->tanggal_lapor)->locale('id')->translatedFormat('l, d F Y')
+                                            : '-' }}
+
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small mb-1">Tenggat Perbaikan</label>
+                                    <p class="font-weight-bold">
+                                        <i class="fas fa-calendar-alt mr-2 text-info"></i>
+
+                                        {{ $penugasan->tenggat
+                                            ? \Carbon\Carbon::parse($penugasan->tenggat)->locale('id')->translatedFormat('l, d F Y')
+                                            : '-' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small mb-1">Ruangan</label>
+                                    <p class="font-weight-bold">
+                                        <i class="fas fa-door-open mr-2 text-info"></i>
+                                        {{ $penugasan->laporan->fasilitas->ruangan->nama_ruangan }}
 
 
-                                </p>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small mb-1">Gedung</label>
+                                    <p class="font-weight-bold">
+                                        <i class="fas fa-building mr-2 text-info"></i>
+                                        {{ $penugasan->laporan->fasilitas->ruangan->gedung->nama_gedung }}
+
+
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
+        @endif
 
         {{-- Grafik --}}
         <div class="row mt-4">
@@ -242,11 +255,17 @@
         </div>
 
     </div>
-
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false"
+        aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
     <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
 
         const perbaikanPerBulanData = {!! json_encode($perbaikanPerBulan) !!};
         const penugasanPerGedungData = {!! json_encode($penugasanPerGedung) !!};
