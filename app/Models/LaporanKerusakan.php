@@ -47,8 +47,7 @@ class LaporanKerusakan extends Model
     {
         return $this->belongsTo(StatusLaporan::class, 'id_status');
     }
-
-    //Kriteria
+    
     public function kriteria()
     {
         return $this->hasMany(KriteriaPenilaian::class, 'id_laporan');
@@ -56,6 +55,7 @@ class LaporanKerusakan extends Model
 
     public function penugasan()
     {
-        return $this->hasOne(PenugasanTeknisi::class, 'id_laporan');
+        return $this->hasMany(PenugasanTeknisi::class, 'id_laporan');
     }
+
 }

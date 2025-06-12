@@ -182,6 +182,7 @@ Route::group(['middleware' => 'auth'], function () {
 			Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 			Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 		});
+		Route::get('/teknisi/skor', [PerbaikanController::class, 'skor_teknisi']);
 	});
 
 	Route::middleware(['authorize:1,4,5,6'])->group(function () {
@@ -213,8 +214,13 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
 		Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 		Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
+
     	Route::get('/laporan/ganti-teknisi/{id}', [LaporanKerusakanController::class, 'formGantiTeknisi']);
 	  Route::post('/ganti-teknisi', [LaporanKerusakanController::class, 'gantiTeknisi']);
+
+		Route::get('/laporan/ganti-teknisi/{id}', [LaporanKerusakanController::class, 'formGantiTeknisi']);
+		Route::post('/ganti-teknisi', [LaporanKerusakanController::class, 'gantiTeknisi']);
+
 	});
 
 	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');

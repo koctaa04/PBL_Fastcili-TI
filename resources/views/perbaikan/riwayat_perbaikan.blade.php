@@ -5,14 +5,25 @@
 
 @section('content')
     <div class="content">
-        <h3 class="mb-0">Riwayat Penugasan Perbaikan</h3>
-        <p class="card-category">Daftar perbaikan yang telah diselesaikan</p>
+        <div class="row align-items-center mb-3">
+            <div class="col-md-6">
+                <h3 class="mb-0">Riwayat Penugasan Perbaikan</h3>
+                <p class="card-category">Daftar perbaikan yang telah diselesaikan</p>
+            </div>
+            @if (auth()->user()->id_level == '2' || (auth()->user()->id_level == '1'))
+                <div class="col-md-6 text-md-right mt-3 mt-md-0">
+                    <button onclick="modalAction('{{ url('/teknisi/skor') }}')" class="btn btn-info">
+                        <i class="nc-icon nc-eye-split"></i> Lihat Skor Kredit Teknisi
+                    </button>
+                </div>
+            @endif
+        </div>
 
         {{-- Tabel Riwayat Penugasan --}}
         <div class="card p-4 shadow">
             <div class="form-group row">
                 <label for="filter_bulan" class="col-form-label col-sm-2">Filter Bulan</label>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                     <select id="filter_bulan" class="form-control">
                         <option value="">-- Semua Bulan --</option>
                         @for ($i = 1; $i <= now()->month; $i++)
@@ -25,6 +36,7 @@
             </div>
 
 
+
             <div class="table-responsive">
                 <table class="table table-hover table-striped table-sm" id="table_riwayat">
                     <thead class="bg-light text-dark">
@@ -34,7 +46,8 @@
                             <th scope="col">Ruangan</th>
                             <th scope="col">Gedung</th>
                             <th scope="col">Tanggal Selesai</th>
-                            <th scope="col">Catatan Teknisi</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Skor Kinerja</th>
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>
@@ -90,8 +103,12 @@
                         className: 'text-center'
                     },
                     {
-                        data: 'catatan_teknisi',
-                        name: 'catatan_teknisi'
+                        data: 'status',
+                        name: 'status'
+                    },
+                    {
+                        data: 'skor_kinerja',
+                        name: 'skor_kinerja'
                     },
                     {
                         data: 'aksi',

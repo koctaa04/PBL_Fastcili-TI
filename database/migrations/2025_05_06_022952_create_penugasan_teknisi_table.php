@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('catatan_teknisi')->nullable();
             $table->text('komentar_sarpras')->nullable();
             $table->string('dokumentasi')->nullable();
+            $table->integer('skor_kinerja')->nullable();
             $table->timestamps();
 
             $table->foreign('id_laporan')->references('id_laporan')->on('laporan_kerusakan')->onDelete('cascade');

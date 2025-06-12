@@ -3,7 +3,7 @@
         <form id="form_ganti_teknisi" method="POST" action="{{ url('/ganti-teknisi') }}">
             @csrf
             <input type="hidden" name="id_laporan" value="{{ $laporan->id_laporan }}">
-            <input type="hidden" name="id_penugasan" value="{{ $laporan->penugasan->id_penugasan }}">
+            <input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}">
 
             <div class="modal-header bg-gradient-primary text-white">
                 <h5 class="modal-title font-weight-bold">
@@ -26,7 +26,7 @@
                                 <div class="mb-3">
                                     <label class="text-muted small mb-1">Teknisi saat ini:</label>
                                     <div class="bg-light p-3 rounded">
-                                        <p class="mb-0">{{ $laporan->penugasan->user->nama }}</p>
+                                        <p class="mb-0">{{ $penugasan->user->nama }}</p>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -34,7 +34,9 @@
                                     <select name="id_user" id="id_user" class="form-control" required>
                                         <option value="">- Pilih Teknisi -</option>
                                         @foreach ($teknisi as $t)
-                                            <option value="{{ $t->id_user }}">{{ $t->nama }}</option>
+                                            @if ($t->id_user != $penugasan->id_user)
+                                                <option value="{{ $t->id_user }}">{{ $t->nama }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                     <small id="error-id_user" class="text-danger error-text"></small>
@@ -127,26 +129,39 @@
                     'Menyimpan...');
             },
             success: function(response) {
-                $('#form_ganti_teknisi button[type=submit]').prop('disabled', false).text('Okay');
+                $('#form_ganti_teknisi button[type=submit]').prop('disabled', false).text(
+                    'Tugaskan Teknisi');
                 if (response.success) {
                     $('#myModal').modal('hide');
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
-                        text: response.messages,
+                        text: response.message,
                     }).then(() => {
                         location.reload();
                     });
                 } else {
-                    alert('Gagal menyimpan data.');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text: response.message ||
+                            'PP Terjadi kesalahan saat menyimpan data.',
+                    });
                 }
             },
             error: function(xhr) {
-                $('#form_ganti_teknisi button[type=submit]').prop('disabled', false).text('Okay');
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    let errors = xhr.responseJSON.errors;
-                    $.each(errors, function(field, messages) {
+                $('#form_ganti_teknisi button[type=submit]').prop('disabled', false).text(
+                    'Tugaskan Teknisi');
+
+                if (xhr.status === 422 && xhr.responseJSON.errors) {
+                    $.each(xhr.responseJSON.errors, function(field, messages) {
                         $('#error-' + field).text(messages[0]);
+                    });
+                    
+                    Swal.fire({
+                        icon: "error",
+                        title: "Validasi Gagal!",
+                        text: "Silakan periksa kembali inputan Anda.",
                     });
                 } else {
                     Swal.fire({

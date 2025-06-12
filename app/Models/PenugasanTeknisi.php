@@ -19,7 +19,8 @@ class PenugasanTeknisi extends Model
         'status_perbaikan',
         'catatan_teknisi',
         'dokumentasi',
-        'komentar_sarpras'
+        'komentar_sarpras',
+        'skor_kinerja'
     ];
 
     protected $casts = [

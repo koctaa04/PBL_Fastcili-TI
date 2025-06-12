@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             KriteriaPenilaianSeeder::class,
             PenugasanTeknisiSeeder::class,
             pelaporLaporanSeeder::class,
+            CreditScoreTeknisiSeeder::class
         ]);
     }
 }

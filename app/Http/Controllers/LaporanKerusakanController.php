@@ -7,7 +7,7 @@ use App\Models\Gedung;
 use App\Models\Ruangan;
 use App\Models\Fasilitas;
 use Illuminate\Http\Request;
-use App\Models\StatusLaporan;
+use App\Models\CreditScoreTeknisi;
 use App\Models\PelaporLaporan;
 use App\Models\LaporanKerusakan;
 use App\Models\PenugasanTeknisi;
@@ -18,13 +18,16 @@ use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Chart\{
-    Chart, DataSeries, DataSeriesValues, PlotArea, Legend, Title
+    Chart,
+    DataSeries,
+    DataSeriesValues,
+    PlotArea,
+    Legend,
+    Title
 };
 use App\Http\Controllers\HomeController;
 use Carbon\Carbon;
-use Database\Seeders\pelaporLaporanSeeder;
-use Illuminate\Support\Facades\DB;
-use App\Notifications\PelaporNotifikasi;
+
 
 class LaporanKerusakanController extends Controller
 {
@@ -456,28 +459,63 @@ class LaporanKerusakanController extends Controller
     public function formGantiTeknisi($id)
     {
         $laporan = LaporanKerusakan::with('fasilitas')->findOrFail($id);
+        $penugasan = PenugasanTeknisi::where('id_laporan', $id)->first();
         $teknisi = User::where('id_level', '3')->get();
 
-        return view('laporan_prioritas.ganti_teknisi', compact('laporan', 'teknisi'));
+
+        return view('laporan_prioritas.ganti_teknisi', compact('laporan', 'penugasan', 'teknisi'));
     }
     public function gantiTeknisi(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'id_penugasan' => 'required|exists:penugasan_teknisi,id_penugasan',
             'id_laporan'   => 'required|exists:laporan_kerusakan,id_laporan',
             'id_user'      => 'required|exists:users,id_user',
             'tenggat'      => 'required|date|after_or_equal:today',
         ]);
 
-        $penugasan = PenugasanTeknisi::findOrFail($request->id_penugasan);
-        $penugasan->id_user = $request->id_user;
-        $penugasan->tenggat = $request->tenggat;
-        $penugasan->updated_at = now();
-        $penugasan->save();
+        // Ambil data penugasan lama
+        $penugasanLama = PenugasanTeknisi::findOrFail($validated['id_penugasan']);
+        $teknisiLama = $penugasanLama->id_user;
+        $tenggatLama = Carbon::parse($penugasanLama->tenggat);
+
+        // Default skor_kinerja untuk penugasan lama
+        $skorKinerjaLama = null;
+
+        // Cek apakah penggantian teknisi melewati tenggat
+        if ($tenggatLama->isPast() && $teknisiLama != $validated['id_user']) {
+            // Turunkan credit score teknisi lama
+            $credit = CreditScoreTeknisi::firstOrCreate(
+                ['id_user' => $teknisiLama],
+                ['credit_score' => 100]
+            );
+            $credit->credit_score = max(0, $credit->credit_score - 10);
+            $credit->save();
+
+            $skorKinerjaLama = '-10'; // keterangan penalti
+        }
+
+        // Update penugasan lama → tidak selesai & simpan penalti jika ada
+        $penugasanLama->update([
+            'status_perbaikan' => 'Tidak Selesai',
+            'skor_kinerja' => $skorKinerjaLama,
+            'updated_at' => now(),
+        ]);
+
+        // Buat penugasan baru (tanpa skor_kinerja)
+        PenugasanTeknisi::create([
+            'id_laporan'   => $validated['id_laporan'],
+            'id_user'      => $validated['id_user'],
+            'tenggat'      => $validated['tenggat'],
+            'status_perbaikan'       => 'Sedang Dikerjakan',
+            'skor_kinerja' => null,
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
 
         return response()->json([
             'success' => true,
-            'messages' => 'Teknisi berhasil diganti.',
+            'message' => 'Teknisi berhasil diganti.',
         ]);
     }
 
@@ -544,11 +582,35 @@ class LaporanKerusakanController extends Controller
                 'tanggal_selesai' => now(), // Selesai
             ]);
 
+
             $penugasan->update([
                 'status_perbaikan' => 'Selesai',
                 'komentar_sarpras' => null,
             ]);
 
+            // Ambil data credit score teknisi yang sudah pasti ada
+            $credit = CreditScoreTeknisi::where('id_user', $penugasan->id_user)->first();
+
+            if ($credit && $credit->credit_score < 100) {
+                $credit->credit_score = min(100, $credit->credit_score + 5);
+                $credit->save();
+
+
+                $penugasan->update([
+                    'status_perbaikan' => 'Selesai Dikerjakan',
+                    'komentar_sarpras' => null,
+                    'skor_kinerja' => '+5',
+                ]);
+            } else {
+                // Sudah maksimal, hanya update status & komentar
+                $penugasan->update([
+                    'status_perbaikan' => 'Selesai Dikerjakan',
+                    'komentar_sarpras' => null,
+                    'skor_kinerja' => null,
+                ]);
+            }
+
+            // Hapus nilai kriteria jika telah selesaidari proses penilaian Waspas
             KriteriaPenilaian::where('id_laporan', $idLaporan)->delete();
         } else {
             $penugasan->update([
@@ -565,15 +627,15 @@ class LaporanKerusakanController extends Controller
 
     public function createPelapor()
     {
-       if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
-          $laporan = PelaporLaporan::with([
-              'laporan.fasilitas.ruangan.gedung',
-              'laporan.status',
-              'user'
-          ])->get();
-          $gedung = Gedung::all();
+        if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
+            $laporan = PelaporLaporan::with([
+                'laporan.fasilitas.ruangan.gedung',
+                'laporan.status',
+                'user'
+            ])->get();
+            $gedung = Gedung::all();
 
-          return view('pages.pelapor.create', compact('laporan', 'gedung'));
+            return view('pages.pelapor.create', compact('laporan', 'gedung'));
         } else {
             return back();
         }
@@ -783,11 +845,11 @@ class LaporanKerusakanController extends Controller
             'tanggal_selesai',
             'id_status'
         )
-        ->whereYear('tanggal_lapor', $tahun)
-        ->whereMonth('tanggal_lapor', $bulan)
-        ->orderBy('id_laporan')
-        ->with('fasilitas', 'status')
-        ->get();
+            ->whereYear('tanggal_lapor', $tahun)
+            ->whereMonth('tanggal_lapor', $bulan)
+            ->orderBy('id_laporan')
+            ->with('fasilitas', 'status')
+            ->get();
 
         // Load library excel
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -796,7 +858,7 @@ class LaporanKerusakanController extends Controller
         $bulanTeks = $now->format('F_Y');
 
         // Sheet 1
-        $sheet->setTitle('Data Laporan ' .$bulanTeks);
+        $sheet->setTitle('Data Laporan ' . $bulanTeks);
         $sheet->setCellValue('A1', 'ID Laporan');
         $sheet->setCellValue('B1', 'Fasilitas');
         $sheet->setCellValue('C1', 'Deskripsi');
@@ -915,7 +977,7 @@ class LaporanKerusakanController extends Controller
 
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->setIncludeCharts(true);
-        $filename = 'Data_Laporan_Kerusakan_' .$bulanTeks. '.xlsx';
+        $filename = 'Data_Laporan_Kerusakan_' . $bulanTeks . '.xlsx';
 
         // Header untuk download file
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
