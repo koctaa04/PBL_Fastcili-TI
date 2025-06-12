@@ -94,7 +94,7 @@
                         <p class="card-category">Laporan per bulan</p>
                     </div>
                     <div class="card-body ">
-                        <canvas id=laporanPerBulan width="400" height="125"></canvas>
+                        <canvas id=laporanPerBulan width="400" height="200"></canvas>
                     </div>
                 </div>
             </div>
@@ -163,7 +163,7 @@
                         <p class="card-category">Laporan per status</p>
                     </div>
                     <div class="card-body ">
-                        <canvas id="statusLaporanChart"></canvas>
+                        <canvas id="statusLaporanChart" height="150"></canvas>
                     </div>
                 </div>
             </div>
@@ -173,7 +173,7 @@
                         <h5 class="card-title">Laporan per gedung</h5>
                     </div>
                     <div class="card-body">
-                        <canvas id="laporanGedungChart" width="400" height="100"></canvas>
+                        <canvas id="laporanGedungChart" width="400" height="115"></canvas>
                     </div>
                 </div>
             </div>
@@ -211,32 +211,72 @@
                 }
             });
 
-            //grafik laporan per bulan
+            const laporanPerBulanData = {!! json_encode($laporanPerBulan) !!};
+
             const ctx1 = document.getElementById('laporanPerBulan').getContext('2d');
             new Chart(ctx1, {
                 type: 'line',
                 data: {
-                    labels: {!! json_encode($laporanPerBulan->keys()) !!},
+                    labels: Object.keys(laporanPerBulanData),
                     datasets: [{
-                        label: 'Jumlah Laporan Masuk',
-                        data: {!! json_encode($laporanPerBulan->values()) !!},
+                        label: 'Jumlah Perbaikan',
+                        data: Object.values(laporanPerBulanData),
                         borderColor: 'rgba(218, 165, 32, 1)',
-                        backgroundColor: 'rgba(218, 165, 32, 1)',
+                        backgroundColor: 'rgba(218, 165, 32, 0.2)',
                         fill: true,
-                        tension: 0.1,
-                        borderWidth: 0
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(218, 165, 32, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(218, 165, 32, 1)',
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: true
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y;
+                                }
+                            }
                         }
                     },
                     scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                },
+                                precision: 0
+                            }
                         }
                     }
                 }
