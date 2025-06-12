@@ -28,6 +28,7 @@
                     </span>
                 </div>
             </div>
+            
             <div class="card-body p-0">
                 <div id="priority-container">
                     @foreach ($ranked as $r)
