@@ -69,7 +69,7 @@ class HomeController extends Controller
     }
 
     // Helper method untuk data laporan perbulan
-    protected function getLaporanPerBulan($tahun)
+    public function getLaporanPerBulan($tahun)
     {
         $bulanLengkap = collect([
             'Jan' => 0,
@@ -115,7 +115,7 @@ class HomeController extends Controller
     }
 
     // Helper method untuk data laporan per gedung
-    protected function getLaporanPerGedung()
+    public function getLaporanPerGedung()
     {
         $countPerGedung = DB::table('laporan_kerusakan')
             ->join('fasilitas', 'laporan_kerusakan.id_fasilitas', '=', 'fasilitas.id_fasilitas')

@@ -23,6 +23,12 @@
                                 <h6 class="mb-0 font-weight-bold">Form Penugasan</h6>
                             </div>
                             <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">Teknisi saat ini:</label>
+                                    <div class="bg-light p-3 rounded">
+                                        <p class="mb-0">{{ $laporan->penugasan->user->nama }}</p>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label for="id_user" class="form-label text-muted small">Pilih Teknisi</label>
                                     <select name="id_user" id="id_user" class="form-control" required>

@@ -48,14 +48,6 @@
                 </form>
 
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link btn-magnify" href="#pablo">
-                            <i class="nc-icon nc-layout-11"></i>
-                            <p>
-                                <span class="d-lg-none d-md-block">{{ __('Stats') }}</span>
-                            </p>
-                        </a>
-                    </li>
                     <li class="nav-item btn-rotate dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
@@ -107,6 +99,8 @@
                                 <a class="dropdown-item text-center" href="#" onclick="markAllNotificationsAsRead()">Tandai
                                     semua telah di baca</a>
                             @endif
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center" href="{{ route('notifications.history') }}">Lihat Semua Notifikasi</a>
                         </div>
                     </li>
                     <li class="nav-item btn-rotate dropdown">

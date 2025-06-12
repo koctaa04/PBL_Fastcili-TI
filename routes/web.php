@@ -150,6 +150,7 @@ Route::group(['middleware' => 'auth'], function () {
 			Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
 			Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
 			Route::post('/simpan-penilaian/{id}', [LaporanKerusakanController::class, 'simpanPenilaian'])->name('laporan.simpanPenilaian');
+			Route::get('/export_laporan', [LaporanKerusakanController::class, 'exportLaporan'])->name('laporan.exportLaporan');
 		});
 	});
 
@@ -175,6 +176,8 @@ Route::group(['middleware' => 'auth'], function () {
 		 *  ---------------------------- */
 		Route::prefix('perbaikan')->group(function () {
 			Route::get('/', [PerbaikanController::class, 'index'])->name('perbaikan_teknisi.index');
+			Route::get('/riwayat_perbaikan', [PerbaikanController::class, 'riwayat_perbaikan'])->name('riwayat_perbaikan.index');
+			Route::get('/riwayat/ajax', [PerbaikanController::class, 'list_riwayat_perbaikan'])->name('riwayat.list');
 			Route::get('/edit/{id}', [PerbaikanController::class, 'edit']);
 			Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 			Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
@@ -217,4 +220,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 	Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 	Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // Optional: page to view all notifications
+	Route::get('/notifikasi/history', [NotificationController::class, 'history'])->name('notifications.history');
+	Route::delete('/notifications/{id}', [NotificationController::class, 'delete'])->name('notifications.delete');
+	Route::delete('/notifications', [NotificationController::class, 'deleteAll'])->name('notifications.deleteAll');
 });

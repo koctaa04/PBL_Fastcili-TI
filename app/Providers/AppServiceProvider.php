@@ -12,6 +12,7 @@ use App\Observers\UpdateLaporanObserver;
 use App\Observers\FeedbackTeknisiObserver;
 use App\Observers\LaporanKerusakanObserver;
 use App\Observers\PenugasanTeknisiObserver;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         //     URL::forceScheme('https');
         // }
 
+        Paginator::useBootstrapFour();
         PenugasanTeknisi::observe(PenugasanTeknisiObserver::class);
         LaporanKerusakan::observe(LaporanKerusakanObserver::class);
         PenugasanTeknisi::observe(FeedbackTeknisiObserver::class);
