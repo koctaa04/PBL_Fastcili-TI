@@ -65,7 +65,7 @@ class LaporanKerusakanSeeder extends Seeder
                 'deskripsi' => 'Printer 3D nozzle tersumbat',
                 'foto_kerusakan' => 'printer3d-rusak.jpg',
                 'jumlah_kerusakan' => 1,
-                'tanggal_lapor' => Carbon::parse('2025-04-10'),
+                'tanggal_lapor' => Carbon::parse('2025-06-10'),
                 'tanggal_selesai' => null,
                 'id_status' => 3
             ],

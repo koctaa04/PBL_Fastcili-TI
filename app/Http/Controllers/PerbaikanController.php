@@ -50,7 +50,13 @@ class PerbaikanController extends Controller
                 $query->where('status_perbaikan', 'Selesai Dikerjakan');
             }
 
-
+            // Filter: yang sudah selesai (laporan) atau tidak selesai (penugasan)
+            $query->where(function ($q) {
+                $q->where('status_perbaikan', 'Tidak Selesai')
+                    ->orWhereHas('laporan', function ($subQuery) {
+                        $subQuery->where('id_status', 4); // Selesai diverifikasi
+                    });
+            });
 
             $data = $query->latest()->get();
 

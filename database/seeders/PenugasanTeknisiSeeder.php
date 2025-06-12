@@ -57,13 +57,13 @@ class PenugasanTeknisiSeeder extends Seeder
                 'updated_at' => now()
             ],
 
-            // ✅ Kondisi ketika Sudah ditugaskan, Sudah selesai
+            // ✅ Kondisi ketika Sudah ditugaskan, Sudah dikerjakan
             [
                 'id_laporan' => 6,
                 'id_user' => 6,
                 'status_perbaikan' => 'Selesai Dikerjakan',
-                'tanggal_selesai' => $penugasan3 = Carbon::parse('2025-04-20'),
-                'tenggat' => $penugasan3->copy()->addDays(4),
+                'tanggal_selesai' => now()->addDays(2),
+                'tenggat' => now()->addDays(7),
                 'catatan_teknisi' => 'printer 3D sudah diperbaiki.',
                 'dokumentasi' => 'printer3d-rusak.jpg',
                 'created_at' => now(),
