@@ -2,23 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PelaporLaporan;
+use App\Models\CreditScoreTeknisi;
+use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\PelaporLaporan;
 use App\Models\PenugasanTeknisi;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class PerbaikanController extends Controller
 {
     public function index()
     {
+        // Status perbaikan yang ingin ditampilkan
+        $status = ['Sedang Dikerjakan', 'Selesai Dikerjakan'];
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-            $laporan = PenugasanTeknisi::all();
+
+            $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
+                ->whereHas('laporan', function ($query) {
+                    $query->where('status_perbaikan', '!=', 'Selesai');
+                })
+
+            // Admin & Sarpras melihat semua penugasan
+            $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
+                ->whereIn('status_perbaikan', $status)
+                ->latest()
+
+                ->get();
         } else {
+            // Teknisi melihat penugasannya sendiri
             $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
                 ->where('id_user', auth()->user()->id_user)
+
+                ->whereHas('laporan', function ($query) {
+                    $query->where('status_perbaikan', '!=', 'Selesai');
+                })
+
+                ->whereIn('status_perbaikan', $status)
+                ->latest()
+
                 ->get();
         }
 
@@ -28,20 +52,25 @@ class PerbaikanController extends Controller
     public function riwayat_perbaikan(Request $request)
     {
         if ($request->ajax()) {
-            //ketika teknisi login
+            $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung']);
+
             if (auth()->user()->id_level == 3) {
-                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai Dikerjakan')->where('id_user', auth()->user()->id_user);
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai')->where('id_user', auth()->user()->id_user);
             } else if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai Dikerjakan');
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai');
+                // Teknisi hanya lihat riwayat miliknya
+                $query->where('id_user', auth()->user()->id_user);
             }
 
-            // Filter bulan berjalan
-            if ($request->bulan) {
-                $query->whereMonth('tanggal_selesai', $request->bulan)
-                    ->whereYear('tanggal_selesai', now()->year);
-            }
+            // Filter: yang sudah selesai (laporan) atau tidak selesai (penugasan)
+            $query->where(function ($q) {
+                $q->where('status_perbaikan', 'Tidak Selesai')
+                    ->orWhereHas('laporan', function ($subQuery) {
+                        $subQuery->where('id_status', 4); // Selesai diverifikasi
+                    });
+            });
 
-            $data = $query->get();
+            $data = $query->latest()->get();
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -59,20 +88,43 @@ class PerbaikanController extends Controller
                         ? \Carbon\Carbon::parse($row->tanggal_selesai)->translatedFormat('l, d F Y')
                         : '-';
                 })
-                ->addColumn('catatan_teknisi', function ($row) {
-                    return $row->catatan_teknisi ?? '-';
+                // Kolom Status: ambil dari status_perbaikan atau id_status
+                ->addColumn('status', function ($row) {
+                    if ($row->status_perbaikan === 'Tidak Selesai') {
+                        return '<span class="badge badge-danger">Tidak Selesai</span>';
+                    } elseif ($row->laporan->id_status == 4) {
+                        return '<span class="badge badge-success">Selesai Diperbaiki</span>';
+                    } else {
+                        return '-';
+                    }
                 })
+
+                // Kolom Skor Kinerja (nilai deskriptif)
+                ->addColumn('skor_kinerja', function ($row) {
+                    return $row->skor_kinerja ?? '-';
+                })
+
                 ->addColumn('aksi', function ($row) {
                     $url = url('/perbaikan/detail/' . $row->id_penugasan);
                     return '<button onclick="modalAction(\'' . $url . '\')" class="btn btn-info btn-sm btn-round">
                             <i class="nc-icon nc-zoom-split"></i> Detail
                         </button>';
                 })
-                ->rawColumns(['aksi'])
+                ->rawColumns(['status', 'aksi'])
                 ->toJson();
         }
 
         return view('perbaikan.riwayat_perbaikan');
+    }
+
+
+    public function skor_teknisi()
+    {
+        $teknisi = CreditScoreTeknisi::with('user')
+            ->orderBy('credit_score', 'asc')
+            ->get();
+
+        return view('pages/teknisi.modal_skor', compact('teknisi'));
     }
 
 

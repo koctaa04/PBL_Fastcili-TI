@@ -13,6 +13,7 @@ class TeknisiNotifikasi extends Notification
     use Queueable;
 
     protected $penugasan;
+    protected $keterangan;
 
     /**
      * Create a new notification instance.
@@ -20,9 +21,10 @@ class TeknisiNotifikasi extends Notification
      * @param PenugasanTeknisi $penugasan
      * @return void
      */
-    public function __construct(PenugasanTeknisi $penugasan)
+    public function __construct(PenugasanTeknisi $penugasan, $keterangan = null)
     {
         $this->penugasan = $penugasan;
+        $this->keterangan = $keterangan;
     }
 
     /**
@@ -46,12 +48,16 @@ class TeknisiNotifikasi extends Notification
      */
     public function toArray($notifiable)
     {
+        $status = $this->penugasan->status_perbaikan;
+
         return [
             'id_penugasan' => $this->penugasan->id_penugasan,
-            'fasilitas' => $this->penugasan->laporan->fasilitas->nama_fasilitas, // Assuming 'judul' is a field in PenugasanTeknisi
-            'deskripsi' => $this->penugasan->laporan->deskripsi, // Assuming 'deskripsi' is a field
-            'assigned_by' => auth()->check() ? auth()->user()->name : 'System', // Who assigned it
-            'link' => url('/perbaikan/detail/' . $this->penugasan->id_penugasan), // Example: link to the task details
+            'fasilitas' => $this->penugasan->laporan->fasilitas->nama_fasilitas,
+            'deskripsi' => $this->penugasan->laporan->deskripsi,
+            'assigned_by' => auth()->check() ? auth()->user()->name : 'System',
+            'status_perbaikan' => $status,
+            'keterangan' => $this->keterangan ?? 'Penugasan Baru',
+            'link' => url('/perbaikan/detail/' . $this->penugasan->id_penugasan),
         ];
     }
 

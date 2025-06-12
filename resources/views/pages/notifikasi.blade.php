@@ -34,7 +34,7 @@
                                                 {{ $notification->data['fasilitas'] ?? 'Notifikasi Baru' }}
                                             </h5>
                                             <p class="card-text text-muted mb-1">
-                                                {{ $notification->data['deskripsi'] ?? '-' }}
+                                                {{ $notification->data['keterangan'] ?? '-' }}
                                             </p>
                                         @elseif (auth()->user()->id_level == 2)
                                             <h5 class="card-title fw-bold text-dark mb-1">

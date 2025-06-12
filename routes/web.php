@@ -195,6 +195,7 @@ Route::group(['middleware' => 'auth'], function () {
 			Route::put('/update/{id}', [PerbaikanController::class, 'update']);
 			Route::get('/detail/{id}', [PerbaikanController::class, 'detail']);
 		});
+		Route::get('/teknisi/skor', [PerbaikanController::class, 'skor_teknisi']);
 	});
 
 	Route::middleware(['authorize:1,4,5,6'])->group(function () {

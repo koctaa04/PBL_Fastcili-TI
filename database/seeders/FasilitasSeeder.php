@@ -33,6 +33,30 @@ class FasilitasSeeder extends Seeder
             ['id_ruangan' => 75, 'kode_fasilitas' => 'TS-14-PR3D',  'nama_fasilitas' => 'Printer 3D',          'jumlah' => 2, 'created_at' => now()],
             ['id_ruangan' => 76, 'kode_fasilitas' => 'TS-15-RKSR',  'nama_fasilitas' => 'Rak Server',          'jumlah' => 5, 'created_at' => now()],
             ['id_ruangan' => 76, 'kode_fasilitas' => 'TS-15-UPSS',  'nama_fasilitas' => 'UPS',                 'jumlah' => 4, 'created_at' => now()],
+
+
+            ['id_ruangan' => 10, 'kode_fasilitas' => 'AA-01-KMPT', 'nama_fasilitas' => 'Komputer Dosen',        'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 10, 'kode_fasilitas' => 'AA-02-KMHS', 'nama_fasilitas' => 'Komputer Mahasiswa',    'jumlah' => 15, 'created_at' => now()],
+            ['id_ruangan' => 10, 'kode_fasilitas' => 'AA-03-PJKT', 'nama_fasilitas' => 'Proyektor',             'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 11, 'kode_fasilitas' => 'BB-01-WFRT', 'nama_fasilitas' => 'WiFi Router',           'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 11, 'kode_fasilitas' => 'BB-02-KRSD', 'nama_fasilitas' => 'Kursi Dosen',           'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 11, 'kode_fasilitas' => 'BB-03-KRMH', 'nama_fasilitas' => 'Kursi Mahasiswa',       'jumlah' => 30, 'created_at' => now()],
+            ['id_ruangan' => 12, 'kode_fasilitas' => 'CC-01-ACSP', 'nama_fasilitas' => 'AC Split',              'jumlah' => 2, 'created_at' => now()],
+            ['id_ruangan' => 12, 'kode_fasilitas' => 'CC-02-WBTR', 'nama_fasilitas' => 'Whiteboard + Spidol',   'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 13, 'kode_fasilitas' => 'DD-01-MCRO', 'nama_fasilitas' => 'Microphone',            'jumlah' => 2, 'created_at' => now()],
+            ['id_ruangan' => 13, 'kode_fasilitas' => 'DD-02-SPKR', 'nama_fasilitas' => 'Speaker Aktif',         'jumlah' => 2, 'created_at' => now()],
+            ['id_ruangan' => 14, 'kode_fasilitas' => 'EE-01-LPTR', 'nama_fasilitas' => 'Laptop',                'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 14, 'kode_fasilitas' => 'EE-02-MSRG', 'nama_fasilitas' => 'Meja Rapat',            'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 14, 'kode_fasilitas' => 'EE-03-PTSN', 'nama_fasilitas' => 'Papan Tulis',           'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 15, 'kode_fasilitas' => 'FF-01-KRHR', 'nama_fasilitas' => 'Kursi Roda',            'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 15, 'kode_fasilitas' => 'FF-02-LEMP', 'nama_fasilitas' => 'Lampu LED',             'jumlah' => 6, 'created_at' => now()],
+            ['id_ruangan' => 16, 'kode_fasilitas' => 'GG-01-TLRK', 'nama_fasilitas' => 'Televisi Rakitan',      'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 16, 'kode_fasilitas' => 'GG-02-DSPS', 'nama_fasilitas' => 'Display Panel Siswa',   'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 17, 'kode_fasilitas' => 'HH-01-KLMP', 'nama_fasilitas' => 'Kulkas Mini',           'jumlah' => 1, 'created_at' => now()],
+            ['id_ruangan' => 17, 'kode_fasilitas' => 'HH-02-MNTR', 'nama_fasilitas' => 'Monitor Tambahan',      'jumlah' => 2, 'created_at' => now()],
+            ['id_ruangan' => 18, 'kode_fasilitas' => 'II-01-CCTV', 'nama_fasilitas' => 'CCTV Indoor',           'jumlah' => 2, 'created_at' => now()],
+
+
         ]);
     }
 }

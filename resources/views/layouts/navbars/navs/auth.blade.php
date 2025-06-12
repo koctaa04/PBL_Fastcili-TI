@@ -68,7 +68,7 @@
                                         onclick="markNotificationAsRead('{{ $notification->id }}')">
                                         <strong>{{ $notification->data['fasilitas'] ?? 'Tugas Baru' }}</strong>
                                         <br>
-                                        <small>{{ $notification->data['deskripsi'] ?? 'Tidak ada deskripsi' }}</small>
+                                        <small>{{ $notification->data['keterangan'] ?? 'Tidak ada deskripsi' }}</small>
                                         <br>
                                         <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                                     </a>

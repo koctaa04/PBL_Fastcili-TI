@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use App\Models\PenugasanTeknisi;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -14,28 +15,72 @@ class PenugasanTeknisiSeeder extends Seeder
     public function run(): void
     {
         PenugasanTeknisi::insert([
+            // ✅ Kondisi ketika Sudah ditugaskan dan selesai dikerjakan
+            [
+                'id_laporan' => 7,
+                'id_user' => 5,
+                'status_perbaikan' => 'Selesai Dikerjakan',
+                'tanggal_selesai' =>  $penugasan1 = Carbon::parse('2025-01-10'),
+                'tenggat' =>  $penugasan1->copy()->addDays(3),
+                'catatan_teknisi' => 'Kit Robotik sudah diperbaiki.',
+                'skor_kinerja' => '+5',
+                'dokumentasi' => 'kit-rusak.jpg',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id_laporan' => 11,
+                'id_user' => 5,
+                'status_perbaikan' => 'Selesai Dikerjakan',
+                'tanggal_selesai' => $penugasan2 = Carbon::parse('2025-02-16'),
+                'tenggat' => $penugasan2->copy()->addDays(4),
+                'catatan_teknisi' => 'CCTV sudah diperbaiki dan terpasang.',
+                'skor_kinerja' => '+5',
+                'dokumentasi' => 'cctv-rusak.jpg',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+        ]);
+
+
+        PenugasanTeknisi::insert([
+            // ✅ Kondisi ketika Sudah ditugaskan, belum selesai, dan lewat tenggat
             [
                 'id_laporan' => 4,
-                'id_user' => 5,
+                'id_user' => 6,
                 'status_perbaikan' => 'Sedang Dikerjakan',
                 'tanggal_selesai' => null,
-                'tenggat' => now()->addDays(3),
+                'tenggat' => now()->subDays(2),
                 'catatan_teknisi' => null,
                 'dokumentasi' => null,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+
+            // ✅ Kondisi ketika Sudah ditugaskan, Sudah selesai
             [
                 'id_laporan' => 6,
-                'id_user' => 5,
+                'id_user' => 6,
                 'status_perbaikan' => 'Selesai Dikerjakan',
-                'tanggal_selesai' => now(),
-                'tenggat' => now()->addDays(3),
-                'catatan_teknisi' => 'Printer sudah diperbaiki. Kerusakan diakibatkan karena kabel printer rusak',
-                'dokumentasi' => 'printer-3d.jpg',
+                'tanggal_selesai' => $penugasan3 = Carbon::parse('2025-04-20'),
+                'tenggat' => $penugasan3->copy()->addDays(4),
+                'catatan_teknisi' => 'printer 3D sudah diperbaiki.',
+                'dokumentasi' => 'printer3d-rusak.jpg',
                 'created_at' => now(),
                 'updated_at' => now()
-            ]
+            ],
+            // ✅ Kondisi ketika Sudah ditugaskan, Belum selesai
+            [
+                'id_laporan' => 13,
+                'id_user' => 7,
+                'status_perbaikan' => 'Sedang Dikerjakan',
+                'tanggal_selesai' => null,
+                'tenggat' => now()->addDays(2),
+                'catatan_teknisi' => null,
+                'dokumentasi' => null,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ]);
     }
 }
