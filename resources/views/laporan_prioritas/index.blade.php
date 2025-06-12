@@ -115,7 +115,7 @@
                                                                 class="btn btn-danger btn-lg px-4 py-2">
                                                                 <i class="fas fa-user-tie mr-1"></i> Tugaskan Teknisi
                                                             </button>
-                                                        @elseif ($statusPerbaikan === 'Selesai Dikerjakan')
+                                                        @elseif ($statusPerbaikan === 'Selesai')
                                                             {{-- Teknisi sudah menyelesaikan, sarpras perlu verifikasi --}}
                                                             <button
                                                                 onclick="modalAction('{{ url('/laporan/verifikasi/' . $r['id_laporan']) }}')"
@@ -127,7 +127,7 @@
                                                             <span class="btn btn-secondary btn-lg px-4 py-2 disabled">
                                                                 <i class="fas fa-clock mr-1"></i> Menunggu perbaikan
                                                             </span>
-                                                        @elseif ($penugasan && $statusPerbaikan !== 'Selesai Dikerjakan' && \Carbon\Carbon::parse($penugasan->tenggat)->isPast())
+                                                        @elseif ($penugasan && $statusPerbaikan !== 'Selesai' && \Carbon\Carbon::parse($penugasan->tenggat)->isPast())
                                                             {{-- Sudah ditugaskan, belum selesai, dan lewat tenggat waktu --}}
                                                             <button
                                                                 onclick="modalAction('{{ url('/laporan/ganti-teknisi/' . $r['id_laporan']) }}')"

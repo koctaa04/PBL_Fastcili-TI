@@ -102,8 +102,7 @@
             <hr class="my-4">
             <p>🔧 Jangan lupa untuk memperbarui status pekerjaan setelah perbaikan selesai dilakukan.</p>
         </div>
-
-        @if ($penugasan && $penugasan->status_perbaikan != "Selesai")
+        @if ($penugasan && $penugasan->status_perbaikan != "Selesai Dikerjakan")
             <div class="card border-0 mb-4">
                 <div class="card-header bg-light pb-3">
                     <h6 class="mb-0 font-weight-bold">
@@ -126,7 +125,7 @@
                                     alt="Foto Kerusakan" class="img-fluid rounded shadow-sm border"
                                     style="max-height: 250px; width: auto;"
                                     onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';">
-                                @if ($penugasan && $penugasan->status_perbaikan == 'Selesai Dikerjakan')
+                                @if ($penugasan && $penugasan->status_perbaikan == 'Selesai')
                                     <button
                                         class="btn btn-warning btn-block mt-3 py-2" style="font-size: 16px;" disabled>
                                         <i class="fa-solid fa-spinner"></i> Menunggu Verifikasi
