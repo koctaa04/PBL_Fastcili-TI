@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Hilangkan comment dari kode dibawah ketika ingin menjalankan ngrokAdd commentMore actions
+        // if (config('app.env') === 'local') {
+        //     URL::forceScheme('https');
+        // }
 
         PenugasanTeknisi::observe(PenugasanTeknisiObserver::class);
         LaporanKerusakan::observe(LaporanKerusakanObserver::class);
