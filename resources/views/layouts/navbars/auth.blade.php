@@ -106,7 +106,7 @@
             {{-- Laporan --}}
             @if (auth()->user()->id_level != 3)
                 <li
-                    class="{{ $elementActive == 'lapor_kerusakan' || $elementActive == 'trending' || $elementActive == 'prioritas' ? 'active' : '' }}">
+                    class="{{ $elementActive == 'periode' || $elementActive == 'lapor_kerusakan' || $elementActive == 'trending' || $elementActive == 'prioritas' ? 'active' : '' }}">
                     <a data-toggle="collapse" aria-expanded="false" href="#laporan">
                         <i class="nc-icon nc-single-copy-04"></i>
                         <p>
@@ -114,7 +114,7 @@
                             <b class="caret"></b>
                         </p>
                     </a>
-                    <div class="collapse {{ $elementActive == 'lapor_kerusakan' || $elementActive == 'trending' || $elementActive == 'prioritas' ? 'show' : '' }}"
+                    <div class="collapse {{ $elementActive == 'periode' || $elementActive == 'lapor_kerusakan' || $elementActive == 'trending' || $elementActive == 'prioritas' ? 'show' : '' }}"
                         id="laporan">
                         <ul class="nav">
                             <li class="{{ $elementActive == 'lapor_kerusakan' ? 'active' : '' }}">
@@ -130,6 +130,12 @@
                                 </a>
                             </li>
                             @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                                <li class="{{ $elementActive == 'periode' ? 'active' : '' }}">
+                                    <a href="{{ route('periode.index') }}">
+                                        <span class="sidebar-mini-icon">{{ __('PE') }}</span>
+                                        <span class="sidebar-normal">{{ __(' Periode & Ekspor Data ') }}</span>
+                                    </a>
+                                </li>
                                 <li class="{{ $elementActive == 'prioritas' ? 'active' : '' }}">
                                     <a href="{{ route('prioritas.index') }}">
                                         <span class="sidebar-mini-icon">{{ __('PP') }}</span>

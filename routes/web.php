@@ -14,6 +14,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PenugasanTeknisiController;
 use App\Http\Controllers\WaspasController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PeriodeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,12 @@ use App\Http\Controllers\NotificationController;
 Route::get('/', function () {
 	if (!Auth::check()) {
 		return view('welcome');
+	} else if (Auth::check() && auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+		return redirect('/home');
+	} else if (Auth::check() && auth()->user()->id_level == 3) {
+		return redirect('/teknisi');
+	} else {
+		return redirect('/pelapor');
 	}
 });
 
@@ -145,13 +152,19 @@ Route::group(['middleware' => 'auth'], function () {
 		 *  ---------------------------- */
 		Route::prefix('lapor_kerusakan')->group(function () {
 			Route::get('/', [LaporanKerusakanController::class, 'index'])->name('perbaikan.index');
+			Route::get('/periode', [PeriodeController::class, 'index'])->name('periode.index');
 			Route::post('/', [LaporanKerusakanController::class, 'store'])->name('laporan.store');
 			Route::delete('/delete/{id}', [LaporanKerusakanController::class, 'destroy'])->name('laporan.destroy');
 			Route::get('/trending', [LaporanKerusakanController::class, 'trending'])->name('trending.index');
 			Route::get('/penilaian/{id}', [LaporanKerusakanController::class, 'showPenilaian'])->name('penilaian.show');
 			Route::post('/simpan-penilaian/{id}', [LaporanKerusakanController::class, 'simpanPenilaian'])->name('laporan.simpanPenilaian');
 			Route::get('/export_laporan', [LaporanKerusakanController::class, 'exportLaporan'])->name('laporan.exportLaporan');
+			// Route::get('/manajemen-periode', [PeriodeController::class, 'index'])->name('periode.index');
 		});
+		Route::post('/manajemen-periode/export', [PeriodeController::class, 'export'])->name('periode.export');
+		Route::delete('/manajemen-periode/destroy', [PeriodeController::class, 'destroy'])->name('periode.destroy');
+		Route::get('/manajemen-periode/modal/export', [PeriodeController::class, 'showExportModal'])->name('periode.modal.export');
+		Route::get('/manajemen-periode/modal/delete/{tahun}', [PeriodeController::class, 'showDeleteModal'])->name('periode.modal.delete');
 	});
 
 
@@ -214,13 +227,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/penugasan-teknisi', [LaporanKerusakanController::class, 'simpanPenugasan']);
 		Route::get('/laporan/verifikasi/{id}', [LaporanKerusakanController::class, 'verifikasiPerbaikan']);
 		Route::post('/verifikasi-perbaikan', [LaporanKerusakanController::class, 'simpanVerifikasi']);
-
-    	Route::get('/laporan/ganti-teknisi/{id}', [LaporanKerusakanController::class, 'formGantiTeknisi']);
-	  Route::post('/ganti-teknisi', [LaporanKerusakanController::class, 'gantiTeknisi']);
-
 		Route::get('/laporan/ganti-teknisi/{id}', [LaporanKerusakanController::class, 'formGantiTeknisi']);
 		Route::post('/ganti-teknisi', [LaporanKerusakanController::class, 'gantiTeknisi']);
-
 	});
 
 	Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
