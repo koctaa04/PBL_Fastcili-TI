@@ -11,6 +11,10 @@ html {
     font-family: "DM Sans", sans-serif;
 }
 
+.navbar-brands {
+    font-size: 1.2rem;
+}
+
 .wrapper {
     position: relative;
     height: 100vh;
