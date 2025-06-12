@@ -8,23 +8,31 @@ use App\Models\User;
 use App\Notifications\SarprasNotifikasi;
 use App\Notifications\PelaporNotifikasi;
 
-class LaporanKerusakanObserver
+class PelaporLaporanObserver
 {
-    /**
-     * Handle the LaporanKerusakan "created" event.
-     */
-    public function created(LaporanKerusakan $laporan): void
+    public function created(PelaporLaporan $pelapor_laporan): void
     {
+        $laporan = $pelapor_laporan->laporan;
+
+        $namaFasilitas = optional($laporan->fasilitas)->nama_fasilitas ?? 'Fasilitas';
+        $namaRuangan = optional($laporan->fasilitas->ruangan ?? null)->nama_ruangan ?? 'Ruangan';
+        $deskripsi = $pelapor_laporan->deskripsi_tambahan ?: '-';
+
+        $tipe = "Laporan Baru: {$namaFasilitas} di {$namaRuangan}";
+        $pesan = "Pesan: {$deskripsi}";
+        $link = url('/lapor_kerusakan/trending/' . $pelapor_laporan->id);
+
         $sarprasUsers = User::where('id_level', 2)->get();
+
         foreach ($sarprasUsers as $user) {
             $user->notify(new SarprasNotifikasi([
-                'tipe' => 'Laporan Baru: ' . ($laporan->fasilitas->nama_fasilitas ?? 'Fasilitas') .
-                    ' di ' . ($laporan->fasilitas->ruangan->nama_ruangan),
-                'pesan' => 'Pesan:  ' . ($laporan->deskripsi),
-                'link' => url('/lapor_kerusakan/penilaian/'. $laporan->id_laporan),
+                'tipe' => $tipe,
+                'pesan' => $pesan,
+                'link' => $link,
             ]));
         }
     }
+
 
     /**
      * Handle the LaporanKerusakan "updated" event.
