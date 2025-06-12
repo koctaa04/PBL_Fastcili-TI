@@ -15,8 +15,9 @@ class CreditScoreTeknisi extends Model
         'id_user',
         'credit_score',
     ];
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
 }
