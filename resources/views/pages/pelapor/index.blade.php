@@ -5,167 +5,119 @@
 
 @section('content')
     <div class="content">
-        <div class="container">
-            @if ($statusList->count() > 0)
-                <h3 class="mb-4 fw-bold ">Status Laporan Anda</h3>
-                @foreach ($statusList as $status)
-                    <div class="card shadow-lg border-0 rounded-4 mb-4 overflow-hidden">
-                        <div class="row g-0">
-                            <div class="col-md-4 d-flex align-items-center justify-content-center p-3 bg-light position-relative">
-                                <div class="image-overlay"></div>
-                                <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $status->laporan->foto_kerusakan) }}"
-                                    onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
-                                    alt="Foto Kerusakan" class="img-fluid h-100 object-fit-cover">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <h5 class="card-title mb-0 fw-bold ">Laporan Kerusakan Fasilitas</h5>
-                                        <span class="text-muted small mt-2" style="text-align: right">{{ $status->created_at->diffForHumans() }}</span>
-                                    </div>
+        {{-- Sambutan --}}
+        <div class="jumbotron bg-white shadow rounded p-4  mb-4">
+            <h2 class="display-5 fw-bold mb-3">Selamat Datang, {{ auth()->user()->nama }}!</h2>
+            <p class="lead mt-3">Terima kasih telah berkontribusi menjaga fasilitas kampus. Anda dapat memantau status
+                laporan kerusakan yang telah Anda buat, serta melihat perkembangan tindak lanjutnya.</p>
+            <a href="{{ url('/lapor_kerusakan') }}" class="btn btn-primary">
+                Lihat Laporan Saya
+            </a>
+            <hr class="mt-4">
+            <p>📢 Jika ada fasilitas lain yang bermasalah, silakan buat laporan baru agar segera ditangani.</p>
+        </div>
+        <hr class="mb-4">
 
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-md-6 mb-3">
-                                            <div class="detail-item">
-                                                <span class="detail-label">Fasilitas</span>
-                                                <span class="detail-value">{{ $status->laporan->fasilitas->nama_fasilitas }}</span>
-                                            </div>
+        <div class="container">
+            <h3 class="mb-4 fw-bold ">Status Laporan Anda</h3>
+            @foreach ($statusList as $status)
+                {{-- @dd($status) --}}
+                <div class="card shadow-lg border-0 rounded-4 mb-4 overflow-hidden">
+                    <div class="row g-0">
+                        <div
+                            class="col-md-4 d-flex align-items-center justify-content-center p-3 bg-light position-relative">
+                            <div class="image-overlay"></div>
+                            <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $status->laporan->foto_kerusakan) }}"
+                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
+                                alt="Foto Kerusakan" class="img-fluid h-100 object-fit-cover">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0 fw-bold ">Laporan Kerusakan Fasilitas</h5>
+                                    <span class="text-muted small mt-2"
+                                        style="text-align: right">{{ $status->created_at->diffForHumans() }}</span>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Fasilitas</span>
+                                            <span
+                                                class="detail-value">{{ $status->laporan->fasilitas->nama_fasilitas }}</span>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="detail-item">
-                                                <span class="detail-label">Tanggal Lapor</span>
-                                                <span class="detail-value">{{ $status->created_at->translatedFormat('l, d F Y') }}</span>
-                                            </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Tanggal Lapor</span>
+                                            <span
+                                                class="detail-value">{{ $status->created_at->translatedFormat('l, d F Y') }}</span>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <div class="detail-item">
-                                                <span class="detail-label">Status</span>
-                                                @php
-                                                    $statusColor = match ($status->laporan->id_status) {
-                                                        1 => 'bg-secondary',
-                                                        2 => 'bg-info',
-                                                        3 => 'bg-danger',
-                                                        4 => 'bg-success',
-                                                        default => 'bg-dark',
-                                                    };
-                                                @endphp
-                                                <span class="detail-value">
-                                                    <span class="badge {{ $statusColor }} px-3 py-2 rounded-pill">
-                                                        {{ $status->laporan->status->nama_status }}
-                                                    </span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Status</span>
+                                            @php
+                                                $statusColor = match ($status->laporan->id_status) {
+                                                    1 => 'bg-warning text-white',
+                                                    2 => 'bg-info text-white',
+                                                    3 => 'bg-secondary text-white',
+                                                    4 => 'bg-success text-white',
+                                                    default => 'bg-primary text-white',
+                                                };
+                                            @endphp
+                                            <span class="detail-value">
+                                                <span class="badge {{ $statusColor }} px-3 py-2 rounded-pill">
+                                                    {{ $status->laporan->status->nama_status }}
                                                 </span>
-                                            </div>
+                                            </span>
                                         </div>
-                                        @if ($status->laporan->id_status == 3 || $status->laporan->id_status == 4)
+                                    </div>
+                                    @if ($status->laporan->id_status == 3 || $status->laporan->id_status == 4)
                                         <div class="col-md-6">
                                             <div class="detail-item">
                                                 <span class="detail-label">Teknisi</span>
-                                                <span class="detail-value">{{ $status->laporan->penugasan->user->nama ?? 'Belum Ditugaskan' }}</span>
+                                                <span
+                                                    class="detail-value">{{ $status->laporan->penugasan->last()?->user->nama ?? 'Belum Ditugaskan' }}</span>
                                             </div>
                                         </div>
-                                        @endif
-                                    </div>
+                                    @endif
+                                </div>
 
-                                    <div class="mb-3">
-                                        <h6 class="fw-semibold text-muted mb-2">Deskripsi Laporan</h6>
-                                        <div class="p-3 bg-light rounded-3">
-                                            <p class="mb-0">{{ $status->deskripsi_tambahan }}</p>
-                                        </div>
+                                <div class="mb-3">
+                                    <h6 class="fw-semibold text-muted mb-2">Deskripsi Laporan</h6>
+                                    <div class="p-3 bg-light rounded-3">
+                                        <p class="mb-0">{{ $status->deskripsi_tambahan }}</p>
                                     </div>
+                                </div>
 
-                                    <div class="d-flex justify-content-end mt-4 gap-2 flex-wrap">
-                                        @if ($status->laporan->id_status == 4)
-                                            <button
-                                                onclick="modalAction('{{ route('pelapor.rate', ['id' => $status->id_laporan]) }}')"
-                                                class="btn btn-success btn-md rounded-pill px-3">
-                                                <i class="bi bi-star-fill me-1"></i>Beri Rating & Ulasan
+                                <div class="d-flex justify-content-end mt-4 gap-2 flex-wrap">
+                                    <button onclick="modalAction('{{ route('pelapor.detail', ['id' => $status->id]) }}')"
+                                        class="btn btn-sm btn-info text-white rounded-pill px-3 mx-2">
+                                        <i class="fas fa-eye me-2"></i> Detail
+                                    </button>
+                                    @if ($status->laporan->id_status == 4)
+                                        <button
+                                            onclick="modalAction('{{ route('pelapor.rate', ['id' => $status->id_laporan]) }}')"
+                                            class="btn btn-success btn-md rounded-pill px-3">
+                                            <i class="fa fa-star me-2"></i>Beri Rating & Ulasan
+                                        </button>
+                                    @elseif ($status->laporan->id_status == 1)
+                                        <form class="form-delete d-inline-block"
+                                            action="{{ route('pelapor.delete', ['id' => $status->id]) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3">
+                                                <i class="fa fa-trash me-2"></i> Batalkan Laporan
                                             </button>
-                                        @elseif ($status->laporan->id_status == 1)
-                                            <form class="form-delete d-inline-block"
-                                                action="{{ route('pelapor.delete', ['id' => $status->id]) }}"
-                                                method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3">
-                                                    <i class="bi bi-trash me-1"></i> Batalkan Laporan
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endforeach
-            @else
-                <div class="jumbotron bg-white shadow rounded-4 p-5 text-center border">
-                    <h2 class="display-5 fw-bold ">Selamat Datang di Sistem Laporan Fasilitas Kampus</h2>
-                    <p class="lead mt-3 text-muted">Sampaikan laporan kerusakan fasilitas kampus dengan mudah dan cepat. Kami akan
-                        menindaklanjuti laporan Anda secepat mungkin untuk kenyamanan bersama.</p>
-                    <hr class="my-4">
-                    <p class="text-muted">Pastikan laporan berisi informasi yang jelas dan disertai foto kerusakan agar proses perbaikan
-                        dapat segera dilakukan.</p>
-                    <a class="btn btn-lg btn-primary mt-3 rounded-pill px-4" href="{{ route('pelapor.create') }}">
-                        <i class="bi bi-plus-circle me-2"></i> Laporkan Kerusakan Fasilitas
-                    </a>
                 </div>
-            @endif
-
-            @if ($laporanAuth->count() > 0)
-                <div class="card shadow-lg border-0 rounded-4 mt-5">
-                    <div class="card-header bg-warning text-white rounded-top-4">
-                        <h3 class="mb-3"><b>Riwayat Laporan</b></h3>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle table-striped table-bordered" id="table_pelapor">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th scope="col" class="text-center">#</th>
-                                        <th scope="col">Nama Fasilitas</th>
-                                        <th scope="col">Deskripsi</th>
-                                        <th scope="col">Tanggal Lapor</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col" class="text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($laporanAuth as $lapor => $l)
-                                        <tr>
-                                            <td></td>
-                                            <td>{{ $l->laporan->fasilitas->nama_fasilitas }}</td>
-                                            <td>{{ $l->deskripsi_tambahan }}</td>
-                                            <td>{{ $l->created_at->translatedFormat('l, d F Y') }}</td>
-                                            <td>
-                                                @php
-                                                    $statusColor = match ($l->laporan->id_status) {
-                                                        1 => 'bg-secondary text-white',
-                                                        2 => 'bg-info text-white',
-                                                        3 => 'bg-danger text-white',
-                                                        4 => 'bg-success text-white',
-                                                        default => 'bg-dark',
-                                                    };
-                                                @endphp
-                                                <span class="badge {{ $statusColor }} px-3 py-2 rounded-pill">
-                                                    {{ $l->laporan->status->nama_status }}
-                                                </span>
-                                            </td>
-                                            <td class="text-center">
-                                                <button
-                                                    onclick="modalAction('{{ route('pelapor.detail', ['id' => $l->id]) }}')"
-                                                    class="btn btn-sm btn-info text-white rounded-pill px-3">
-                                                    <i class="bi bi-eye-fill me-1"></i> Detail
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
+            @endforeach
         </div>
     </div>
 
@@ -180,12 +132,12 @@
             transition: all 0.3s ease;
             border: none;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Image Styling */
         .image-overlay {
             position: absolute;
@@ -193,57 +145,57 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0));
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
             z-index: 1;
         }
-        
+
         .object-fit-cover {
             object-fit: cover;
             width: 100%;
             height: 100%;
             min-height: 250px;
         }
-        
+
         /* Detail Item Styling */
         .detail-item {
             display: flex;
             flex-direction: column;
         }
-        
+
         .detail-label {
             font-size: 0.8rem;
             color: #6c757d;
             font-weight: 500;
         }
-        
+
         .detail-value {
             font-size: 0.95rem;
             font-weight: 500;
             color: #212529;
         }
-        
+
         /* Badge Styling */
         .badge {
             font-weight: 500;
             letter-spacing: 0.5px;
         }
-        
+
         /* Button Styling */
         .btn {
             font-weight: 500;
             transition: all 0.2s ease;
         }
-        
+
         .btn-sm {
             padding: 0.4rem 0.9rem;
         }
-        
+
         /* Jumbotron Styling */
         .jumbotron {
             background-color: #f8f9fa;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         /* Table Styling */
         .table thead th {
             background-color: #f8f9fa;
@@ -253,17 +205,17 @@
             letter-spacing: 0.5px;
             color: #495057;
         }
-        
+
         .table-hover tbody tr:hover {
             background-color: rgba(13, 110, 253, 0.05);
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .card-body {
                 padding: 1.25rem;
             }
-            
+
             .detail-item {
                 margin-bottom: 0.5rem;
             }

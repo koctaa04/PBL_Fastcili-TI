@@ -44,7 +44,7 @@ class pelaporLaporanSeeder extends Seeder
             [
                 'id_user' => 10,
                 'id_laporan' => 4, // Whiteboard retak
-                'deskripsi_tambahan' => 'Papn sudah di lem tapi tetap retak.',
+                'deskripsi_tambahan' => 'Papan sudah di lem tapi tetap retak.',
                 'rating_pengguna' => null,
                 'feedback_pengguna' => null,
                 'created_at' => now(),

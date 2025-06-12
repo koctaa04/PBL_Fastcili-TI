@@ -822,9 +822,9 @@ class LaporanKerusakanController extends Controller
     public function detail(string $id)
     {
         if (auth()->user()->id_level == 4 || auth()->user()->id_level == 5 || auth()->user()->id_level == 6) {
-            $laporan = PelaporLaporan::find($id);
+            $pelaporLaporan = PelaporLaporan::find($id);
 
-            return view('pages.pelapor.detail', ['laporan' => $laporan]);
+            return view('pages.pelapor.detail', ['pelaporLaporan' => $pelaporLaporan]);
         } else {
             return back();
         }

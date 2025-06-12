@@ -11,7 +11,7 @@
         <div class="modal-body p-4">
             <!-- Foto Kerusakan Section -->
             <div class="text-center mb-4">
-                <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $laporan->laporan->foto_kerusakan) }}"
+                <img src="{{ asset('storage/uploads/laporan_kerusakan/' . $pelaporLaporan->laporan->foto_kerusakan) }}"
                     onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';" 
                     alt="Foto Kerusakan"
                     class="img-fluid rounded shadow border" 
@@ -33,22 +33,22 @@
                                     <th class="text-right text-muted" style="width: 30%">Fasilitas:</th>
                                     <td>
                                         <i class="fas fa-tools mr-2 text-warning"></i>
-                                        {{ $laporan->laporan->fasilitas->nama_fasilitas }}
+                                        {{ $pelaporLaporan->laporan->fasilitas->nama_fasilitas }}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="text-right text-muted" style="width: 30%">Lokasi:</th>
                                     <td>
                                         <i class="fas fa-building mr-2 text-danger"></i>
-                                        {{ $laporan->laporan->fasilitas->ruangan->gedung->nama_gedung }} -
-                                        {{ $laporan->laporan->fasilitas->ruangan->nama_ruangan }}
+                                        {{ $pelaporLaporan->laporan->fasilitas->ruangan->gedung->nama_gedung }} -
+                                        {{ $pelaporLaporan->laporan->fasilitas->ruangan->nama_ruangan }}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="text-right text-muted">Deskripsi:</th>
                                     <td>
                                         <div class="bg-light p-3 rounded">
-                                            <p class="mb-3">{{ $laporan->deskripsi_tambahan }}</p>
+                                            <p class="mb-3">{{ $pelaporLaporan->deskripsi_tambahan }}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -56,32 +56,32 @@
                                     <th class="text-right text-muted">Tanggal Lapor:</th>
                                     <td>
                                         <i class="fas fa-calendar-alt mr-2 text-info"></i>
-                                        {{ $laporan->created_at->translatedFormat('l, d F Y') }}
+                                        {{ $pelaporLaporan->created_at->translatedFormat('l, d F Y') }}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="text-right text-muted">Status:</th>
                                     <td>
                                         @php
-                                            $statusColor = match ($laporan->laporan->id_status) {
-                                                1 => 'bg-secondary text-white',
+                                            $statusColor = match ($pelaporLaporan->laporan->id_status) {
+                                                1 => 'bg-warning text-white',
                                                 2 => 'bg-info text-white',
-                                                3 => 'bg-warning text-white',
+                                                3 => 'bg-secondary text-white',
                                                 4 => 'bg-success text-white',
-                                                default => 'bg-dark',
+                                                default => 'bg-primary text-white',
                                             };
                                         @endphp
                                         <span class="badge {{ $statusColor }} px-3 py-2">
-                                            {{ $laporan->laporan->status->nama_status }}
+                                            {{ $pelaporLaporan->laporan->status->nama_status }}
                                         </span>
                                     </td>
                                 </tr>
-                                @if ($laporan->laporan->status->nama_status == 'Selesai Diperbaiki')
+                                @if ($pelaporLaporan->laporan->status->nama_status == 'Selesai Diperbaiki')
                                     <tr>
                                         <th class="text-right text-muted">Tanggal Selesai:</th>
                                         <td>
                                             <i class="fas fa-calendar-alt mr-2 text-info"></i>
-                                            {{ $laporan->laporan->tanggal_selesai->translatedFormat('l, d F Y') }}
+                                            {{ $pelaporLaporan->laporan->tanggal_selesai->translatedFormat('l, d F Y') }}
                                         </td>
                                     </tr>
                                 @endif
@@ -89,9 +89,9 @@
                                 <tr>
                                     <th class="text-right text-muted">Teknisi:</th>
                                     <td>
-                                        @if ($laporan->laporan->penugasan)
+                                        @if ($pelaporLaporan->laporan->penugasan->last()?->user->nama)
                                         <i class="fas fa-user-tie mr-2 text-success"></i>
-                                        {{ $laporan->laporan->penugasan->user->nama }}
+                                        {{ $pelaporLaporan->laporan->penugasan->last()?->user->nama }}
                                         @else
                                         <i class="fas fa-user-tie mr-2 text-danger"></i>
                                         Belum ditugaskan
@@ -102,13 +102,13 @@
                                 <tr>
                                     <th class="text-right text-muted">Rating:</th>
                                     <td class="text-danger">
-                                        @if ($laporan->laporan->status->nama_status != 'Selesai Diperbaiki')
+                                        @if ($pelaporLaporan->laporan->status->nama_status != 'Selesai Diperbaiki')
                                             Laporan belum selesai sehingga tidak bisa di-rating
-                                        @elseif ($laporan->laporan->status->nama_status == 'Selesai Diperbaiki' && $laporan->rating_pengguna)
-                                            @for ($i = 0; $i < $laporan->rating_pengguna; $i++)
+                                        @elseif ($pelaporLaporan->laporan->status->nama_status == 'Selesai Diperbaiki' && $pelaporLaporan->rating_pengguna)
+                                            @for ($i = 0; $i < $pelaporLaporan->rating_pengguna; $i++)
                                                 <span style="color: gold; font-size: 1.2rem;">&#9733;</span>
                                             @endfor
-                                            ({{ $laporan->rating_pengguna }}/5)
+                                            ({{ $pelaporLaporan->rating_pengguna }}/5)
                                         @else
                                             Belum di-rating
                                         @endif
@@ -117,11 +117,11 @@
                                 <tr>
                                     <th class="text-right text-muted">Ulasan:</th>
                                     <td class="text-danger">
-                                        @if ($laporan->laporan->status->nama_status != 'Selesai Diperbaiki')
+                                        @if ($pelaporLaporan->laporan->status->nama_status != 'Selesai Diperbaiki')
                                             Laporan belum selesai sehingga tidak bisa diulas
-                                        @elseif ($laporan->laporan->status->nama_status == 'Selesai Diperbaiki' && $laporan->feedback_pengguna)
+                                        @elseif ($pelaporLaporan->laporan->status->nama_status == 'Selesai Diperbaiki' && $pelaporLaporan->feedback_pengguna)
                                             <div class="bg-light p-3 rounded">
-                                                <p class="mb-3">{{ $laporan->feedback_pengguna }}</p>
+                                                <p class="mb-3">{{ $pelaporLaporan->feedback_pengguna }}</p>
                                             </div>
                                         @else
                                             Belum diulas
