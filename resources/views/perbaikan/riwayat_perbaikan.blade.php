@@ -10,11 +10,13 @@
                 <h3 class="mb-0">Riwayat Penugasan Perbaikan</h3>
                 <p class="card-category">Daftar perbaikan yang telah diselesaikan</p>
             </div>
-            <div class="col-md-6 text-md-right mt-3 mt-md-0">
-                <button onclick="modalAction('{{ url('/teknisi/skor') }}')" class="btn btn-info">
-                    <i class="nc-icon nc-eye-split"></i> Lihat Skor Kredit Teknisi
-                </button>
-            </div>
+            @if (auth()->user()->id_level == '2')
+                <div class="col-md-6 text-md-right mt-3 mt-md-0">
+                    <button onclick="modalAction('{{ url('/teknisi/skor') }}')" class="btn btn-info">
+                        <i class="nc-icon nc-eye-split"></i> Lihat Skor Kredit Teknisi
+                    </button>
+                </div>
+            @endif
         </div>
 
         {{-- Tabel Riwayat Penugasan --}}
