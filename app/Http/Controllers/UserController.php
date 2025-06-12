@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CreditScoreTeknisi;
 use App\Models\User;
 use App\Models\Level;
 use Illuminate\Http\Request;
@@ -93,6 +94,10 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make('password'),
             'created_at' => now()
+        ]);
+
+        CreditScoreTeknisi::create([
+            'id_user' => User::latest()->first()->id_user
         ]);
 
         return response()->json([

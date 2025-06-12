@@ -47,8 +47,7 @@ class LaporanKerusakan extends Model
     {
         return $this->belongsTo(StatusLaporan::class, 'id_status');
     }
-
-    //Kriteria
+    
     public function kriteria()
     {
         return $this->hasMany(KriteriaPenilaian::class, 'id_laporan');
@@ -58,4 +57,10 @@ class LaporanKerusakan extends Model
     {
         return $this->hasOne(PenugasanTeknisi::class, 'id_laporan');
     }
+
+    public function penugasanTerakhir()
+{
+    return $this->hasOne(PenugasanTeknisi::class, 'id_laporan', 'id_laporan')
+                ->latestOfMany(); // Ambil penugasan terbaru berdasarkan created_at
+}
 }
