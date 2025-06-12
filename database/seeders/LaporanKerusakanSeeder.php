@@ -87,6 +87,61 @@ class LaporanKerusakanSeeder extends Seeder
                 'tanggal_selesai' => null,
                 'id_status' => 1
             ],
+            [
+                'id_fasilitas' => 38,
+                'deskripsi' => 'Monitor tidak menampilkan gambar',
+                'foto_kerusakan' => 'monitor-rusak.jpg',
+                'jumlah_kerusakan' => 1,
+                'tanggal_lapor' => $lapor9 = Carbon::parse('2025-01-18'),
+                'tanggal_selesai' => $lapor9->copy()->addDays(2),
+                'id_status' => 2
+            ],
+            [
+                'id_fasilitas' => 23,
+                'deskripsi' => 'Router tidak memancarkan sinyal',
+                'foto_kerusakan' => 'router-rusak.jpg',
+                'jumlah_kerusakan' => 1,
+                'tanggal_lapor' => Carbon::parse('2025-04-15'),
+                'tanggal_selesai' => null,
+                'id_status' => 1
+            ],
+            [
+                'id_fasilitas' => 39,
+                'deskripsi' => 'CCTV mati total',
+                'foto_kerusakan' => 'cctv-rusak.jpg',
+                'jumlah_kerusakan' => 1,
+                'tanggal_lapor' => $lapor14 = Carbon::parse('2025-02-12'),
+                'tanggal_selesai' => $lapor14->copy()->addDays(7),
+                'id_status' => 4
+            ],
+            [
+                'id_fasilitas' => 28,
+                'deskripsi' => 'Mic tidak menangkap suara',
+                'foto_kerusakan' => 'mic-rusak.jpg',
+                'jumlah_kerusakan' => 1,
+                'tanggal_lapor' => Carbon::parse('2025-04-03'),
+                'tanggal_selesai' => null,
+                'id_status' => 2
+            ],
+            [
+                'id_fasilitas' => 26,
+                'deskripsi' => 'AC tidak dingin',
+                'foto_kerusakan' => 'ac2-rusak.jpg',
+                'jumlah_kerusakan' => 1,
+                'tanggal_lapor' => Carbon::parse('2025-05-18'),
+                'tanggal_selesai' => null,
+                'id_status' => 3
+            ],
+            [
+                'id_fasilitas' => 29,
+                'deskripsi' => 'Kabel speaker terkelupas dan membahayakan.',
+                'foto_kerusakan' => 'speaker-rusak.jpg',
+                'jumlah_kerusakan' => 1,
+                'tanggal_lapor' => Carbon::parse('2025-05-18'),
+                'tanggal_selesai' => null,
+                'id_status' => 2
+            ],
         ]);
+        
     }
 }

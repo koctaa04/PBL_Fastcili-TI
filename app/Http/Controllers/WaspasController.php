@@ -21,10 +21,20 @@ class WaspasController extends Controller
     public function getPrioritas()
     {
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+            $latestPenugasan = DB::table('penugasan_teknisi')
+                ->select('id_laporan', 'id_user')
+                ->whereRaw('id_penugasan = (SELECT MAX(id_penugasan) FROM penugasan_teknisi WHERE id_laporan = penugasan_teknisi.id_laporan)')
+                ->groupBy('id_laporan', 'id_user');
+
             $data = DB::table('laporan_kerusakan as l')
                 ->join('kriteria_penilaian as k', 'l.id_laporan', '=', 'k.id_laporan')
-                ->leftJoin('penugasan_teknisi as p', 'l.id_laporan', '=', 'p.id_laporan')
+                // ->leftJoin('penugasan_teknisi as p', 'l.id_laporan', '=', 'p.id_laporan')
+                // ->leftJoin('users as u', 'u.id_user', '=', 'p.id_user')
+                ->leftJoinSub($latestPenugasan, 'p', function ($join) {
+                    $join->on('l.id_laporan', '=', 'p.id_laporan');
+                })
                 ->leftJoin('users as u', 'u.id_user', '=', 'p.id_user')
+
                 ->join('fasilitas as f', 'f.id_fasilitas', '=', 'l.id_fasilitas')
                 ->join('ruangan as r', 'r.id_ruangan', '=', 'f.id_ruangan')
                 ->join('gedung as g', 'g.id_gedung', '=', 'r.id_gedung')

@@ -3,7 +3,7 @@
         <form id="formVerifikasi" method="POST" action="{{ url('/verifikasi-perbaikan') }}" data-status-ntf="{{ $laporan->status->id_status }}">
             @csrf
             <input type="hidden" name="id_laporan" value="{{ $laporan->id_laporan }}">
-            <input type="hidden" name="id_penugasan" value="{{ $laporan->penugasan->id_penugasan ?? '' }}">
+            <input type="hidden" name="id_penugasan" value="{{ $laporan->penugasan->last()?->id_penugasan ?? '' }}">
 
             <div class="modal-header bg-gradient-success text-white">
                 <h5 class="modal-title font-weight-bold">
@@ -32,8 +32,8 @@
                                         <div class="mb-3">
                                             <label class="text-muted small mb-1">Status Perbaikan</label>
                                             <div class="d-flex align-items-center">
-                                                <span class="badge badge-{{ $laporan->penugasan->status_perbaikan == 'selesai' ? 'success' : 'warning' }} mr-2">
-                                                    {{ $laporan->penugasan->status_perbaikan ?? '-' }}
+                                                <span class="badge badge-{{ $laporan->penugasan->last()?->status_perbaikan == 'selesai' ? 'success' : 'warning' }} mr-2">
+                                                    {{ $laporan->penugasan->last()?->status_perbaikan ?? '-' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -42,7 +42,7 @@
                                             <label class="text-muted small mb-1">Teknisi</label>
                                             <p class="mb-3 font-weight-bold">
                                                 <i class="fas fa-user-tie mr-2 text-primary"></i>
-                                                {{ $laporan->penugasan->user->nama ?? '-' }}
+                                                {{ $laporan->penugasan->last()?->user->nama ?? '-' }}
                                             </p>
                                         </div>
                                         
@@ -51,14 +51,14 @@
                                             <div class="bg-light p-3 rounded">
                                                 <p class="mb-3">
                                                     <i class="fas fa-sticky-note mr-2 text-info"></i>
-                                                    {{ $laporan->penugasan->catatan_teknisi ?? 'Tidak ada catatan' }}
+                                                    {{ $laporan->penugasan->last()?->catatan_teknisi ?? 'Tidak ada catatan' }}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="documentation-preview text-center">
-                                            <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->dokumentasi) }}"
+                                            <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->last()?->dokumentasi) }}"
                                                  onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                                  alt="Belum ada dokumentasi diberikan" 
                                                  class="img-fluid rounded shadow-sm border"
@@ -81,7 +81,7 @@
                             </div>
                             <div class="card-body p-0">
                                 <div class="text-center">
-                                    <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->dokumentasi) }}"
+                                    <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->penugasan->last()?->dokumentasi) }}"
                                          onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
                                          alt="Dokumentasi Perbaikan" 
                                          class="img-fluid w-100">

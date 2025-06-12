@@ -55,12 +55,7 @@ class LaporanKerusakan extends Model
 
     public function penugasan()
     {
-        return $this->hasOne(PenugasanTeknisi::class, 'id_laporan');
+        return $this->hasMany(PenugasanTeknisi::class, 'id_laporan');
     }
 
-    public function penugasanTerakhir()
-{
-    return $this->hasOne(PenugasanTeknisi::class, 'id_laporan', 'id_laporan')
-                ->latestOfMany(); // Ambil penugasan terbaru berdasarkan created_at
-}
 }
