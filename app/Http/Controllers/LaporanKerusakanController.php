@@ -582,12 +582,19 @@ class LaporanKerusakanController extends Controller
                 'tanggal_selesai' => now(), // Selesai
             ]);
 
+
+            $penugasan->update([
+                'status_perbaikan' => 'Selesai',
+                'komentar_sarpras' => null,
+            ]);
+
             // Ambil data credit score teknisi yang sudah pasti ada
             $credit = CreditScoreTeknisi::where('id_user', $penugasan->id_user)->first();
 
             if ($credit && $credit->credit_score < 100) {
                 $credit->credit_score = min(100, $credit->credit_score + 5);
                 $credit->save();
+
 
                 $penugasan->update([
                     'status_perbaikan' => 'Selesai Dikerjakan',

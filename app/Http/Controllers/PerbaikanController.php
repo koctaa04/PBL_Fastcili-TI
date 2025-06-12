@@ -19,17 +19,30 @@ class PerbaikanController extends Controller
         // Status perbaikan yang ingin ditampilkan
         $status = ['Sedang Dikerjakan', 'Selesai Dikerjakan'];
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+
+            $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
+                ->whereHas('laporan', function ($query) {
+                    $query->where('status_perbaikan', '!=', 'Selesai');
+                })
+
             // Admin & Sarpras melihat semua penugasan
             $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
                 ->whereIn('status_perbaikan', $status)
                 ->latest()
+
                 ->get();
         } else {
             // Teknisi melihat penugasannya sendiri
             $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
                 ->where('id_user', auth()->user()->id_user)
+
+                ->whereHas('laporan', function ($query) {
+                    $query->where('status_perbaikan', '!=', 'Selesai');
+                })
+
                 ->whereIn('status_perbaikan', $status)
                 ->latest()
+
                 ->get();
         }
 
@@ -42,6 +55,9 @@ class PerbaikanController extends Controller
             $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung']);
 
             if (auth()->user()->id_level == 3) {
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai')->where('id_user', auth()->user()->id_user);
+            } else if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai');
                 // Teknisi hanya lihat riwayat miliknya
                 $query->where('id_user', auth()->user()->id_user);
             }

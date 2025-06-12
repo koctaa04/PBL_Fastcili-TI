@@ -21,7 +21,9 @@ class PenugasanTeknisiObserver
     
         $assignedUser = User::find($penugasanTeknisi->id_user);
         if ($assignedUser) {
-            $assignedUser->notify(new TeknisiNotifikasi($penugasanTeknisi));
+            $assignedUser->notify(new TeknisiNotifikasi($penugasanTeknisi, 'Penugasan Baru ' . 
+                                    $penugasanTeknisi->laporan->fasilitas->ruangan->nama_ruangan . 
+                                    ', ' . $penugasanTeknisi->laporan->fasilitas->ruangan->gedung->nama_gedung));
             $notifiedIds[] = $penugasanTeknisi->id;
         }
     }
