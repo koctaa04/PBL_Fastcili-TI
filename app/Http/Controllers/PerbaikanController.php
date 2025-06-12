@@ -15,10 +15,17 @@ class PerbaikanController extends Controller
     public function index()
     {
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-            $laporan = PenugasanTeknisi::all();
+            $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
+                ->whereHas('laporan', function ($query) {
+                    $query->where('status_perbaikan', '!=', 'Selesai');
+                })
+                ->get();
         } else {
             $laporan = PenugasanTeknisi::with(['user', 'laporan.fasilitas'])
                 ->where('id_user', auth()->user()->id_user)
+                ->whereHas('laporan', function ($query) {
+                    $query->where('status_perbaikan', '!=', 'Selesai');
+                })
                 ->get();
         }
 
@@ -30,9 +37,9 @@ class PerbaikanController extends Controller
         if ($request->ajax()) {
             //ketika teknisi login
             if (auth()->user()->id_level == 3) {
-                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai Dikerjakan')->where('id_user', auth()->user()->id_user);
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai')->where('id_user', auth()->user()->id_user);
             } else if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai Dikerjakan');
+                $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung'])->where('status_perbaikan', 'Selesai');
             }
 
             // Filter bulan berjalan

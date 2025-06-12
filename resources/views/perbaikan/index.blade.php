@@ -53,16 +53,19 @@
                                     </td>
 
                                     <td>
-                                        <span
-                                        @if ($laporan->laporan->id_status == 4)
-                                                class="badge badge-pill py-2 badge-danger">
-                                            {{ $laporan->laporan->status->nama_status }}
-                                        @else
-                                            class="badge badge-pill py-2
-                                                {{ $laporan->status_perbaikan == 'Selesai' ? 'badge-success' :
-                                                   ($laporan->status_perbaikan == 'Ditolak' ? 'badge-danger' : 'badge-warning') }}">
-                                            {{ $laporan->status_perbaikan }}
-                                        @endif
+                                        <span class="badge badge-pill py-2
+                                            @if ($laporan->status_perbaikan == 'Selesai')
+                                                badge-success
+                                            @elseif ($laporan->status_perbaikan == 'Ditolak')
+                                                badge-danger
+                                            @else
+                                                badge-warning
+                                            @endif">
+                                            @if ($laporan->laporan->id_status == 4)
+                                                {{ $laporan->laporan->status->nama_status }}
+                                            @else
+                                                {{ $laporan->status_perbaikan }}
+                                            @endif
                                         </span>
                                     </td>
 
