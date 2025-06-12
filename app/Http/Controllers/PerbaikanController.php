@@ -41,24 +41,31 @@ class PerbaikanController extends Controller
         if ($request->ajax()) {
             $query = PenugasanTeknisi::with(['laporan.fasilitas.ruangan.gedung']);
 
+            // Filter berdasarkan level user
             if (auth()->user()->id_level == 3) {
-                // Teknisi hanya melihat riwayat miliknya yang selesai dikerjakan
-                $query->where('id_user', auth()->user()->id_user)
-                    ->where('status_perbaikan', 'Selesai Dikerjakan');
-            } else if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-                // Admin & Sarpras melihat semua yang selesai dikerjakan
-                $query->where('status_perbaikan', 'Selesai Dikerjakan');
+                // Teknisi hanya melihat riwayat miliknya
+                $query->where('id_user', auth()->user()->id_user);
             }
 
-            // Filter: yang sudah selesai (laporan) atau tidak selesai (penugasan)
+            // Hanya tampilkan yang status_perbaikan 'Tidak Selesai' atau laporan sudah selesai diverifikasi (id_status = 4)
             $query->where(function ($q) {
                 $q->where('status_perbaikan', 'Tidak Selesai')
                     ->orWhereHas('laporan', function ($subQuery) {
-                        $subQuery->where('id_status', 4); // Selesai diverifikasi
+                        $subQuery->where('id_status', 4);
                     });
             });
 
+            if ($request->has('bulan') && $request->bulan != '') {
+                $query->whereMonth('tanggal_selesai', $request->bulan);
+            }
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status_perbaikan', $request->status);
+            }
+
+
             $data = $query->latest()->get();
+
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -77,7 +84,13 @@ class PerbaikanController extends Controller
                         : '-';
                 })
                 ->addColumn('status', function ($row) {
-                    return '<span class="badge badge-success">Selesai Dikerjakan</span>';
+                    if ($row->status_perbaikan === 'Selesai Dikerjakan') {
+                        return '<span class="badge badge-success">Selesai Diperbaiki</span>';
+                    } elseif ($row->status_perbaikan === 'Tidak Selesai') {
+                        return '<span class="badge badge-danger">Tidak Selesai</span>';
+                    } else {
+                        return '<span class="badge badge-secondary">-</span>';
+                    }
                 })
                 ->addColumn('skor_kinerja', function ($row) {
                     return $row->skor_kinerja ?? '-';

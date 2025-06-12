@@ -10,7 +10,7 @@
                 <h3 class="mb-0">Riwayat Penugasan Perbaikan</h3>
                 <p class="card-category">Daftar perbaikan yang telah diselesaikan</p>
             </div>
-            @if (auth()->user()->id_level == '2' || (auth()->user()->id_level == '1'))
+            @if (auth()->user()->id_level == '2' || auth()->user()->id_level == '1')
                 <div class="col-md-6 text-md-right mt-3 mt-md-0">
                     <button onclick="modalAction('{{ url('/teknisi/skor') }}')" class="btn btn-info">
                         <i class="nc-icon nc-eye-split"></i> Lihat Skor Kredit Teknisi
@@ -21,9 +21,9 @@
 
         {{-- Tabel Riwayat Penugasan --}}
         <div class="card p-4 shadow">
-            <div class="form-group row">
-                <label for="filter_bulan" class="col-form-label col-sm-2">Filter Bulan</label>
-                <div class="col-sm-6">
+            <div class="form-group row mb-4">
+                <div class="col-sm-6 d-flex ">
+                    <label for="filter_bulan" class="col-form-label col-3  px-0">Filter Bulan : </label>
                     <select id="filter_bulan" class="form-control">
                         <option value="">-- Semua Bulan --</option>
                         @for ($i = 1; $i <= now()->month; $i++)
@@ -31,6 +31,18 @@
                                 {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
                             </option>
                         @endfor
+                    </select>
+                </div>
+                <div class="col-sm-6 d-flex">
+                    <label for="filter_status" class="col-form-label col-3">Filter Status : </label>
+                    <select id="filter_status" class="form-control">
+                        <option value="">-- Semua Status --</option>
+                        <option value="Selesai Dikerjakan">
+                            Selesai Diperbaiki
+                        </option>
+                        <option value="Tidak Selesai">
+                            Tidak Selesai
+                        </option>
                     </select>
                 </div>
             </div>
@@ -73,11 +85,12 @@
             // Inisialisasi DataTable
             dataRiwayat = $('#table_riwayat').DataTable({
                 processing: true,
-                serverSide: false,
+                serverSide: true,
                 ajax: {
                     url: window.location.href,
                     data: function(d) {
                         d.bulan = $('#filter_bulan').val();
+                        d.status = $('#filter_status').val();
                     }
                 },
                 columns: [{
@@ -123,12 +136,11 @@
                 }],
                 language: {
                     emptyTable: "<i class='fas fa-info-circle'></i> Tidak ada riwayat tersedia",
-                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ditemukan data untuk bulan yang dipilih"
+                    zeroRecords: "<i class='fas fa-info-circle'></i> Tidak ditemukan data yang dicari"
                 }
             });
 
-            // Filter berdasarkan bulan
-            $('#filter_bulan').on('change', function() {
+            $('#filter_bulan, #filter_status').on('change', function() {
                 dataRiwayat.ajax.reload();
             });
         });
