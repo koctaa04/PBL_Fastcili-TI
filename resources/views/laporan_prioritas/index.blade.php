@@ -9,26 +9,27 @@
         <div class="card px-2 px-md-4">
             <div
                 class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center pb-3 pb-md-3 pt-3 pt-md-5">
-                <div class="d-flex align-items-center mb-3 mb-md-0 w-100">
-                    <div class="w-100" style="max-width: 580px;">
-                        <input type="text" class="form-control rounded-pill" id="search"
-                            placeholder="Cari Laporan Prioritas...">
-                        <small class="form-text text-muted text-small">Cari berdasarkan deskripsi laporan atau
-                            status</small>
-                    </div>
-                </div>
-                <div class="d-flex flex-wrap gap-2 w-100 w-md-auto justify-content-start justify-content-md-end">
-                    <a style="cursor: pointer" data-toggle="modal" data-target="#waspasModal">
-                        <span class="badge badge-danger px-2 px-md-3 py-2 mr-3 mb-3">
-                            <i class="fas fa-calculator mr-1"></i> Lihat Perhitungan WASPAS
-                        </span>
-                    </a>
-                    <span class="badge badge-warning px-2 px-md-3 py-2 mb-3">
-                        <i class="fas fa-sort-amount-down-alt mr-1"></i> Diurutkan berdasarkan: Nilai WASPAS
+                <!-- Kolom kiri: Filter -->
+                <div class="w-100 mb-3 mb-md-0" style="max-width: 580px;">
+                    <input type="text" class="form-control rounded-pill" id="search"
+                        placeholder="Cari Laporan Prioritas...">
+                    <small class="form-text text-muted text-small">
+                        *Cari berdasarkan deskripsi laporan atau status
+                    </small>
+                    <span class="badge badge-secondary px-3 py-2 mt-4 mb-2 d-inline-block">
+                        <i class="fas fa-sort-amount-down-alt mr-1"></i>
+                        Diurutkan berdasarkan: <strong>Nilai WASPAS</strong>
                     </span>
                 </div>
+                <div class="d-flex flex-wrap gap-2 w-100 w-md-auto justify-content-start justify-content-md-end">
+                    <a class="btn btn-info text-white" data-toggle="modal" data-target="#waspasModal">
+                        <i class="fas fa-calculator mr-1"></i> Lihat Perhitungan WASPAS
+                    </a>
+
+                </div>
             </div>
-            
+
+
             <div class="card-body p-0">
                 <div id="priority-container">
                     @foreach ($ranked as $r)
