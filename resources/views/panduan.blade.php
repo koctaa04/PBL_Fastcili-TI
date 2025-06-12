@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    @extends('layouts.app', ['class' => 'panduan-page'])
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Panduan Fastcili-TI</title>
-    <link rel="stylesheet" href="{{ asset('landing/style_panduan.css') }}">
-</head>
-<body>
+@extends('layouts.app', [
+    'class' => 'panduan-page',
+    'elementActive' => ''
+])
+
+@section('content')
 <div class="container mt-content">
     <!-- Halaman Utama -->
     <section class="panduan-section">
@@ -360,18 +355,44 @@
         </div>
     </div>
 </div>
+@endsection
+
+@push('styles')
+<link rel="stylesheet" href="landing/style_panduan.css">
+@endpush
+
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const navbar = document.querySelector('.navbar');
-        window.addEventListener('scroll', function () {
-            if (window.scrollY > 10) {
-                navbar.classList.add('scrolled');
+        // Hanya jalankan jika elemen navbar ada di halaman
+        const navbar = document.querySelector('.navbar.fixed-top');
+        if (!navbar) return;
+
+        let lastScrollTop = 0;
+
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // Kondisi 1: Saat scroll di paling atas
+            if (scrollTop === 0) {
+                navbar.classList.remove('navbar-scrolled');
+                navbar.classList.remove('navbar-hidden');
             } else {
-                navbar.classList.remove('scrolled');
+                // Tambahkan background putih jika belum ada
+                navbar.classList.add('navbar-scrolled');
+
+                // Kondisi 2 & 3: Scroll ke bawah (sembunyikan) atau ke atas (tampilkan)
+                if (scrollTop > lastScrollTop) {
+                    // Scroll ke Bawah
+                    navbar.classList.add('navbar-hidden');
+                } else {
+                    // Scroll ke Atas
+                    navbar.classList.remove('navbar-hidden');
+                }
             }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Untuk menghindari bug di mobile
         });
     });
 </script>
-
-</body>
-</html>
+@endpush

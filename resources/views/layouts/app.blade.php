@@ -59,11 +59,11 @@ The above copyright notice and this permission notice shall be included in all c
     <link href="{{ asset('paper') }}/css/paper-dashboard.css?v=2.0.0" rel="stylesheet" />
     <!-- CSS DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
+    
     @stack('styles')
 </head>
 
-<body class="{{ $class }}">
+<body class="{{ $class ?? '' }}">
 
     @auth()
         @include('layouts.page_templates.auth')
@@ -85,7 +85,7 @@ The above copyright notice and this permission notice shall be included in all c
     <!-- Control Center for Now Ui Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="{{ asset('paper') }}/js/paper-dashboard.min.js?v=2.0.0" type="text/javascript"></script>
     <!-- Paper Dashboard DEMO methods, don't include it in your project! -->
-    <script src="{{ asset('paper') }}/demo/demo.js"></script>
+    {{-- <script src="{{ asset('paper') }}/demo/demo.js"></script> --}}
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- DataTables -->
@@ -99,7 +99,6 @@ The above copyright notice and this permission notice shall be included in all c
     </script>
 
     <script src="{{ asset('script/script.js') }}"></script>
-    @stack('styles')
     @stack('scripts')
 </body>
 
