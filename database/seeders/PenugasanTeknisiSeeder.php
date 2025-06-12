@@ -81,6 +81,17 @@ class PenugasanTeknisiSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'id_laporan' => 15,
+                'id_user' => 7,
+                'status_perbaikan' => 'Selesai Dikerjakan',
+                'tanggal_selesai' => Carbon::parse('2024-05-25'),
+                'tenggat' => Carbon::parse('2024-05-26'),
+                'catatan_teknisi' => 'Test',
+                'dokumentasi' => null,
+                'created_at' => Carbon::parse('2024-05-20'),
+                'updated_at' => Carbon::parse('2024-05-25')
+            ],
         ]);
     }
 }

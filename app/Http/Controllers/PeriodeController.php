@@ -18,39 +18,6 @@ class PeriodeController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil tahun yang dipilih, default-nya tahun sekarang
-        // $selectedYear = $request->input('tahun', now()->year);
-
-        // // Ambil daftar tahun unik dari data laporan untuk dropdown
-        // $availableYears = LaporanKerusakan::selectRaw('YEAR(created_at) as year')
-        //     ->union(LaporanKerusakan::selectRaw('YEAR(tanggal_selesai) as year'))
-        //     ->distinct()
-        //     ->orderBy('year', 'desc')
-        //     ->pluck('year');
-
-        // // 1. Laporan Belum Selesai (id_status != 4)
-        // $laporanBelumSelesai = LaporanKerusakan::with(['fasilitas.ruangan.gedung', 'pelaporLaporan.user', 'status'])
-        //     ->where('id_status', '!=', 4)
-        //     ->whereYear('created_at', $selectedYear)
-        //     ->orderBy('created_at', 'desc')
-        //     ->get()
-        //     ->groupBy(function ($item) {
-        //         return Carbon::parse($item->created_at)->format('F Y'); // Grup per Bulan Tahun
-        //     });
-
-        // // 2. Laporan Sudah Selesai (id_status == 4)
-        // $laporanSelesai = LaporanKerusakan::with(['fasilitas.ruangan.gedung', 'pelaporLaporan.user', 'penugasan.user', 'status'])
-        //     ->where('id_status', 4)
-        //     ->whereNotNull('tanggal_selesai')
-        //     ->whereYear('tanggal_selesai', $selectedYear)
-        //     ->orderBy('tanggal_selesai', 'desc')
-        //     ->get()
-        //     ->groupBy(function ($item) {
-        //         return Carbon::parse($item->tanggal_selesai)->format('F Y'); // Grup per Bulan Tahun
-        //     });
-
-        // return view('laporan.periode', compact('laporanBelumSelesai', 'laporanSelesai', 'selectedYear', 'availableYears'));
-        // Ambil tahun yang dipilih, default-nya tahun sekarang
         $selectedYear = $request->input('tahun', now()->year);
 
         // Ambil daftar tahun unik dari data laporan untuk dropdown
@@ -153,7 +120,8 @@ class PeriodeController extends Controller
             $startDate = now()->subYear();
         }
 
-        return Excel::download(new LaporanPeriodeExport($startDate, $endDate), 'laporan-kerusakan-periode.xlsx');
+        return Excel::download(new LaporanPeriodeExport($startDate, $endDate), 'laporan-kerusakan-periode.xlsx', \Maatwebsite\Excel\Excel::XLSX, [
+            'charts' => true]);
     }
 
     /**

@@ -141,7 +141,15 @@ class LaporanKerusakanSeeder extends Seeder
                 'tanggal_selesai' => null,
                 'id_status' => 2
             ],
+            [
+                'id_fasilitas' => 27,
+                'deskripsi' => 'Test',
+                'foto_kerusakan' => 'speaker-rusak.jpg',
+                'jumlah_kerusakan' => 1,
+                'tanggal_lapor' => Carbon::parse('2024-05-18'),
+                'tanggal_selesai' => Carbon::parse('2024-05-25'),
+                'id_status' => 4
+            ],
         ]);
-        
     }
 }
