@@ -54,14 +54,13 @@
 
                                     <td>
 
-                                        <span class="badge badge-pill py-2
-                                            @if ($laporan->status_perbaikan == 'Selesai Dikerjakan')
-                                                badge-success
+                                        <span
+                                            class="badge badge-pill py-2
+                                            @if ($laporan->status_perbaikan == 'Selesai Dikerjakan') badge-success
                                             @elseif ($laporan->status_perbaikan == 'Ditolak')
                                                 badge-danger
                                             @else
-                                                badge-warning
-                                            @endif">
+                                                badge-warning @endif">
                                             @if ($laporan->laporan->id_status == 4)
                                                 {{ $laporan->laporan->status->nama_status }}
                                             @else
@@ -77,8 +76,8 @@
                                     <td>
                                         @if ($laporan->dokumentasi)
                                             <img src="{{ asset('storage/uploads/dokumentasi/' . $laporan->dokumentasi) }}"
-                                            onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"    
-                                            alt="Dokumentasi" height="65">
+                                                onerror="this.onerror=null;this.src='{{ asset('foto_kerusakan.jpg') }}';"
+                                                alt="Dokumentasi" height="65">
                                         @else
                                             <span class="text-danger">(Belum ada dokumentasi)</span>
                                         @endif
@@ -88,7 +87,7 @@
                                         {{-- Catatan Sarpras --}}
                                         <td>{{ Str::limit($laporan->komentar_sarpras, 30) ?? '-' }}</td>
                                     @endif
-                                    
+
                                     {{-- Tombol Aksi --}}
                                     <td>
                                         <div class="d-flex">
@@ -102,27 +101,28 @@
                                                 $laporanUrl = url('/perbaikan/edit/' . $laporan->id_penugasan);
                                                 $detailUrl = url('/perbaikan/detail/' . $laporan->id_penugasan);
                                             @endphp
-
-
-                                            @if ($isWaiting && $isEditable)
-                                                <button class="btn btn-sm btn-warning mr-2" disabled>
-                                                    Menunggu Verifikasi
-                                                </button>
-                                            @elseif ($isEditable && !$isLate)
-                                                <button onclick="modalAction('{{ $laporanUrl }}')"
-                                                    class="btn btn-sm btn-danger mr-2">
-                                                    {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
-                                                </button>
-                                            @elseif ($isLate && $isEditable)
-                                                <button class="btn btn-sm btn-secondary mr-2" disabled>
-                                                    Tenggat Terlewat
+                                            @if (auth()->user()->id_level == 3)
+                                                @if ($isWaiting && $isEditable)
+                                                    <button class="btn btn-sm btn-warning mr-2" disabled>
+                                                        Menunggu Verifikasi
+                                                    </button>
+                                                @elseif ($isEditable && !$isLate)
+                                                    <button onclick="modalAction('{{ $laporanUrl }}')"
+                                                        class="btn btn-sm btn-danger mr-2">
+                                                        {{ $isRejected ? 'Edit Laporan' : 'Laporkan' }}
+                                                    </button>
+                                                @elseif ($isLate && $isEditable)
+                                                    <button class="btn btn-sm btn-secondary mr-2" disabled>
+                                                        Tenggat Terlewat
+                                                    </button>
+                                                @endif
+                                            @elseif (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
+                                                <button onclick="modalAction('{{ $detailUrl }}')"
+                                                    class="btn btn-sm btn-info">
+                                                    Detail
                                                 </button>
                                             @endif
 
-                                            <button onclick="modalAction('{{ $detailUrl }}')"
-                                                class="btn btn-sm btn-info">
-                                                Detail
-                                            </button>
                                         </div>
                                     </td>
 
