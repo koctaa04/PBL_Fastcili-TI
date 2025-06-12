@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\PelaporLaporan;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class pelaporLaporanSeeder extends Seeder
 {
@@ -238,6 +239,15 @@ class pelaporLaporanSeeder extends Seeder
                 'feedback_pengguna' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
+            ],
+            [
+                'id_user' => 20,
+                'id_laporan' => 15, // Speaker Rusak
+                'deskripsi_tambahan' => 'Test',
+                'rating_pengguna' => 3,
+                'feedback_pengguna' => 'Gooooood',
+                'created_at' => Carbon::parse('2024-05-18'),
+                'updated_at' => Carbon::parse('2024-05-25'),
             ],
         ]);
     }
