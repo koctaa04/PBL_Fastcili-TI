@@ -32,6 +32,9 @@
 
             <div class="card-body p-0">
                 <div id="priority-container">
+                    @php
+                        $firstNotAssignedShown = false;
+                    @endphp
                     @foreach ($ranked as $r)
                         @php
                             $penugasan = $r['penugasan'];
@@ -108,12 +111,17 @@
                                                 </div>
                                                 <div class="mt-auto">
                                                     <div class="d-flex justify-content-end">
-                                                        @if (!$penugasan)
+                                                        @if (!$penugasan && !$firstNotAssignedShown)
                                                             {{-- Belum ada penugasan teknisi --}}
+                                                            @php $firstNotAssignedShown = true; @endphp
                                                             <button
                                                                 onclick="modalAction('{{ url('/laporan/penugasan/' . $r['id_laporan']) }}')"
                                                                 class="btn btn-danger btn-lg px-4 py-2">
                                                                 <i class="fas fa-user-tie mr-1"></i> Tugaskan Teknisi
+                                                            </button>
+                                                        @elseif (!$penugasan)
+                                                            <button class="btn btn-secondary btn-lg px-4 py-2 disabled">
+                                                                <i class="fas fa-user-slash mr-1"></i> Belum Ditugaskan Teknisi
                                                             </button>
                                                         @elseif ($statusPerbaikan === 'Selesai Dikerjakan')
                                                             {{-- Teknisi sudah menyelesaikan, sarpras perlu verifikasi --}}
