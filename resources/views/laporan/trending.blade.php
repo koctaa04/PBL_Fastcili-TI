@@ -26,6 +26,9 @@
         </div>
         <div class="card-body p-0">
             <div id="trending-container">
+                @php
+                    $firstNotAssignedShown = false;
+                @endphp
                 @foreach ($data as $laporan)
                 @php
                 $rank = $laporan['rank']; // Menggunakan rank yang sudah di-set di controller
@@ -102,10 +105,17 @@
                                                         <i class="fas fa-star mr-1"></i> Skor: {{ $laporan['skor'] }}
                                                     </span>
                                                 </div>
+                                                @if (!$firstNotAssignedShown)
+                                                    @php $firstNotAssignedShown = true; @endphp
                                                     <button class="btn btn-danger btn-sm btn-md-lg"
                                                         onclick="modalAction('{{ url('/lapor_kerusakan/penilaian/' . $laporan['laporan']->id_laporan) }}')">
                                                         <i class="fas fa-star mr-1"></i> Beri Nilai
                                                     </button>
+                                                @else
+                                                    <span class="btn btn-secondary btn-lg px-4 py-2 disabled">
+                                                        <i class="fas fa-clock mr-1"></i> Menunggu Penilaian Lain
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
                                         @endif
