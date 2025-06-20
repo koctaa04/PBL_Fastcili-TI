@@ -111,9 +111,6 @@
             <div class="card p-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3>Daftar Laporan Kerusakan</h3>
-                    <a href="{{ route('laporan.exportLaporan') }}" class="btn btn-success">
-                        <i class="fas fa-file-excel"></i> Export Excel
-                     </a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

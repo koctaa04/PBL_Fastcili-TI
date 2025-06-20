@@ -21,34 +21,40 @@ class WaspasController extends Controller
     public function getPrioritas()
     {
         if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2) {
-            $latestPenugasan = DB::table('penugasan_teknisi')
-                ->select('id_laporan', 'id_user')
-                ->whereRaw('id_penugasan = (SELECT MAX(id_penugasan) FROM penugasan_teknisi WHERE id_laporan = penugasan_teknisi.id_laporan)')
-                ->groupBy('id_laporan', 'id_user');
+            // Ambil ID penugasan terbaru per laporan
+            $subLatestPenugasan = DB::table('penugasan_teknisi')
+                ->select(DB::raw('MAX(id_penugasan) as id_penugasan'))
+                ->groupBy('id_laporan');
 
+            // Ambil data penugasan terbaru (id_laporan dan id_user)
+            $latestPenugasan = DB::table('penugasan_teknisi as pt')
+                ->joinSub($subLatestPenugasan, 'latest', function ($join) {
+                    $join->on('pt.id_penugasan', '=', 'latest.id_penugasan');
+                })
+                ->select('pt.id_laporan', 'pt.id_user');
+
+            // Data utama
             $data = DB::table('laporan_kerusakan as l')
                 ->join('kriteria_penilaian as k', 'l.id_laporan', '=', 'k.id_laporan')
-                // ->leftJoin('penugasan_teknisi as p', 'l.id_laporan', '=', 'p.id_laporan')
-                // ->leftJoin('users as u', 'u.id_user', '=', 'p.id_user')
                 ->leftJoinSub($latestPenugasan, 'p', function ($join) {
                     $join->on('l.id_laporan', '=', 'p.id_laporan');
                 })
                 ->leftJoin('users as u', 'u.id_user', '=', 'p.id_user')
-
                 ->join('fasilitas as f', 'f.id_fasilitas', '=', 'l.id_fasilitas')
                 ->join('ruangan as r', 'r.id_ruangan', '=', 'f.id_ruangan')
                 ->join('gedung as g', 'g.id_gedung', '=', 'r.id_gedung')
-                ->join('status_laporan as s', 'l.id_status', '=', 's.id_status') // JOIN status
+                ->join('status_laporan as s', 'l.id_status', '=', 's.id_status')
                 ->whereIn('l.id_status', [2, 3])
                 ->select(
                     'l.id_laporan',
-                    'l.deskripsi',         // ambil deskripsi laporan
+                    'l.deskripsi',
                     'l.foto_kerusakan',
+                    'l.tanggal_lapor',
                     'u.nama as nama_teknisi',
                     'f.nama_fasilitas',
                     'r.nama_ruangan',
                     'g.nama_gedung',
-                    's.nama_status',       // ambil nama status dari join status_laporan
+                    's.nama_status',
                     'k.tingkat_kerusakan',
                     'k.frekuensi_digunakan',
                     'k.dampak',
@@ -107,7 +113,7 @@ class WaspasController extends Controller
 
                 $Q = 0.5 * $WSM + 0.5 * $WPM;
 
-                // Ambil deskripsi dan status dari dataArray (cari berdasarkan id)
+                // Ambil data asli berdasarkan ID
                 $original = collect($dataArray)->firstWhere('id_laporan', $id);
 
                 $results[] = [
@@ -119,8 +125,9 @@ class WaspasController extends Controller
                     'ruangan' => $original['nama_ruangan'] ?? null,
                     'gedung' => $original['nama_gedung'] ?? null,
                     'teknisi' => $original['nama_teknisi'] ?? null,
+                    'tanggal_lapor' => $original['tanggal_lapor'] ?? null,
                     'Q' => round($Q, 4),
-                    'tingkat_kerusakan' => $original['tingkat_kerusakan'] ?? null, // Nilai asli dari kriteria
+                    'tingkat_kerusakan' => $original['tingkat_kerusakan'] ?? null,
                     'frekuensi_digunakan' => $original['frekuensi_digunakan'] ?? null,
                     'dampak' => $original['dampak'] ?? null,
                     'estimasi_biaya' => $original['estimasi_biaya'] ?? null,
@@ -129,7 +136,15 @@ class WaspasController extends Controller
             }
 
             // Ranking berdasarkan nilai Q
-            usort($results, fn($a, $b) => $b['Q'] <=> $a['Q']);
+            // usort($results, fn($a, $b) => $b['Q'] <=> $a['Q']);
+
+            // Multi-level sort: Q desc, tanggal_lapor asc (semakin lama semakin atas)
+            usort($results, function ($a, $b) {
+                if ($b['Q'] === $a['Q']) {
+                    return strtotime($a['tanggal_lapor']) <=> strtotime($b['tanggal_lapor']);
+                }
+                return $b['Q'] <=> $a['Q'];
+            });
 
             $ranked = [];
             $rank = 1;
@@ -137,7 +152,7 @@ class WaspasController extends Controller
                 $item['rank'] = $rank++;
 
                 // Tambahkan data penugasan teknisi
-                $penugasan = PenugasanTeknisi::where('id_laporan', $item['id_laporan'])->first();
+                $penugasan = \App\Models\PenugasanTeknisi::where('id_laporan', $item['id_laporan'])->orderByDesc('id_penugasan')->first();
                 $item['penugasan'] = $penugasan;
 
                 $ranked[] = $item;
